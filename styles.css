@@ -1,0 +1,29 @@
+canvas {
+    border: 2px solid;
+    display: inline-block;
+}
+
+#frame_counter {
+    font-size: 20px;
+    display: inline;
+    float: right;
+    margin-bottom: 0px;
+}
+
+#title {
+    font-size: 40px;
+    display: inline;
+}
+
+.head {
+    width: 800px;
+}
+
+.body {
+    display: flex;
+    width: 800px;
+}
+
+h3{
+    margin: 0px;
+}
