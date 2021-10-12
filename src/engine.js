@@ -76,7 +76,7 @@ export class Engine
     init()
     {
         this.time = 0;
-        this.renderer = new Renderer(this.gfx);
+        this.renderer = new Renderer(this.gfx, this.width, this.height);
         this.game = new Game(this.renderer, this.width, this.height);
     }
 
@@ -92,7 +92,7 @@ export class Engine
 
         if (!this.paused)
         {
-            this.update(delta);
+            this.update(delta / 1000.0);
             this.render();
         }
         else

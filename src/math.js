@@ -22,7 +22,7 @@ export class Vector2
         const len = this.getLength();
 
         if (len != 0)
-            return this.div(len);
+            return this.divS(len);
         else
             return this;
     }
@@ -42,22 +42,22 @@ export class Vector2
         return this.x * v.y - this.y * v.x;
     }
 
-    add(v)
+    addV(v)
     {
         return new Vector2(this.x + v.x, this.y + v.y);
     }
 
-    sub(v)
+    subV(v)
     {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
-    div(v)
+    divS(v)
     {
         return new Vector2(this.x / v, this.y / v);
     }
 
-    mul(v)
+    mulS(v)
     {
         return new Vector2(this.x * v, this.y * v);
     }
@@ -163,6 +163,84 @@ export class Vector3
             this.y = 0;
             this.z = 0;
         }
+    }
+}
+
+export class Matrix3
+{
+    constructor()
+    {
+        this.m00 = 1; this.m01 = 0; this.m02 = 0;
+        this.m10 = 0; this.m11 = 1; this.m12 = 0;
+        this.m20 = 0; this.m21 = 0; this.m22 = 1;
+    }
+
+    mulMatrix(right)
+    {
+        let res = new Matrix3();
+
+        res.m00 = this.m00 * right.m00 + this.m01 * right.m10 + this.m02 * right.m20;
+        res.m01 = this.m00 * right.m01 + this.m01 * right.m11 + this.m02 * right.m21;
+        res.m02 = this.m00 * right.m02 + this.m01 * right.m12 + this.m02 * right.m22;
+
+        res.m10 = this.m10 * right.m00 + this.m11 * right.m10 + this.m12 * right.m20;
+        res.m11 = this.m10 * right.m01 + this.m11 * right.m11 + this.m12 * right.m21;
+        res.m12 = this.m10 * right.m02 + this.m11 * right.m12 + this.m12 * right.m22;
+
+        res.m20 = this.m20 * right.m00 + this.m21 * right.m10 + this.m22 * right.m20;
+        res.m21 = this.m20 * right.m01 + this.m21 * right.m11 + this.m22 * right.m21;
+        res.m22 = this.m20 * right.m02 + this.m21 * right.m12 + this.m22 * right.m22;
+
+        return res;
+    }
+
+    mulVector(right, z)
+    {
+        let res = new Vector2(0, 0);
+
+        if (z == undefined) z = 1;
+
+        res.x = this.m00 * right.x + this.m01 * right.y + this.m02 * z;
+        res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * z;
+
+        return res;
+    }
+
+    scale(x, y)
+    {
+        if (y == undefined)
+            y = x;
+
+        let scale = new Matrix3();
+        scale.m00 = x;
+        scale.m11 = y;
+
+        return this.mulMatrix(scale);
+    }
+
+    rotate(r)
+    {
+        const sin = Math.sin(r);
+        const cos = Math.cos(r);
+
+        let res = new Matrix3();
+
+        res.m00 = cos;
+        res.m01 = -sin;
+        res.m10 = sin;
+        res.m11 = cos;
+
+        return this.mulMatrix(res);
+    }
+
+    translate(x, y)
+    {
+        let res = new Matrix3();
+
+        res.m02 = x;
+        res.m12 = y;
+
+        return this.mulMatrix(res);
     }
 }
 
