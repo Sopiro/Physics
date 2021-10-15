@@ -25,7 +25,7 @@ export class Simplex
         switch (this.count)
         {
             case 1: // 0-Simplex: Point
-                return this;
+                return this.vertices[0];
             case 2: // 1-Simplex: Line segment
                 {
                     const a = this.vertices[0];
@@ -75,8 +75,5 @@ export class Simplex
             default:
                 return undefined;
         }
-
     }
-
-
 }
