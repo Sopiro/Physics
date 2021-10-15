@@ -12,7 +12,7 @@ export class Game
 
         this.time = 0;
 
-        this.sp = new Simplex([new Vector2(100, 100), new Vector2(200, 200)]);
+        this.sp = new Simplex([new Vector2(200, 200), new Vector2(400, 400), new Vector2(500, 300)]);
     }
 
     update(delta)
@@ -27,7 +27,10 @@ export class Game
 
     render()
     {
-        this.r.drawLineV(this.sp.vertices[0], this.sp.vertices[1]);
+        this.r.drawSimplex(this.sp);
         this.r.drawVectorP(this.closest, this.cursorPos);
+
+        if(this.closest == this.cursorPos)
+            this.r.drawText(100, 100, "Inside");
     }
 }

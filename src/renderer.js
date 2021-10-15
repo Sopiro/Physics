@@ -91,4 +91,24 @@ export class Renderer
     {
         this.drawVector(p1, p2.subV(p1), arrowSize);
     }
+
+    drawSimplex(sp)
+    {
+        switch (sp.count)
+        {
+            case 1:
+                this.drawCircleV(sp.vertices[0], 5, true, true);
+                break;
+            case 2:
+                this.drawLineV(sp.vertices[0], sp.vertices[1]);
+                break;
+            case 3:
+                this.drawLineV(sp.vertices[0], sp.vertices[1]);
+                this.drawLineV(sp.vertices[1], sp.vertices[2]);
+                this.drawLineV(sp.vertices[2], sp.vertices[0]);
+                break;
+            default:
+                break;
+        }
+    }
 }
