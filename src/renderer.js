@@ -45,6 +45,11 @@ export class Renderer
             this.gfx.stroke();
     }
 
+    drawCircleV(v, radius, filled = false, centered = true)
+    {
+        this.drawCircle(v.x, v.y, radius, filled, centered);
+    }
+
     drawLine(x0, y0, x1, y1, lineWidth = 1)
     {
         this.gfx.lineWidth = lineWidth;
@@ -53,6 +58,11 @@ export class Renderer
         this.gfx.moveTo(x0, this.height - 1 - y0);
         this.gfx.lineTo(x1, this.height - 1 - y1);
         this.gfx.stroke();
+    }
+
+    drawLineV(v0, v1, lineWidth = 1)
+    {
+        this.drawLine(v0.x, v0.y, v1.x, v1.y, lineWidth);
     }
 
     drawText(x, y, content, fontSize = 20)

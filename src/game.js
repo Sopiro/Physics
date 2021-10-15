@@ -1,5 +1,6 @@
 import { Vector2, Vector3, Matrix4, Matrix3 } from "./math.js";
 import * as Input from "./input.js";
+import { Simplex } from "./simplex.js";
 
 export class Game
 {
@@ -11,10 +12,7 @@ export class Game
 
         this.time = 0;
 
-        this.p = new Vector2(100, 100);
-        this.v = new Vector2(100, 0);
-        this.vv = new Vector2(0, 0);
-        this.cursorPos = new Vector2(100, 0);
+        this.sp = new Simplex([new Vector2(100, 100), new Vector2(200, 200)]);
     }
 
     update(delta)
@@ -24,26 +22,12 @@ export class Game
         const speed = delta * 100;
 
         this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY);
-
-        let m = new Matrix3();
-        m = m.translate(this.cursorPos.x, this.cursorPos.y).rotate(this.time);
-
-        this.vv = m.mulVector(this.v);
-        
+        this.closest = this.sp.getClosest(this.cursorPos, this.r);
     }
 
     render()
     {
-        // Render Code Here
-
-        // this.r.drawText(100, 100, this.cursorPos.x + ", " + this.cursorPos.y);
-        this.r.drawText(100, 100, Math.trunc(this.vv.x) + ", " + Math.trunc(this.vv.y));
-
-        // let toCursor = new Vector2(cursorPos.x, cursorPos.y).subV(this.p);
-        // this.r.drawVector(this.p, toCursor);
-
-        // this.r.drawCircle(this.v.x, this.v.y, 10);
-        // this.r.drawCircle(this.vv.x, this.vv.y, 10);
-        this.r.drawVectorP(this.cursorPos, this.vv);
+        this.r.drawLineV(this.sp.vertices[0], this.sp.vertices[1]);
+        this.r.drawVectorP(this.closest, this.cursorPos);
     }
 }
