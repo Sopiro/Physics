@@ -18,7 +18,7 @@ export class Renderer
         }
 
         this.gfx.lineWidth = 1;
-        this.gfx.rect(x, this.height - y, width, height);
+        this.gfx.rect(x, this.height - 1 - y, width, height);
 
         if (filled)
             this.gfx.fill();
@@ -37,7 +37,7 @@ export class Renderer
         }
 
         this.gfx.beginPath();
-        this.gfx.arc(x, this.height - y, radius, 0, 2 * Math.PI);
+        this.gfx.arc(x, this.height - 1 - y, radius, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -50,8 +50,8 @@ export class Renderer
         this.gfx.lineWidth = lineWidth;
 
         this.gfx.beginPath();
-        this.gfx.moveTo(x0, this.height - y0);
-        this.gfx.lineTo(x1, this.height - y1);
+        this.gfx.moveTo(x0, this.height - 1 - y0);
+        this.gfx.lineTo(x1, this.height - 1 - y1);
         this.gfx.stroke();
     }
 
@@ -76,6 +76,7 @@ export class Renderer
         this.drawLine(p.x + v.x - n.x - nv.x * arrowSize, p.y + v.y - n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
     }
 
+    // Draw p1 to p2 vector
     drawVectorP(p1, p2, arrowSize = 3)
     {
         this.drawVector(p1, p2.subV(p1), arrowSize);
