@@ -6,16 +6,26 @@ import * as Input from "./input.js";
 
 export class Engine
 {
-    constructor(width, height)
+    private width: number;
+    private height: number;
+    private cvs: HTMLCanvasElement;
+    private gfx: CanvasRenderingContext2D;
+    private frameCounterElement: any;
+    private paused: boolean;
+    private time: number;
+    private renderer: Renderer;
+    private game: Game;
+
+    constructor(width: number, height: number)
     {
         this.width = width;
         this.height = height;
 
-        this.cvs = document.getElementById("canvas");
-        this.cvs.setAttribute("width", this.width);
-        this.cvs.setAttribute("height", this.height);
+        this.cvs = document.getElementById("canvas") as HTMLCanvasElement;
+        this.cvs.setAttribute("width", this.width.toString());
+        this.cvs.setAttribute("height", this.height.toString());
 
-        this.gfx = this.cvs.getContext("2d");
+        this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
         this.frameCounterElement = document.getElementById("frame_counter");
 
         this.paused = false;
@@ -60,27 +70,29 @@ export class Engine
         });
         window.addEventListener("mousemove", (e) =>
         {
-            let rect = canvas.getBoundingClientRect();
+            let rect = this.cvs.getBoundingClientRect();
 
-            Input.mouses.currX = Math.trunc(e.clientX - rect.left);
-            Input.mouses.currY = Math.trunc(e.clientY - rect.top);
+            Input.mouses.currX = e.clientX - rect.left;
+            Input.mouses.currY = e.clientY - rect.top;
         });
-    }
 
-    start()
-    {
-        this.init();
-        this.run();
-    }
-
-    init()
-    {
         this.time = 0;
         this.renderer = new Renderer(this.gfx, this.width, this.height);
         this.game = new Game(this.renderer, this.width, this.height);
     }
 
-    run(t) // Gameloop
+    start(): void
+    {
+        this.init();
+        this.run(0);
+    }
+
+    init(): void
+    {
+
+    }
+
+    run(t: number) // Gameloop
     {
         let delta = t - this.time;
         if (isNaN(delta)) delta = 1;
@@ -104,7 +116,7 @@ export class Engine
         window.requestAnimationFrame(this.run.bind(this));
     }
 
-    update(delta)
+    update(delta: number): void 
     {
         this.game.update(delta);
 
@@ -116,7 +128,7 @@ export class Engine
         Input.mouses.last_down = Input.mouses.curr_down;
     }
 
-    render()
+    render(): void
     {
         this.gfx.clearRect(0, 0, this.width, this.height);
         this.game.render();

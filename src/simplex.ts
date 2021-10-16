@@ -1,15 +1,24 @@
 import { Vector2, Vector3, Matrix4, Matrix3 } from "./math.js";
 
+interface UV
+{
+    u: number;
+    v: number;
+}
+
 export class Simplex
 {
-    constructor(vertices)
+    public readonly vertices: Vector2[];
+    public readonly count: number;
+
+    constructor(vertices: Vector2[])
     {
         this.vertices = vertices;
         this.count = vertices.length;
     }
 
     // Returns barycentric weights u, v
-    getUV(a, b, p) 
+    getUV(a: Vector2, b: Vector2, p: Vector2): UV
     {
         let dir = b.subV(a);
         const len = dir.getLength();
@@ -20,7 +29,7 @@ export class Simplex
         return { u: 1 - region, v: region };
     }
 
-    getClosest(p)
+    getClosest(p: Vector2): Vector2 | undefined
     {
         switch (this.count)
         {

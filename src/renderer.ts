@@ -1,15 +1,20 @@
 import { Vector2 } from "./math.js";
+import { Simplex } from "./simplex.js";
 
 export class Renderer
 {
-    constructor(gfx, width, height)
+    private gfx: CanvasRenderingContext2D;
+    private width: number;
+    private height: number;
+
+    constructor(gfx: CanvasRenderingContext2D, width: number, height: number)
     {
         this.gfx = gfx;
         this.width = width;
         this.height = height;
     }
 
-    drawRect(x, y, width, height, filled = false, centered = false)
+    drawRect(x: number, y: number, width: number, height: number, filled: boolean = false, centered: boolean = false): void
     {
         if (centered)
         {
@@ -26,7 +31,7 @@ export class Renderer
             this.gfx.stroke();
     }
 
-    drawCircle(x, y, radius, filled = false, centered = true)
+    drawCircle(x: number, y: number, radius: number, filled: boolean = false, centered: boolean = true): void
     {
         this.gfx.lineWidth = 1;
 
@@ -45,12 +50,12 @@ export class Renderer
             this.gfx.stroke();
     }
 
-    drawCircleV(v, radius, filled = false, centered = true)
+    drawCircleV(v: Vector2, radius: number, filled: boolean = false, centered: boolean = true): void
     {
         this.drawCircle(v.x, v.y, radius, filled, centered);
     }
 
-    drawLine(x0, y0, x1, y1, lineWidth = 1)
+    drawLine(x0: number, y0: number, x1: number, y1: number, lineWidth = 1): void
     {
         this.gfx.lineWidth = lineWidth;
 
@@ -60,12 +65,12 @@ export class Renderer
         this.gfx.stroke();
     }
 
-    drawLineV(v0, v1, lineWidth = 1)
+    drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
     {
         this.drawLine(v0.x, v0.y, v1.x, v1.y, lineWidth);
     }
 
-    drawText(x, y, content, fontSize = 20)
+    drawText(x: number, y: number, content: any, fontSize = 20): void
     {
         this.gfx.font = fontSize + "px verdana";
 
@@ -74,7 +79,7 @@ export class Renderer
 
     // v: vector
     // p: point
-    drawVector(p, v, arrowSize = 3)
+    drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
     {
         this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
         let n = new Vector2(-v.y, v.x).normalized().mulS(3 * arrowSize);
@@ -87,12 +92,12 @@ export class Renderer
     }
 
     // Draw p1 to p2 vector
-    drawVectorP(p1, p2, arrowSize = 3)
+    drawVectorP(p1: Vector2, p2: Vector2, arrowSize: number = 3): void
     {
         this.drawVector(p1, p2.subV(p1), arrowSize);
     }
 
-    drawSimplex(sp)
+    drawSimplex(sp: Simplex): void
     {
         switch (sp.count)
         {

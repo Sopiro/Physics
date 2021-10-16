@@ -1,5 +1,3 @@
-'use strict'
-
 import { Engine } from "./engine.js";
 
 window.onload = () =>
