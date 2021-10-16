@@ -26,7 +26,7 @@ export class Game
         this.closest = new Vector2(0, 0);
     }
 
-    update(delta: number)
+    update(delta: number): void
     {
         // Game Logic Here
         this.time += delta;
@@ -36,7 +36,7 @@ export class Game
         this.closest = this.sp.getClosest(this.cursorPos);
     }
 
-    render()
+    render(): void
     {
         this.r.drawSimplex(this.sp);
         if (this.closest != undefined)

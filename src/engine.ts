@@ -92,7 +92,7 @@ export class Engine
 
     }
 
-    run(t: number) // Gameloop
+    run(t: number): void // Gameloop
     {
         let delta = t - this.time;
         if (isNaN(delta)) delta = 1;
