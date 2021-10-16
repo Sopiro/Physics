@@ -1,4 +1,5 @@
-import { Vector2 } from "./math.js";
+import { Matrix3, Vector2 } from "./math.js";
+import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 
 export class Renderer
@@ -6,24 +7,47 @@ export class Renderer
     private gfx: CanvasRenderingContext2D;
     private width: number;
     private height: number;
+    private cameraTransform: Matrix3;
+    private transform: Matrix3;
 
     constructor(gfx: CanvasRenderingContext2D, width: number, height: number)
     {
         this.gfx = gfx;
         this.width = width;
         this.height = height;
+        this.cameraTransform = new Matrix3();
+        this.transform = new Matrix3();
+    }
+
+    setTransform(transform: Matrix3): void
+    {
+        this.transform = transform;
+    }
+
+    setCameraTransform(cameraTransfrom: Matrix3): void
+    {
+        this.cameraTransform = cameraTransfrom;
     }
 
     drawRect(x: number, y: number, width: number, height: number, filled: boolean = false, centered: boolean = false): void
     {
-        if (centered)
+        this.drawRectV(new Vector2(x, y), width, height, filled, centered);
+    }
+
+    drawRectV(v: Vector2, width: number, height: number, filled: boolean = false, centered: boolean = false): void
+    {
+        let tv = v.copy();
+
+        if (!centered)
         {
-            x -= width / 2.0;
-            y -= height / 2.0;
+            tv.x -= width / 2.0;
+            tv.y -= height / 2.0;
         }
 
+        tv = this.cameraTransform.mulVector(tv, 1);
+
         this.gfx.lineWidth = 1;
-        this.gfx.rect(x, this.height - 1 - y, width, height);
+        this.gfx.rect(tv.x, this.height - 1 - tv.y, width, height);
 
         if (filled)
             this.gfx.fill();
@@ -33,16 +57,24 @@ export class Renderer
 
     drawCircle(x: number, y: number, radius: number, filled: boolean = false, centered: boolean = true): void
     {
-        this.gfx.lineWidth = 1;
+        this.drawCircleV(new Vector2(x, y), radius, filled, centered);
+    }
+
+    drawCircleV(v: Vector2, radius: number, filled: boolean = false, centered: boolean = true): void
+    {
+        let tv = v.copy();
 
         if (!centered)
         {
-            x += radius / 2.0;
-            y += radius / 2.0;
+            tv.x += radius / 2.0;
+            tv.y += radius / 2.0;
         }
 
+        tv = this.cameraTransform.mulVector(tv, 1);
+
+        this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(x, this.height - 1 - y, radius, 0, 2 * Math.PI);
+        this.gfx.arc(tv.x, this.height - 1 - tv.y, radius, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -50,24 +82,21 @@ export class Renderer
             this.gfx.stroke();
     }
 
-    drawCircleV(v: Vector2, radius: number, filled: boolean = false, centered: boolean = true): void
-    {
-        this.drawCircle(v.x, v.y, radius, filled, centered);
-    }
-
     drawLine(x0: number, y0: number, x1: number, y1: number, lineWidth = 1): void
     {
-        this.gfx.lineWidth = lineWidth;
-
-        this.gfx.beginPath();
-        this.gfx.moveTo(x0, this.height - 1 - y0);
-        this.gfx.lineTo(x1, this.height - 1 - y1);
-        this.gfx.stroke();
+        this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
     }
 
     drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
     {
-        this.drawLine(v0.x, v0.y, v1.x, v1.y, lineWidth);
+        let tv0 = this.cameraTransform.mulVector(v0, 1);
+        let tv1 = this.cameraTransform.mulVector(v1, 1);
+
+        this.gfx.lineWidth = lineWidth;
+        this.gfx.beginPath();
+        this.gfx.moveTo(tv0.x, this.height - 1 - tv0.y);
+        this.gfx.lineTo(tv1.x, this.height - 1 - tv1.y);
+        this.gfx.stroke();
     }
 
     drawText(x: number, y: number, content: any, fontSize = 20): void
@@ -81,14 +110,17 @@ export class Renderer
     // p: point
     drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
     {
-        this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
-        let n = new Vector2(-v.y, v.x).normalized().mulS(3 * arrowSize);
+        let tp = this.cameraTransform.mulVector(p, 1);
+        let tv = this.cameraTransform.mulVector(v, 0);
 
-        const nv = v.normalized();
+        this.drawLine(tp.x, tp.y, tp.x + tv.x, tp.y + tv.y);
+        let n = new Vector2(-tv.y, tv.x).normalized().mulS(3 * arrowSize);
+
+        const nv = tv.normalized();
         arrowSize *= 4;
 
-        this.drawLine(p.x + v.x + n.x - nv.x * arrowSize, p.y + v.y + n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
-        this.drawLine(p.x + v.x - n.x - nv.x * arrowSize, p.y + v.y - n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
+        this.drawLine(tp.x + tv.x + n.x - nv.x * arrowSize, tp.y + tv.y + n.y - nv.y * arrowSize, tp.x + tv.x, tp.y + tv.y);
+        this.drawLine(tp.x + tv.x - n.x - nv.x * arrowSize, tp.y + tv.y - n.y - nv.y * arrowSize, tp.x + tv.x, tp.y + tv.y);
     }
 
     // Draw p1 to p2 vector
@@ -114,6 +146,23 @@ export class Renderer
                 break;
             default:
                 break;
+        }
+    }
+
+    drawPolygon(p: Polygon, b: boolean = false): void
+    {
+        for (let i = 0; i < p.count; i++)
+        {
+            if (b)
+            {
+                this.drawCircleV(p.vertices[i], 5, true);
+            }
+            else
+            {
+                let curr = p.vertices[i];
+                let next = p.vertices[(i + 1) % p.count];
+                this.drawLineV(curr, next);
+            }
         }
     }
 }
