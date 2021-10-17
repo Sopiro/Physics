@@ -8,7 +8,7 @@ export class Renderer
     private width: number;
     private height: number;
     private cameraTransform: Matrix3;
-    private transform: Matrix3;
+    private modelTransform: Matrix3;
 
     constructor(gfx: CanvasRenderingContext2D, width: number, height: number)
     {
@@ -16,17 +16,22 @@ export class Renderer
         this.width = width;
         this.height = height;
         this.cameraTransform = new Matrix3();
-        this.transform = new Matrix3();
-    }
-
-    setTransform(transform: Matrix3): void
-    {
-        this.transform = transform;
+        this.modelTransform = new Matrix3();
     }
 
     setCameraTransform(cameraTransfrom: Matrix3): void
     {
         this.cameraTransform = cameraTransfrom;
+    }
+
+    setModelTransform(modelTransform: Matrix3): void
+    {
+        this.modelTransform = modelTransform;
+    }
+
+    resetModelTransform(): void
+    {
+        this.modelTransform.loadIdentity();
     }
 
     drawRect(x: number, y: number, width: number, height: number, filled: boolean = false, centered: boolean = false): void
@@ -44,7 +49,7 @@ export class Renderer
             tv.y -= height / 2.0;
         }
 
-        tv = this.cameraTransform.mulVector(tv, 1);
+        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
         this.gfx.rect(tv.x, this.height - 1 - tv.y, width, height);
@@ -70,7 +75,7 @@ export class Renderer
             tv.y += radius / 2.0;
         }
 
-        tv = this.cameraTransform.mulVector(tv, 1);
+        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
@@ -89,8 +94,8 @@ export class Renderer
 
     drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
     {
-        let tv0 = this.cameraTransform.mulVector(v0, 1);
-        let tv1 = this.cameraTransform.mulVector(v1, 1);
+        let tv0 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v0, 1), 1);
+        let tv1 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v1, 1), 1);
 
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
@@ -102,7 +107,6 @@ export class Renderer
     drawText(x: number, y: number, content: any, fontSize = 20): void
     {
         this.gfx.font = fontSize + "px verdana";
-
         this.gfx.fillText(content, x, y);
     }
 
@@ -110,8 +114,8 @@ export class Renderer
     // p: point
     drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
     {
-        let tp = this.cameraTransform.mulVector(p, 1);
-        let tv = this.cameraTransform.mulVector(v, 0);
+        let tp = this.cameraTransform.mulVector(this.modelTransform.mulVector(p, 1), 1);
+        let tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(v, 0), 0);
 
         this.drawLine(tp.x, tp.y, tp.x + tv.x, tp.y + tv.y);
         let n = new Vector2(-tv.y, tv.x).normalized().mulS(3 * arrowSize);
@@ -151,6 +155,8 @@ export class Renderer
 
     drawPolygon(p: Polygon, b: boolean = false): void
     {
+        this.setModelTransform(p.localToGlobal());
+
         for (let i = 0; i < p.count; i++)
         {
             if (b)
@@ -164,5 +170,7 @@ export class Renderer
                 this.drawLineV(curr, next);
             }
         }
+
+        this.resetModelTransform();
     }
 }

@@ -124,6 +124,17 @@ export class Matrix3 {
         this.m21 = 0;
         this.m22 = 1;
     }
+    loadIdentity() {
+        this.m00 = 1;
+        this.m01 = 0;
+        this.m02 = 0;
+        this.m10 = 0;
+        this.m11 = 1;
+        this.m12 = 0;
+        this.m20 = 0;
+        this.m21 = 0;
+        this.m22 = 1;
+    }
     copy() {
         let res = new Matrix3();
         res.m00 = this.m00;
@@ -158,6 +169,12 @@ export class Matrix3 {
         res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * z;
         return res;
     }
+    mulVectors(right, z) {
+        let res = [];
+        for (let i = 0; i < right.length; i++)
+            res.push(this.mulVector(right[i], 1));
+        return res;
+    }
     scale(x, y) {
         if (y == undefined)
             y = x;
@@ -185,6 +202,24 @@ export class Matrix3 {
 }
 export class Matrix4 {
     constructor() {
+        this.m00 = 1;
+        this.m01 = 0;
+        this.m02 = 0;
+        this.m03 = 0;
+        this.m10 = 0;
+        this.m11 = 1;
+        this.m12 = 0;
+        this.m13 = 0;
+        this.m20 = 0;
+        this.m21 = 0;
+        this.m22 = 1;
+        this.m23 = 0;
+        this.m30 = 0;
+        this.m31 = 0;
+        this.m32 = 0;
+        this.m33 = 1;
+    }
+    loadIdentity() {
         this.m00 = 1;
         this.m01 = 0;
         this.m02 = 0;
@@ -264,6 +299,12 @@ export class Matrix4 {
         res.z = this.m20 * right.x + this.m21 * right.y + this.m22 * right.z + this.m23 * w;
         return res;
     }
+    mulVectors(right, z) {
+        let res = [];
+        for (let i = 0; i < right.length; i++)
+            res.push(this.mulVector(right[i], 1));
+        return res;
+    }
     scale(x, y, z) {
         if (y == undefined && z == undefined) {
             y = x;
@@ -309,29 +350,31 @@ export class Matrix4 {
         return this.mulMatrix(res);
     }
 }
+export function createCameraMatrix() {
+}
 // Returns the fardest vertex in the 'dir' direction
 export function support(p, dir) {
     let idx = 0;
-    let maxValue = dir.dot(p.vertices[idx]);
-    for (let i = 1; i < p.count; i++) {
-        let value = dir.dot(p.vertices[i]);
+    let maxValue = dir.dot(p[idx]);
+    for (let i = 1; i < p.length; i++) {
+        let value = dir.dot(p[i]);
         if (value > maxValue) {
             idx = i;
             maxValue = value;
         }
     }
-    return p.vertices[idx];
+    return p[idx];
 }
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
-        let p1v = p1.vertices[i];
+        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++) {
-            let p2v = p2.vertices[j];
+            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
             res.push(p1v.subV(p2v));
         }
     }
-    return new Polygon(res);
+    return new Polygon(res, false);
 }
 export function gjk(q, p) {
 }

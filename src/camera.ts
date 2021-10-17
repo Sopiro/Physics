@@ -13,15 +13,32 @@ export class Camera
         this._scale = new Vector2(1, 1);
     }
 
+    setPosition(p: Vector2): void
+    {
+        this._translation.x = p.x;
+        this._translation.y = p.y;
+    }
+
     translate(t: Vector2): void
     {
         this._translation.x += t.x;
         this._translation.y += t.y;
     }
 
+    setRotation(r: number): void
+    {
+        this._rotation = r;
+    }
+
     rotate(r: number): void
     {
         this._rotation += r;
+    }
+
+    setScale(s: Vector2): void
+    {
+        this._scale.x = s.x;
+        this._scale.y = s.y;
     }
 
     scale(s: Vector2): void
@@ -36,7 +53,7 @@ export class Camera
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
     }
-    
+
     getCameraTransform(): Matrix3
     {
         return new Matrix3().translate(-this._translation.x, -this._translation.y)

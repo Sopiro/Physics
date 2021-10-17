@@ -5,13 +5,16 @@ export class Renderer {
         this.width = width;
         this.height = height;
         this.cameraTransform = new Matrix3();
-        this.transform = new Matrix3();
-    }
-    setTransform(transform) {
-        this.transform = transform;
+        this.modelTransform = new Matrix3();
     }
     setCameraTransform(cameraTransfrom) {
         this.cameraTransform = cameraTransfrom;
+    }
+    setModelTransform(modelTransform) {
+        this.modelTransform = modelTransform;
+    }
+    resetModelTransform() {
+        this.modelTransform.loadIdentity();
     }
     drawRect(x, y, width, height, filled = false, centered = false) {
         this.drawRectV(new Vector2(x, y), width, height, filled, centered);
@@ -22,7 +25,7 @@ export class Renderer {
             tv.x -= width / 2.0;
             tv.y -= height / 2.0;
         }
-        tv = this.cameraTransform.mulVector(tv, 1);
+        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.rect(tv.x, this.height - 1 - tv.y, width, height);
         if (filled)
@@ -39,7 +42,7 @@ export class Renderer {
             tv.x += radius / 2.0;
             tv.y += radius / 2.0;
         }
-        tv = this.cameraTransform.mulVector(tv, 1);
+        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
         this.gfx.arc(tv.x, this.height - 1 - tv.y, radius, 0, 2 * Math.PI);
@@ -52,8 +55,8 @@ export class Renderer {
         this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
     }
     drawLineV(v0, v1, lineWidth = 1) {
-        let tv0 = this.cameraTransform.mulVector(v0, 1);
-        let tv1 = this.cameraTransform.mulVector(v1, 1);
+        let tv0 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v0, 1), 1);
+        let tv1 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v1, 1), 1);
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
         this.gfx.moveTo(tv0.x, this.height - 1 - tv0.y);
@@ -67,8 +70,8 @@ export class Renderer {
     // v: vector
     // p: point
     drawVector(p, v, arrowSize = 3) {
-        let tp = this.cameraTransform.mulVector(p, 1);
-        let tv = this.cameraTransform.mulVector(v, 0);
+        let tp = this.cameraTransform.mulVector(this.modelTransform.mulVector(p, 1), 1);
+        let tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(v, 0), 0);
         this.drawLine(tp.x, tp.y, tp.x + tv.x, tp.y + tv.y);
         let n = new Vector2(-tv.y, tv.x).normalized().mulS(3 * arrowSize);
         const nv = tv.normalized();
@@ -98,6 +101,7 @@ export class Renderer {
         }
     }
     drawPolygon(p, b = false) {
+        this.setModelTransform(p.localToGlobal());
         for (let i = 0; i < p.count; i++) {
             if (b) {
                 this.drawCircleV(p.vertices[i], 5, true);
@@ -108,5 +112,6 @@ export class Renderer {
                 this.drawLineV(curr, next);
             }
         }
+        this.resetModelTransform();
     }
 }

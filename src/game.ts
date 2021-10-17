@@ -33,8 +33,8 @@ export class Game
         this.cursorPos = new Vector2(0, 0);
         this.closest = new Vector2(0, 0);
 
-        this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)]);
-        this.p2 = new Polygon([new Vector2(300, 100), new Vector2(350, 280), new Vector2(400, 200)]);
+        this.p = new Polygon([new Vector2(0, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(100, 0)]);
+        this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)]);
         this.p3 = subPolygon(this.p2, this.p);
 
         this.camera.translate(new Vector2(-width / 2.0, -height/ 2.0));
@@ -54,6 +54,9 @@ export class Game
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
 
         this.closest = this.sp.getClosest(this.cursorPos);
+        this.p2.rotate(delta);
+        this.p2.setPosition(new Vector2(100, 100));
+        this.p3 = subPolygon(this.p2, this.p);
     }
 
     render(): void
@@ -72,12 +75,11 @@ export class Game
 
         this.r.drawText(50, 100, this.cursorPos.x + ", " + this.cursorPos.y);
 
-        this.r.drawPolygon(this.p2);
         this.r.drawVectorP(this.camera._translation, this.cursorPos.addV(this.camera._translation));
 
         let dir = this.cursorPos;
         // let res = support(this.p3, dir);
-        let res = support(this.p2, dir).subV(support(this.p, dir.mulS(-1)));
+        let res = support(this.p2.getGlobalVertices(), dir).subV(support(this.p.getGlobalVertices(), dir.mulS(-1)));
 
         this.r.drawCircleV(res, 10);
 

@@ -198,6 +198,13 @@ export class Matrix3
         this.m20 = 0; this.m21 = 0; this.m22 = 1;
     }
 
+    loadIdentity(): void
+    {
+        this.m00 = 1; this.m01 = 0; this.m02 = 0;
+        this.m10 = 0; this.m11 = 1; this.m12 = 0;
+        this.m20 = 0; this.m21 = 0; this.m22 = 1;
+    }
+
     copy(): Matrix3
     {
         let res = new Matrix3();
@@ -236,6 +243,16 @@ export class Matrix3
 
         res.x = this.m00 * right.x + this.m01 * right.y + this.m02 * z;
         res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * z;
+
+        return res;
+    }
+
+    mulVectors(right: Vector2[], z: number): Vector2[]
+    {
+        let res:Vector2[] = [];
+
+        for(let i = 0; i < right.length; i++)
+            res.push(this.mulVector(right[i], 1));
 
         return res;
     }
@@ -286,6 +303,14 @@ export class Matrix4
     m30: number; m31: number; m32: number; m33: number;
 
     constructor()
+    {
+        this.m00 = 1; this.m01 = 0; this.m02 = 0; this.m03 = 0;
+        this.m10 = 0; this.m11 = 1; this.m12 = 0; this.m13 = 0;
+        this.m20 = 0; this.m21 = 0; this.m22 = 1; this.m23 = 0;
+        this.m30 = 0; this.m31 = 0; this.m32 = 0; this.m33 = 1;
+    }
+
+    loadIdentity(): void
     {
         this.m00 = 1; this.m01 = 0; this.m02 = 0; this.m03 = 0;
         this.m10 = 0; this.m11 = 1; this.m12 = 0; this.m13 = 0;
@@ -356,6 +381,17 @@ export class Matrix4
         return res;
     }
 
+    
+    mulVectors(right: Vector3[], z: number): Vector3[]
+    {
+        let res:Vector3[] = [];
+
+        for(let i = 0; i < right.length; i++)
+            res.push(this.mulVector(right[i], 1));
+
+        return res;
+    }
+
     scale(x: number, y: number, z: number): Matrix4
     {
         if (y == undefined && z == undefined)
@@ -403,15 +439,20 @@ export class Matrix4
     }
 }
 
+export function createCameraMatrix()
+{
+
+}
+
 // Returns the fardest vertex in the 'dir' direction
-export function support(p: Polygon, dir: Vector2): Vector2
+export function support(p: Vector2[], dir: Vector2): Vector2
 {
     let idx = 0;
-    let maxValue = dir.dot(p.vertices[idx]);
+    let maxValue = dir.dot(p[idx]);
 
-    for (let i = 1; i < p.count; i++)
+    for (let i = 1; i < p.length; i++)
     {
-        let value = dir.dot(p.vertices[i]);
+        let value = dir.dot(p[i]);
         if (value > maxValue)
         {
             idx = i;
@@ -419,7 +460,7 @@ export function support(p: Polygon, dir: Vector2): Vector2
         }
     }
 
-    return p.vertices[idx];
+    return p[idx];
 }
 
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
@@ -428,16 +469,16 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 
     for (let i = 0; i < p1.count; i++)
     {
-        let p1v = p1.vertices[i];
+        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++)
         {
-            let p2v = p2.vertices[j];
+            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
 
             res.push(p1v.subV(p2v));
         }
     }
 
-    return new Polygon(res);
+    return new Polygon(res, false);
 }
 
 export function gjk(q: Vector2, p: Polygon)
