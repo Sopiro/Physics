@@ -1,6 +1,7 @@
 import { Polygon } from "./polygon.js";
+import { Simplex } from "./simplex.js";
 export class Vector2 {
-    constructor(x, y) {
+    constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
@@ -53,7 +54,7 @@ export class Vector2 {
     }
 }
 export class Vector3 {
-    constructor(x, y, z) {
+    constructor(x = 0, y = 0, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -350,8 +351,6 @@ export class Matrix4 {
         return this.mulMatrix(res);
     }
 }
-export function createCameraMatrix() {
-}
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
@@ -385,5 +384,27 @@ export function csoSupport(p1, p2, dir) {
     supportP2 = p2.localToGlobal().mulVector(supportP2, 1);
     return supportP1.subV(supportP2);
 }
-export function gjk(q, p1, p2) {
+export function gjk(p1, p2, r) {
+    const origin = new Vector2();
+    let simplex = new Simplex();
+    let dir = new Vector2(1, 0); // Random initial direction
+    let supportPoint = csoSupport(p1, p2, dir);
+    simplex.addVertex(supportPoint);
+    while (true) {
+        let closest = simplex.getClosest(origin);
+        if (closest.result.equals(origin))
+            return closest.result;
+        let newSimplex = new Simplex();
+        for (let i = 0; i < closest.info.length; i++)
+            newSimplex.addVertex(simplex.vertices[closest.info[i]]);
+        simplex = newSimplex;
+        dir = origin.subV(closest.result);
+        supportPoint = csoSupport(p1, p2, dir);
+        // if(dir.dot(supportPoint) < dir.dot(closest.result))
+        //     return simplex;
+        if (simplex.contains(supportPoint))
+            return closest.result;
+        else
+            simplex.addVertex(supportPoint);
+    }
 }

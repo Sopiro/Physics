@@ -26,44 +26,10 @@ export class Engine {
         window.addEventListener("keydown", (e) => {
             if (e.key == "Escape")
                 this.paused = !this.paused;
-            if (e.key == "w" || e.key == "ArrowUp")
-                Input.keys.up = true;
-            if (e.key == "a" || e.key == "ArrowLeft")
-                Input.keys.left = true;
-            if (e.key == "s" || e.key == "ArrowDown")
-                Input.keys.down = true;
-            if (e.key == "d" || e.key == "ArrowRight")
-                Input.keys.right = true;
-            if (e.key == " ")
-                Input.keys.space = true;
-            if (e.key == "c")
-                Input.keys.c = true;
-            if (e.key == "q")
-                Input.keys.q = true;
-            if (e.key == "e")
-                Input.keys.e = true;
-            if (e.key == "Shift")
-                Input.keys.shift = true;
+            Input.keys[e.key] = true;
         });
         window.addEventListener("keyup", (e) => {
-            if (e.key == "w" || e.key == "ArrowUp")
-                Input.keys.up = false;
-            if (e.key == "a" || e.key == "ArrowLeft")
-                Input.keys.left = false;
-            if (e.key == "s" || e.key == "ArrowDown")
-                Input.keys.down = false;
-            if (e.key == "d" || e.key == "ArrowRight")
-                Input.keys.right = false;
-            if (e.key == " ")
-                Input.keys.space = false;
-            if (e.key == "c")
-                Input.keys.c = false;
-            if (e.key == "q")
-                Input.keys.q = false;
-            if (e.key == "e")
-                Input.keys.e = false;
-            if (e.key == "Shift")
-                Input.keys.shift = false;
+            Input.keys[e.key] = false;
         });
         window.addEventListener("mousemove", (e) => {
             let rect = this.cvs.getBoundingClientRect();

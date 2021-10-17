@@ -19,6 +19,11 @@ export class Renderer
         this.modelTransform = new Matrix3();
     }
 
+    log(content: any)
+    {
+        this.drawText(50, 100, content);
+    }
+
     setCameraTransform(cameraTransfrom: Matrix3): void
     {
         this.cameraTransform = cameraTransfrom;
@@ -65,7 +70,7 @@ export class Renderer
         this.drawCircleV(new Vector2(x, y), radius, filled, centered);
     }
 
-    drawCircleV(v: Vector2, radius: number, filled: boolean = false, centered: boolean = true): void
+    drawCircleV(v: Vector2, radius: number = 5, filled: boolean = false, centered: boolean = true): void
     {
         let tv = v.copy();
 
@@ -138,7 +143,7 @@ export class Renderer
         switch (sp.count)
         {
             case 1:
-                this.drawCircleV(sp.vertices[0], 5, true, true);
+                this.drawCircleV(sp.vertices[0], 10, false, true);
                 break;
             case 2:
                 this.drawLineV(sp.vertices[0], sp.vertices[1]);

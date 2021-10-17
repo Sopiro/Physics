@@ -1,7 +1,11 @@
 export class Simplex {
-    constructor(vertices) {
+    constructor(vertices = []) {
         this.vertices = vertices;
         this.count = vertices.length;
+    }
+    clear() {
+        this.vertices = [];
+        this.count = 0;
     }
     // Returns barycentric weights u, v
     getUV(a, b, p) {
@@ -11,51 +15,87 @@ export class Simplex {
         const region = dir.dot(p.subV(a)) / len;
         return { u: 1 - region, v: region };
     }
-    getClosest(p) {
+    // Returns the closest point to the input q
+    getClosest(q) {
         switch (this.count) {
             case 1: // 0-Simplex: Point
-                return this.vertices[0];
+                return { result: this.vertices[0], info: [0] };
             case 2: // 1-Simplex: Line segment
                 {
                     const a = this.vertices[0];
                     const b = this.vertices[1];
-                    const w = this.getUV(a, b, p);
+                    const w = this.getUV(a, b, q);
                     if (w.v <= 0)
-                        return a;
+                        return { result: a, info: [0] };
                     else if (w.v >= 1)
-                        return b;
+                        return { result: b, info: [1] };
                     else
-                        return a.mulS(w.u).addV(b.mulS(w.v));
+                        return { result: a.mulS(w.u).addV(b.mulS(w.v)), info: [0, 1] };
                 }
             case 3: // 2-Simplex: Triangle
                 {
                     const a = this.vertices[0];
                     const b = this.vertices[1];
                     const c = this.vertices[2];
-                    const wab = this.getUV(a, b, p);
-                    const wbc = this.getUV(b, c, p);
-                    const wca = this.getUV(c, a, p);
-                    if (wca.u <= 0 && wab.v <= 0)
-                        return a;
-                    else if (wab.u <= 0 && wbc.v <= 0)
-                        return b;
-                    else if (wbc.u <= 0 && wca.v <= 0)
-                        return c;
+                    const wab = this.getUV(a, b, q);
+                    const wbc = this.getUV(b, c, q);
+                    const wca = this.getUV(c, a, q);
+                    if (wca.u <= 0 && wab.v <= 0) // A area
+                        return { result: a, info: [0] };
+                    else if (wab.u <= 0 && wbc.v <= 0) // B area
+                        return { result: b, info: [1] };
+                    else if (wbc.u <= 0 && wca.v <= 0) // C area
+                        return { result: c, info: [2] };
                     const area = b.subV(a).cross(c.subV(a));
-                    const u = b.subV(p).cross(c.subV(p)) / area;
-                    const v = c.subV(p).cross(a.subV(p)) / area;
-                    const w = a.subV(p).cross(b.subV(p)) / area;
-                    if (wab.u > 0 && wab.v > 0 && w <= 0)
-                        return a.mulS(wab.u).addV(b.mulS(wab.v));
-                    else if (wbc.u > 0 && wbc.v > 0 && u <= 0)
-                        return b.mulS(wbc.u).addV(c.mulS(wbc.v));
-                    else if (wca.u > 0 && wca.u > 0 && v <= 0)
-                        return c.mulS(wca.u).addV(a.mulS(wca.v));
-                    else
-                        return p;
+                    // If area == 0, 3 vertices are in collinear position, which means all aligned in a line
+                    const u = b.subV(q).cross(c.subV(q));
+                    const v = c.subV(q).cross(a.subV(q));
+                    const w = a.subV(q).cross(b.subV(q));
+                    if (wab.u > 0 && wab.v > 0 && w * area <= 0) // On the AB edge
+                     {
+                        return {
+                            result: a.mulS(wab.u).addV(b.mulS(wab.v)),
+                            info: area != 0 ? [0, 1] : [0, 1, 2]
+                        };
+                    }
+                    else if (wbc.u > 0 && wbc.v > 0 && u * area <= 0) // On the BC edge
+                     {
+                        return {
+                            result: b.mulS(wbc.u).addV(c.mulS(wbc.v)),
+                            info: area != 0 ? [1, 2] : [0, 1, 2]
+                        };
+                    }
+                    else if (wca.u > 0 && wca.u > 0 && v * area <= 0) // On the CA edge
+                     {
+                        return {
+                            result: c.mulS(wca.u).addV(a.mulS(wca.v)),
+                            info: area != 0 ? [2, 0] : [0, 1, 2]
+                        };
+                    }
+                    else // Inside the triangle
+                     {
+                        return { result: q, info: [] };
+                    }
                 }
             default:
-                return undefined;
+                throw "Error: Simplex constains vertices more than 3";
         }
+    }
+    addVertex(vertex) {
+        if (this.count >= 3)
+            throw "error";
+        this.vertices.push(vertex);
+        this.count++;
+    }
+    removeVertex(index) {
+        this.vertices.splice(index, 1);
+    }
+    // Return true if this simplex contains input vertex
+    contains(vertex) {
+        for (let i = 0; i < this.count; i++) {
+            if (vertex.equals(this.vertices[i]))
+                return true;
+        }
+        return false;
     }
 }
