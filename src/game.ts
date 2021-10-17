@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Matrix4, Matrix3, support, subPolygon } from "./math.js";
+import { Vector2, Vector3, Matrix4, Matrix3, support, subPolygon, csoSupport } from "./math.js";
 import * as Input from "./input.js";
 import { Simplex } from "./simplex.js";
 import { Renderer } from "./renderer.js";
@@ -37,7 +37,7 @@ export class Game
         this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
         this.p3 = subPolygon(this.p2, this.p);
 
-        this.camera.translate(new Vector2(-width / 2.0, -height/ 2.0));
+        this.camera.translate(new Vector2(-width / 2.0, -height / 2.0));
     }
 
     update(delta: number): void
@@ -56,7 +56,7 @@ export class Game
         this.closest = this.sp.getClosest(this.cursorPos);
         this.p2.rotate(delta);
         this.p2.setPosition(new Vector2(100, 100));
-        this.p3 = subPolygon(this.p2, this.p);
+        this.p3 = subPolygon(this.p, this.p2);
     }
 
     render(): void
@@ -78,10 +78,11 @@ export class Game
         this.r.drawVectorP(this.camera._translation, this.cursorPos.addV(this.camera._translation));
 
         let dir = this.cursorPos;
+        this.r.drawCircleV(csoSupport(this.p, this.p2, dir), 10);
         // let res = support(this.p3, dir);
-        let res = support(this.p2.getGlobalVertices(), dir).subV(support(this.p.getGlobalVertices(), dir.mulS(-1)));
+        // let res = support(this.p2.getGlobalVertices(), dir).subV(support(this.p.getGlobalVertices(), dir.mulS(-1)));
 
-        this.r.drawCircleV(res, 10);
+        // this.r.drawCircleV(res, 10);
 
         this.r.drawPolygon(this.p);
         this.r.drawPolygon(this.p2);

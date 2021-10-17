@@ -249,9 +249,9 @@ export class Matrix3
 
     mulVectors(right: Vector2[], z: number): Vector2[]
     {
-        let res:Vector2[] = [];
+        let res: Vector2[] = [];
 
-        for(let i = 0; i < right.length; i++)
+        for (let i = 0; i < right.length; i++)
             res.push(this.mulVector(right[i], 1));
 
         return res;
@@ -381,12 +381,12 @@ export class Matrix4
         return res;
     }
 
-    
+
     mulVectors(right: Vector3[], z: number): Vector3[]
     {
-        let res:Vector3[] = [];
+        let res: Vector3[] = [];
 
-        for(let i = 0; i < right.length; i++)
+        for (let i = 0; i < right.length; i++)
             res.push(this.mulVector(right[i], 1));
 
         return res;
@@ -444,25 +444,6 @@ export function createCameraMatrix()
 
 }
 
-// Returns the fardest vertex in the 'dir' direction
-export function support(p: Vector2[], dir: Vector2): Vector2
-{
-    let idx = 0;
-    let maxValue = dir.dot(p[idx]);
-
-    for (let i = 1; i < p.length; i++)
-    {
-        let value = dir.dot(p[i]);
-        if (value > maxValue)
-        {
-            idx = i;
-            maxValue = value;
-        }
-    }
-
-    return p[idx];
-}
-
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 {
     let res: Vector2[] = [];
@@ -481,7 +462,39 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
     return new Polygon(res, false);
 }
 
-export function gjk(q: Vector2, p: Polygon)
+// Returns the fardest vertex in the 'dir' direction
+export function support(vertices: Vector2[], dir: Vector2): Vector2
 {
+    let idx = 0;
+    let maxValue = dir.dot(vertices[idx]);
 
+    for (let i = 1; i < vertices.length; i++)
+    {
+        let value = dir.dot(vertices[i]);
+        if (value > maxValue)
+        {
+            idx = i;
+            maxValue = value;
+        }
+    }
+
+    return vertices[idx];
+}
+
+export function csoSupport(p1: Polygon, p2: Polygon, dir: Vector2): Vector2
+{
+    const localDirP1 = p1.globalToLocal().mulVector(dir, 0);
+    const localDirP2 = p2.globalToLocal().mulVector(dir.mulS(-1), 0);
+
+    let supportP1 = support(p1.vertices, localDirP1);
+    let supportP2 = support(p2.vertices, localDirP2);
+
+    supportP1 = p1.localToGlobal().mulVector(supportP1, 1);
+    supportP2 = p2.localToGlobal().mulVector(supportP2, 1);
+
+    return supportP1.subV(supportP2);
+}
+
+export function gjk(q: Vector2, p1: Polygon, p2: Polygon)
+{
 }

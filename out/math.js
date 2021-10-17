@@ -352,19 +352,6 @@ export class Matrix4 {
 }
 export function createCameraMatrix() {
 }
-// Returns the fardest vertex in the 'dir' direction
-export function support(p, dir) {
-    let idx = 0;
-    let maxValue = dir.dot(p[idx]);
-    for (let i = 1; i < p.length; i++) {
-        let value = dir.dot(p[i]);
-        if (value > maxValue) {
-            idx = i;
-            maxValue = value;
-        }
-    }
-    return p[idx];
-}
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
@@ -376,5 +363,27 @@ export function subPolygon(p1, p2) {
     }
     return new Polygon(res, false);
 }
-export function gjk(q, p) {
+// Returns the fardest vertex in the 'dir' direction
+export function support(vertices, dir) {
+    let idx = 0;
+    let maxValue = dir.dot(vertices[idx]);
+    for (let i = 1; i < vertices.length; i++) {
+        let value = dir.dot(vertices[i]);
+        if (value > maxValue) {
+            idx = i;
+            maxValue = value;
+        }
+    }
+    return vertices[idx];
+}
+export function csoSupport(p1, p2, dir) {
+    const localDirP1 = p1.globalToLocal().mulVector(dir, 0);
+    const localDirP2 = p2.globalToLocal().mulVector(dir.mulS(-1), 0);
+    let supportP1 = support(p1.vertices, localDirP1);
+    let supportP2 = support(p2.vertices, localDirP2);
+    supportP1 = p1.localToGlobal().mulVector(supportP1, 1);
+    supportP2 = p2.localToGlobal().mulVector(supportP2, 1);
+    return supportP1.subV(supportP2);
+}
+export function gjk(q, p1, p2) {
 }
