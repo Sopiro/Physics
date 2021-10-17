@@ -1,26 +1,26 @@
 import { Matrix3, Vector2 } from "./math.js";
 export class Polygon {
-    constructor(vertices, reposition = true) {
+    constructor(vertices, resetPosition = true) {
         this.vertices = vertices;
         this.count = vertices.length;
         this.cm = new Vector2(0, 0);
+        this._translation = new Vector2(0, 0);
+        this._rotation = 0;
+        this._scale = new Vector2(1, 1);
         for (let i = 0; i < this.count; i++) {
             this.cm.x += this.vertices[i].x;
             this.cm.y += this.vertices[i].y;
         }
         this.cm.x /= this.count;
         this.cm.y /= this.count;
-        if (reposition) {
-            for (let i = 0; i < this.count; i++) {
-                this.vertices[i].x -= this.cm.x;
-                this.vertices[i].y -= this.cm.y;
-            }
-            this.cm.x = 0;
-            this.cm.y = 0;
+        for (let i = 0; i < this.count; i++) {
+            this.vertices[i].x -= this.cm.x;
+            this.vertices[i].y -= this.cm.y;
         }
-        this._translation = new Vector2(0, 0);
-        this._rotation = 0;
-        this._scale = new Vector2(1, 1);
+        if (!resetPosition)
+            this.translate(this.cm);
+        this.cm.x = 0;
+        this.cm.y = 0;
     }
     setPosition(p) {
         this._translation.x = p.x;

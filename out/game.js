@@ -13,8 +13,8 @@ export class Game {
         this.sp = new Simplex([new Vector2(200, 200), new Vector2(400, 400), new Vector2(500, 300)]);
         this.cursorPos = new Vector2(0, 0);
         this.closest = new Vector2(0, 0);
-        this.p = new Polygon([new Vector2(0, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(100, 0)]);
-        this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)]);
+        this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
         this.p3 = subPolygon(this.p2, this.p);
         this.camera.translate(new Vector2(-width / 2.0, -height / 2.0));
     }

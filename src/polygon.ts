@@ -10,12 +10,16 @@ export class Polygon
     private _rotation: number;
     private _scale: Vector2;
 
-    constructor(vertices: Vector2[], reposition: boolean = true)
+    constructor(vertices: Vector2[], resetPosition: boolean = true)
     {
         this.vertices = vertices;
         this.count = vertices.length;
 
         this.cm = new Vector2(0, 0);
+
+        this._translation = new Vector2(0, 0);
+        this._rotation = 0;
+        this._scale = new Vector2(1, 1);
 
         for (let i = 0; i < this.count; i++)
         {
@@ -26,21 +30,17 @@ export class Polygon
         this.cm.x /= this.count;
         this.cm.y /= this.count;
 
-        if (reposition)
+        for (let i = 0; i < this.count; i++)
         {
-            for (let i = 0; i < this.count; i++)
-            {
-                this.vertices[i].x -= this.cm.x;
-                this.vertices[i].y -= this.cm.y;
-            }
-
-            this.cm.x = 0;
-            this.cm.y = 0;
+            this.vertices[i].x -= this.cm.x;
+            this.vertices[i].y -= this.cm.y;
         }
 
-        this._translation = new Vector2(0, 0);
-        this._rotation = 0;
-        this._scale = new Vector2(1, 1);
+        if (!resetPosition)
+            this.translate(this.cm);
+
+        this.cm.x = 0;
+        this.cm.y = 0;
     }
 
     setPosition(p: Vector2): void
@@ -90,7 +90,7 @@ export class Polygon
 
         let res: Vector2[] = [];
 
-        for(let i = 0; i < this.count; i++)
+        for (let i = 0; i < this.count; i++)
             res.push(transform.mulVector(this.vertices[i], 1));
 
         return res;
