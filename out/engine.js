@@ -41,10 +41,7 @@ export class Engine {
         this.game = new Game(this.renderer, this.width, this.height);
     }
     start() {
-        this.init();
-        this.run(0);
-    }
-    init() {
+        window.requestAnimationFrame(this.run.bind(this));
     }
     run(t) {
         let delta = t - this.time;

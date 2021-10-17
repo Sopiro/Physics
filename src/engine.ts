@@ -67,13 +67,7 @@ export class Engine
 
     start(): void
     {
-        this.init();
-        this.run(0);
-    }
-
-    init(): void
-    {
-
+        window.requestAnimationFrame(this.run.bind(this));
     }
 
     run(t: number): void // Gameloop

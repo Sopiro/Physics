@@ -44,10 +44,17 @@ export class Polygon {
         this._scale.x *= s.x;
         this._scale.y *= s.y;
     }
+    // Returns local to global transform
     localToGlobal() {
         return new Matrix3().translate(this._translation.x, this._translation.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
+    }
+    // Returns global to local transform
+    globalToLocal() {
+        return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
+            .rotate(-this._rotation)
+            .translate(-this._translation.x, -this._translation.y);
     }
     getGlobalVertices() {
         const transform = this.localToGlobal();
@@ -55,10 +62,5 @@ export class Polygon {
         for (let i = 0; i < this.count; i++)
             res.push(transform.mulVector(this.vertices[i], 1));
         return res;
-    }
-    globalToLocal() {
-        return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
-            .rotate(-this._rotation)
-            .translate(-this._translation.x, -this._translation.y);
     }
 }

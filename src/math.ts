@@ -1,5 +1,4 @@
 import { Polygon } from "./polygon.js";
-import { Renderer } from "./renderer.js";
 import { Simplex } from "./simplex.js";
 
 export class Vector2
@@ -11,6 +10,12 @@ export class Vector2
     {
         this.x = x;
         this.y = y;
+    }
+
+    clear(): void
+    {
+        this.x = 0;
+        this.y = 0;
     }
 
     copy(): Vector2
@@ -100,6 +105,13 @@ export class Vector3
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    clear(): void
+    {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
     }
 
     copy(): Vector3
@@ -492,7 +504,9 @@ export function csoSupport(p1: Polygon, p2: Polygon, dir: Vector2): Vector2
     return supportP1.subV(supportP2);
 }
 
-export function gjk(p1: Polygon, p2: Polygon, r: Renderer)
+const MAX_ITERATION = 100;
+
+export function gjk(p1: Polygon, p2: Polygon)
 {
     const origin = new Vector2();
     let simplex = new Simplex();
@@ -501,7 +515,7 @@ export function gjk(p1: Polygon, p2: Polygon, r: Renderer)
     let supportPoint = csoSupport(p1, p2, dir);
     simplex.addVertex(supportPoint);
 
-    while (true)
+    for (let k = 0; k < MAX_ITERATION; k++)
     {
         let closest = simplex.getClosest(origin);
         if (closest.result.equals(origin))
@@ -515,12 +529,16 @@ export function gjk(p1: Polygon, p2: Polygon, r: Renderer)
         dir = origin.subV(closest.result);
         supportPoint = csoSupport(p1, p2, dir);
 
-        // if(dir.dot(supportPoint) < dir.dot(closest.result))
-        //     return simplex;
+        // If the new support point is not further along the search direction than the closest point,
+        // the two objects are not colliding so you can early return here.
+        // if(dir.getLength() > dir.normalized().dot(supportPoint.subV(closest.result)))
+        //     return closest.result;
 
         if (simplex.contains(supportPoint))
             return closest.result;
         else
             simplex.addVertex(supportPoint);
     }
+
+    throw "Exceed max iteration";
 }

@@ -77,11 +77,20 @@ export class Polygon
         this._scale.y *= s.y;
     }
 
+    // Returns local to global transform
     localToGlobal(): Matrix3
     {
         return new Matrix3().translate(this._translation.x, this._translation.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
+    }
+
+    // Returns global to local transform
+    globalToLocal(): Matrix3
+    {
+        return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
+            .rotate(-this._rotation)
+            .translate(-this._translation.x, -this._translation.y);
     }
 
     getGlobalVertices(): Vector2[]
@@ -94,12 +103,5 @@ export class Polygon
             res.push(transform.mulVector(this.vertices[i], 1));
 
         return res;
-    }
-
-    globalToLocal(): Matrix3
-    {
-        return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
-            .rotate(-this._rotation)
-            .translate(-this._translation.x, -this._translation.y);
     }
 }

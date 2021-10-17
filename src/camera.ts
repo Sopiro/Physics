@@ -49,14 +49,16 @@ export class Camera
 
     getTransform(): Matrix3
     {
-        return new Matrix3().translate(this._translation.x, this._translation.y)
+        return new Matrix3()
+            .translate(this._translation.x, this._translation.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
     }
 
     getCameraTransform(): Matrix3
     {
-        return new Matrix3().translate(-this._translation.x, -this._translation.y)
+        return new Matrix3()
+            .translate(-this._translation.x, -this._translation.y)
             .rotate(-this._rotation)
             .scale(this._scale.x, this._scale.y);
     }

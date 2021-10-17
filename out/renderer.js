@@ -36,7 +36,7 @@ export class Renderer {
         else
             this.gfx.stroke();
     }
-    drawCircle(x, y, radius, filled = false, centered = true) {
+    drawCircle(x, y, radius = 5, filled = false, centered = true) {
         this.drawCircleV(new Vector2(x, y), radius, filled, centered);
     }
     drawCircleV(v, radius = 5, filled = false, centered = true) {
@@ -70,8 +70,7 @@ export class Renderer {
         this.gfx.font = fontSize + "px verdana";
         this.gfx.fillText(content, x, y);
     }
-    // v: vector
-    // p: point
+    // Draw vector from point p toward direction v
     drawVector(p, v, arrowSize = 3) {
         let tp = this.cameraTransform.mulVector(this.modelTransform.mulVector(p, 1), 1);
         let tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(v, 0), 0);

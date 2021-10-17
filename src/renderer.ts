@@ -19,7 +19,7 @@ export class Renderer
         this.modelTransform = new Matrix3();
     }
 
-    log(content: any)
+    log(content: any): void
     {
         this.drawText(50, 100, content);
     }
@@ -65,7 +65,7 @@ export class Renderer
             this.gfx.stroke();
     }
 
-    drawCircle(x: number, y: number, radius: number, filled: boolean = false, centered: boolean = true): void
+    drawCircle(x: number, y: number, radius: number = 5, filled: boolean = false, centered: boolean = true): void
     {
         this.drawCircleV(new Vector2(x, y), radius, filled, centered);
     }
@@ -115,8 +115,7 @@ export class Renderer
         this.gfx.fillText(content, x, y);
     }
 
-    // v: vector
-    // p: point
+    // Draw vector from point p toward direction v
     drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
     {
         let tp = this.cameraTransform.mulVector(this.modelTransform.mulVector(p, 1), 1);
