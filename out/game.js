@@ -1,4 +1,5 @@
-import { Vector2, subPolygon, gjk } from "./math.js";
+import { subPolygon, gjk } from "./pyhsics.js";
+import { Vector2 } from "./math.js";
 import * as Input from "./input.js";
 import { Simplex } from "./simplex.js";
 import { Polygon } from "./polygon.js";

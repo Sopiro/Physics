@@ -1,4 +1,5 @@
-import { Vector2, Vector3, Matrix4, Matrix3, support, subPolygon, csoSupport, gjk } from "./math.js";
+import { support, subPolygon, csoSupport, gjk } from "./pyhsics.js";
+import { Vector2, Vector3, Matrix4, Matrix3 } from "./math.js";
 import * as Input from "./input.js";
 import { Simplex } from "./simplex.js";
 import { Renderer } from "./renderer.js";
