@@ -87,10 +87,6 @@ export class Simplex {
         this.vertices.push(vertex);
         this.count++;
     }
-    removeVertex(index) {
-        this.vertices.splice(index, 1);
-        this.count--;
-    }
     // Return true if this simplex contains input vertex
     containsVertex(vertex) {
         for (let i = 0; i < this.count; i++) {

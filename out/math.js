@@ -17,6 +17,10 @@ export class Vector2 {
     fixed() {
         return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
     }
+    invert() {
+        this.x *= -1;
+        this.y *= -1;
+    }
     normalize() {
         const len = this.getLength();
         if (len != 0) {
@@ -96,6 +100,11 @@ export class Vector3 {
             return this.divS(len);
         else
             return this;
+    }
+    invert() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
     }
     getLength() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);

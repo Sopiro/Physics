@@ -31,6 +31,12 @@ export class Vector2
         return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
     }
 
+    invert(): void
+    {
+        this.x *= -1;
+        this.y *= -1;
+    }
+
     normalize(): void
     {
         const len = this.getLength();
@@ -156,6 +162,13 @@ export class Vector3
             return this.divS(len);
         else
             return this;
+    }
+
+    invert(): void
+    {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
     }
 
     getLength(): number

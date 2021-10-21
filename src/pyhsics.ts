@@ -1,5 +1,7 @@
 import { toFixed, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
+import { ClosestEdgeInfo, Polytope } from "./polytope.js";
+import { Renderer } from "./renderer.js";
 import { Simplex } from "./simplex.js";
 
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
@@ -61,7 +63,7 @@ interface GJKResult
     simplex: Simplex;
 }
 
-export function gjk(p1: Polygon, p2: Polygon)
+function gjk(p1: Polygon, p2: Polygon): GJKResult
 {
     const origin = new Vector2(0, 0);
     let simplex = new Simplex();
@@ -82,7 +84,6 @@ export function gjk(p1: Polygon, p2: Polygon)
             result.collide = true;
             break;
         }
-
 
         if (simplex.count != 1)
         {
@@ -113,7 +114,6 @@ export function gjk(p1: Polygon, p2: Polygon)
             simplex.addVertex(supportPoint);
     }
 
-    // throw "asd";
     if (k >= MAX_ITERATION)
         throw "Exceed max iteration";
 
@@ -122,7 +122,66 @@ export function gjk(p1: Polygon, p2: Polygon)
     return result;
 }
 
-export function epa(p1: Polygon, p2: Polygon, polytope: Simplex)
+interface EPAResult
 {
+    penetrationDepth: number;
+    collisionNormal: Vector2;
+}
 
+const TOLERANCE = 0.001;
+
+function epa(p1: Polygon, p2: Polygon, gjkResult: Simplex, r: Renderer): EPAResult
+{
+    let polytope: Polytope = new Polytope(gjkResult);
+
+    while (true)
+    {
+        let closestEdge: ClosestEdgeInfo = polytope.getClosestEdge();
+        let supportPoint = csoSupport(p1, p2, closestEdge.normal);
+        let newDistance = closestEdge.normal.dot(supportPoint);
+
+        if (Math.abs(closestEdge.distance - newDistance) > TOLERANCE)
+        {
+            // Insert the support vertex so that it expands our polytope
+            polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint);
+        }
+        else
+        {
+            // Visualizing result polytope
+            for (let i = 0; i < polytope.count; i++)
+                r.drawLineV(polytope.vertices[i], polytope.vertices[(i + 1) % polytope.count]);
+
+            return {
+                penetrationDepth: closestEdge.distance,
+                collisionNormal: closestEdge.normal
+            };
+        }
+    }
+}
+
+interface CollisionResult
+{
+    collide: boolean;
+    penetrationDepth?: number;
+    collisionNormal?: Vector2;
+}
+
+export function detectCollision(p1: Polygon, p2: Polygon, r: Renderer): CollisionResult
+{
+    const gjkResult = gjk(p1, p2);
+
+    if (gjkResult.simplex.count != 3)
+    {
+        return { collide: false };
+    }
+    else
+    {
+        const epaResult: EPAResult = epa(p1, p2, gjkResult.simplex, r);
+
+        return {
+            collide: true,
+            penetrationDepth: epaResult.penetrationDepth,
+            collisionNormal: epaResult.collisionNormal
+        };
+    }
 }

@@ -72,14 +72,12 @@ export class Renderer {
     }
     // Draw vector from point p toward direction v
     drawVector(p, v, arrowSize = 3) {
-        let tp = this.cameraTransform.mulVector(this.modelTransform.mulVector(p, 1), 1);
-        let tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(v, 0), 0);
-        this.drawLine(tp.x, tp.y, tp.x + tv.x, tp.y + tv.y);
-        let n = new Vector2(-tv.y, tv.x).normalized().mulS(3 * arrowSize);
-        const nv = tv.normalized();
+        this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
+        let n = new Vector2(-v.y, v.x).normalized().mulS(3 * arrowSize);
+        const nv = v.normalized();
         arrowSize *= 4;
-        this.drawLine(tp.x + tv.x + n.x - nv.x * arrowSize, tp.y + tv.y + n.y - nv.y * arrowSize, tp.x + tv.x, tp.y + tv.y);
-        this.drawLine(tp.x + tv.x - n.x - nv.x * arrowSize, tp.y + tv.y - n.y - nv.y * arrowSize, tp.x + tv.x, tp.y + tv.y);
+        this.drawLine(p.x + v.x + n.x - nv.x * arrowSize, p.y + v.y + n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
+        this.drawLine(p.x + v.x - n.x - nv.x * arrowSize, p.y + v.y - n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
     }
     // Draw p1 to p2 vector
     drawVectorP(p1, p2, arrowSize = 3) {
