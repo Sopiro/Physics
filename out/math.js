@@ -10,6 +10,13 @@ export class Vector2 {
     copy() {
         return new Vector2(this.x, this.y);
     }
+    toFixed() {
+        this.x = Math.round(this.x * 1e9) / 1e9;
+        this.y = Math.round(this.y * 1e9) / 1e9;
+    }
+    fixed() {
+        return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
+    }
     normalize() {
         const len = this.getLength();
         if (len != 0) {
@@ -68,6 +75,14 @@ export class Vector3 {
     }
     copy() {
         return new Vector3(this.x, this.y, this.z);
+    }
+    toFixed() {
+        this.x = Math.round(this.x * 1e9) / 1e9;
+        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.z = Math.round(this.z * 1e9) / 1e9;
+    }
+    fixed() {
+        return new Vector3(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9);
     }
     normalize() {
         const len = this.getLength();

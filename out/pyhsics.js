@@ -34,31 +34,36 @@ export function csoSupport(p1, p2, dir) {
     supportP2 = p2.localToGlobal().mulVector(supportP2, 1);
     return supportP1.subV(supportP2);
 }
-const MAX_ITERATION = 100;
+const MAX_ITERATION = 10;
 export function gjk(p1, p2) {
-    const origin = new Vector2();
+    const origin = new Vector2(0, 0);
     let simplex = new Simplex();
     let dir = new Vector2(1, 0); // Random initial direction
     let supportPoint = csoSupport(p1, p2, dir);
     simplex.addVertex(supportPoint);
     for (let k = 0; k < MAX_ITERATION; k++) {
         let closest = simplex.getClosest(origin);
-        if (closest.result.equals(origin))
-            return closest.result;
-        let newSimplex = new Simplex();
-        for (let i = 0; i < closest.info.length; i++)
-            newSimplex.addVertex(simplex.vertices[closest.info[i]]);
-        simplex = newSimplex;
+        if (closest.result.fixed().equals(origin))
+            return simplex;
+        if (simplex.count != 1) {
+            // Rebuild the simplex with vertices that are used(involved) to calculate closest distance
+            let newSimplex = new Simplex();
+            for (let i = 0; i < closest.info.length; i++)
+                newSimplex.addVertex(simplex.vertices[closest.info[i]]);
+            simplex = newSimplex;
+        }
         dir = origin.subV(closest.result);
         supportPoint = csoSupport(p1, p2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
-        // if(dir.getLength() > dir.normalized().dot(supportPoint.subV(closest.result)))
-        //     return closest.result;
+        if (dir.getLength() > dir.normalized().dot(supportPoint.subV(closest.result.fixed())))
+            return simplex;
         if (simplex.contains(supportPoint))
-            return closest.result;
+            return simplex;
         else
             simplex.addVertex(supportPoint);
     }
     throw "Exceed max iteration";
+}
+export function epa(p1, p2, polytope) {
 }

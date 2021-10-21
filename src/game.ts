@@ -35,7 +35,8 @@ export class Game
         this.closest = new Vector2(0, 0);
 
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
-        this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
+        this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(-50, 50), new Vector2(50, 50), new Vector2(50, -50)], true);
+        // this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
         // this.p2 = new Polygon([new Vector2(-30, -30), new Vector2(-50, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(80, 0)], true);
         this.p3 = subPolygon(this.p, this.p2);
 
@@ -59,8 +60,8 @@ export class Game
 
         this.p.translate(new Vector2(mx * speed, my * speed));
         this.p.rotate(mr * delta);
-        this.p2.rotate(delta);
-        this.p2.setPosition(new Vector2(70, 90));
+        // this.p2.rotate(delta);
+        this.p2.setPosition(new Vector2(0, 100));
         this.p3 = subPolygon(this.p, this.p2);
     }
 
@@ -76,12 +77,14 @@ export class Game
 
         this.r.drawPolygon(this.p);
         this.r.drawPolygon(this.p2);
-        // this.r.drawPolygon(this.p3, true);
+        this.r.drawPolygon(this.p3, true);
 
         let res = gjk(this.p, this.p2);
         // this.r.drawCircleV(res, 7);
 
-        if (res.equals(new Vector2()))
+        this.r.drawSimplex(res);
+
+        if (res.getClosest(new Vector2()).result.fixed().equals(new Vector2()))
         {
             this.r.log("Collide!");
         }
