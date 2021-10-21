@@ -92,7 +92,7 @@ export class Simplex {
         this.count--;
     }
     // Return true if this simplex contains input vertex
-    contains(vertex) {
+    containsVertex(vertex) {
         for (let i = 0; i < this.count; i++) {
             if (vertex.equals(this.vertices[i]))
                 return true;

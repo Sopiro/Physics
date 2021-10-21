@@ -1,12 +1,12 @@
 import { Vector2, Vector3, Matrix4, Matrix3 } from "./math.js";
 
-interface UV
+export interface UV
 {
     u: number;
     v: number;
 }
 
-interface ClosestWithInfo
+export interface ClosestWithInfo
 {
     result: Vector2;
     info: number[]; // Vertex indices that are contributed to calculate the closest point
@@ -133,7 +133,7 @@ export class Simplex
     }
 
     // Return true if this simplex contains input vertex
-    contains(vertex: Vector2): boolean
+    containsVertex(vertex: Vector2): boolean
     {
         for (let i = 0; i < this.count; i++)
         {

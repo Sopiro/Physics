@@ -61,7 +61,7 @@ export class Game
         this.p.translate(new Vector2(mx * speed, my * speed));
         this.p.rotate(mr * delta);
         // this.p2.rotate(delta);
-        this.p2.setPosition(new Vector2(0, 100));
+        this.p2.setPosition(new Vector2(100, -100));
         this.p3 = subPolygon(this.p, this.p2);
     }
 
@@ -82,11 +82,16 @@ export class Game
         let res = gjk(this.p, this.p2);
         // this.r.drawCircleV(res, 7);
 
-        this.r.drawSimplex(res);
-
-        if (res.getClosest(new Vector2()).result.fixed().equals(new Vector2()))
+        if (res.collide)
         {
-            this.r.log("Collide!");
+            this.r.log("Collide");
+            this.r.drawSimplex(res.simplex);
         }
+
+
+        // if (res.getClosest(new Vector2()).result.fixed().equals(new Vector2()))
+        // {
+        //     this.r.log("Collide!");
+        // }
     }
 }

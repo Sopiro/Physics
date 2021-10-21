@@ -1,4 +1,4 @@
-import { Vector2 } from "./math.js";
+import { toFixed, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 export function subPolygon(p1, p2) {
@@ -41,10 +41,14 @@ export function gjk(p1, p2) {
     let dir = new Vector2(1, 0); // Random initial direction
     let supportPoint = csoSupport(p1, p2, dir);
     simplex.addVertex(supportPoint);
-    for (let k = 0; k < MAX_ITERATION; k++) {
+    let result = { collide: false, simplex: simplex };
+    let k;
+    for (k = 0; k < MAX_ITERATION; k++) {
         let closest = simplex.getClosest(origin);
-        if (closest.result.fixed().equals(origin))
-            return simplex;
+        if (closest.result.fixed().equals(origin)) {
+            result.collide = true;
+            break;
+        }
         if (simplex.count != 1) {
             // Rebuild the simplex with vertices that are used(involved) to calculate closest distance
             let newSimplex = new Simplex();
@@ -56,14 +60,22 @@ export function gjk(p1, p2) {
         supportPoint = csoSupport(p1, p2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
-        if (dir.getLength() > dir.normalized().dot(supportPoint.subV(closest.result.fixed())))
-            return simplex;
-        if (simplex.contains(supportPoint))
-            return simplex;
+        if (toFixed(dir.getLength() - dir.normalized().dot(supportPoint.subV(closest.result))) > 0) {
+            result.collide = false;
+            break;
+        }
+        if (simplex.containsVertex(supportPoint)) {
+            result.collide = false;
+            break;
+        }
         else
             simplex.addVertex(supportPoint);
     }
-    throw "Exceed max iteration";
+    // throw "asd";
+    if (k >= MAX_ITERATION)
+        throw "Exceed max iteration";
+    result.simplex = simplex;
+    return result;
 }
 export function epa(p1, p2, polytope) {
 }

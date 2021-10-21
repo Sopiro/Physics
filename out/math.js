@@ -373,3 +373,6 @@ export class Matrix4 {
         return this.mulMatrix(res);
     }
 }
+export function toFixed(value) {
+    return Math.round(value * 1e9) / 1e9;
+}
