@@ -21,14 +21,20 @@ export class Renderer
         this.modelTransform = new Matrix3();
     }
 
-    log(content: any): void
+    log(content: any, line: number = 0): void
     {
-        this.drawText(50, 100, content);
+        let y = 80 + line * 20;
+        this.drawText(30, y, content);
     }
 
     setCameraTransform(cameraTransfrom: Matrix3): void
     {
         this.cameraTransform = cameraTransfrom;
+    }
+
+    resetCameraTransform():void
+    {
+        this.cameraTransform.loadIdentity();
     }
 
     setModelTransform(modelTransform: Matrix3): void

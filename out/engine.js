@@ -26,10 +26,10 @@ export class Engine {
         window.addEventListener("keydown", (e) => {
             if (e.key == "Escape")
                 this.paused = !this.paused;
-            Input.keys[e.key] = true;
+            Input.curr_keys[e.key] = true;
         });
         window.addEventListener("keyup", (e) => {
-            Input.keys[e.key] = false;
+            Input.curr_keys[e.key] = false;
         });
         window.addEventListener("mousemove", (e) => {
             let rect = this.cvs.getBoundingClientRect();
@@ -68,6 +68,7 @@ export class Engine {
         Input.mouses.lastX = Input.mouses.currX;
         Input.mouses.lastY = Input.mouses.currY;
         Input.mouses.last_down = Input.mouses.curr_down;
+        Object.assign(Input.last_keys, Input.curr_keys);
     }
     render() {
         this.gfx.clearRect(0, 0, this.width, this.height);

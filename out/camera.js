@@ -5,6 +5,11 @@ export class Camera {
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
+    reset() {
+        this._translation.clear();
+        this._rotation = 0;
+        this._scale = new Vector2(1, 1);
+    }
     setPosition(p) {
         this._translation.x = p.x;
         this._translation.y = p.y;

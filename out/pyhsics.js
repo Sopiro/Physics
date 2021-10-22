@@ -84,10 +84,11 @@ export function gjk(c1, c2) {
     return result;
 }
 const TOLERANCE = 0.001;
-export function epa(c1, c2, gjkResult, r) {
+export function epa(c1, c2, gjkResult) {
     let polytope = new Polytope(gjkResult);
-    while (true) {
-        let closestEdge = polytope.getClosestEdge();
+    let closestEdge = { index: 0, distance: Infinity, normal: new Vector2() };
+    for (let i = 0; i < MAX_ITERATION; i++) {
+        closestEdge = polytope.getClosestEdge();
         let supportPoint = csoSupport(c1, c2, closestEdge.normal);
         let newDistance = closestEdge.normal.dot(supportPoint);
         if (Math.abs(closestEdge.distance - newDistance) > TOLERANCE) {
@@ -95,23 +96,22 @@ export function epa(c1, c2, gjkResult, r) {
             polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint);
         }
         else {
-            // Visualizing result polytope
-            for (let i = 0; i < polytope.count; i++)
-                r.drawLineV(polytope.vertices[i], polytope.vertices[(i + 1) % polytope.count]);
-            return {
-                penetrationDepth: closestEdge.distance,
-                collisionNormal: closestEdge.normal
-            };
+            // If you didn't expand edge, you reached the most outer edge
+            break;
         }
     }
+    return {
+        penetrationDepth: closestEdge.distance,
+        collisionNormal: closestEdge.normal
+    };
 }
-export function detectCollision(c1, c2, r) {
+export function detectCollision(c1, c2) {
     const gjkResult = gjk(c1, c2);
     if (gjkResult.simplex.count != 3) {
         return { collide: false };
     }
     else {
-        const epaResult = epa(c1, c2, gjkResult.simplex, r);
+        const epaResult = epa(c1, c2, gjkResult.simplex);
         return {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,

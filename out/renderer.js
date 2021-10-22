@@ -9,11 +9,15 @@ export class Renderer {
         this.cameraTransform = new Matrix3();
         this.modelTransform = new Matrix3();
     }
-    log(content) {
-        this.drawText(50, 100, content);
+    log(content, line = 0) {
+        let y = 80 + line * 20;
+        this.drawText(30, y, content);
     }
     setCameraTransform(cameraTransfrom) {
         this.cameraTransform = cameraTransfrom;
+    }
+    resetCameraTransform() {
+        this.cameraTransform.loadIdentity();
     }
     setModelTransform(modelTransform) {
         this.modelTransform = modelTransform;

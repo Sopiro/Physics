@@ -1,24 +1,23 @@
-import { subPolygon, detectCollision } from "./pyhsics.js";
+import { detectCollision } from "./pyhsics.js";
 import { Vector2 } from "./math.js";
 import * as Input from "./input.js";
-import { Simplex } from "./simplex.js";
 import { Renderer } from "./renderer.js";
 import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
-import { Circle } from "./circle.js";
-
+import { createRandomConvexCollider } from "./util.js";
+import { Collider } from "./collider.js";
 export class Game
 {
     private r: Renderer;
     private width: number;
     private height: number;
     private time: number;
-    private sp: Simplex;
     private cursorPos: Vector2;
-    private p: Polygon;
+    private p: Collider;
     private p2: Polygon;
-    private p3: Polygon;
-    private c: Circle;
+
+    private colliders: Collider[];
+    private static_response = false;
 
     private camera: Camera;
 
@@ -31,17 +30,14 @@ export class Game
         this.camera = new Camera();
         this.time = 0;
 
-        this.sp = new Simplex([new Vector2(200, 200), new Vector2(400, 400), new Vector2(500, 300)]);
         this.cursorPos = new Vector2(0, 0);
 
-        this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
-        // this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(-50, 50), new Vector2(50, 50), new Vector2(50, -50)], true);
-        // this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
-        this.p2 = new Polygon([new Vector2(-30, -30), new Vector2(-50, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(80, 0)], true);
-        this.p3 = subPolygon(this.p, this.p2);
-        this.c = new Circle(new Vector2(100, 100), 50);
+        this.colliders = [];
 
-        this.camera.translate(new Vector2(-width / 2.0, -height / 2.0));
+        this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        this.p2 = new Polygon([new Vector2(-30, -30), new Vector2(-50, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(80, 0)], true);
+
+        this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
     }
 
     update(delta: number): void
@@ -50,9 +46,9 @@ export class Game
         this.time += delta;
         const speed = delta * 500;
 
-        const mx = Input.keys.ArrowLeft ? -1 : Input.keys.ArrowRight ? 1 : 0;
-        const my = Input.keys.ArrowDown ? -1 : Input.keys.ArrowUp ? 1 : 0;
-        let mr = Input.keys.e ? -1 : Input.keys.q ? 1 : 0;
+        const mx = Input.curr_keys.ArrowLeft ? -1 : Input.curr_keys.ArrowRight ? 1 : 0;
+        const my = Input.curr_keys.ArrowDown ? -1 : Input.curr_keys.ArrowUp ? 1 : 0;
+        let mr = Input.curr_keys.e ? -1 : Input.curr_keys.q ? 1 : 0;
 
         this.camera.translate(new Vector2(mx * speed, my * speed));
 
@@ -63,7 +59,26 @@ export class Game
         this.p.rotate(mr * delta * 2.5);
         // this.p2.rotate(delta);
         this.p2.setPosition(new Vector2(100, 100));
-        this.p3 = subPolygon(this.p, this.p2);
+
+        if (Input.mouses.curr_down && !Input.mouses.last_down)
+        {
+            let nc = createRandomConvexCollider(Math.random() * 60 + 40);
+            nc.setPosition(this.cursorPos);
+
+            this.colliders.push(nc);
+        }
+
+        if (Input.curr_keys.r && !Input.last_keys.r)
+        {
+            this.static_response = !this.static_response;
+        }
+
+        if (Input.curr_keys.n && !Input.last_keys.n)
+        {
+            this.p = createRandomConvexCollider(Math.random() * 60 + 40);
+            this.camera.reset();
+            this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
+        }
     }
 
     render(): void
@@ -76,20 +91,32 @@ export class Game
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
 
-        let res = detectCollision(this.p, this.c, this.r);
-
-        if (res.collide)
+        this.colliders.forEach((collider) =>
         {
-            this.r.log("collide!");
-            this.r.drawVectorP(new Vector2(), res.collisionNormal!.mulS(res.penetrationDepth!));
-            this.p.translate(res.collisionNormal!.mulS(-res.penetrationDepth!));
-            this.camera.translate(res.collisionNormal!.mulS(-res.penetrationDepth!));
-        }
+            let res = detectCollision(this.p, collider);
+
+            if (res.collide)
+            {
+                this.r.log("collide!");
+                this.r.resetCameraTransform();
+                this.r.drawText(630, 150, "collision vector");
+                this.r.drawVector(new Vector2(700, 500), res.collisionNormal!.mulS(res.penetrationDepth!));
+                this.r.setCameraTransform(this.camera.getCameraTransform());
+
+                if (this.static_response)
+                {
+                    this.p.translate(res.collisionNormal!.mulS(-(res.penetrationDepth! + 0.01)));
+                    this.camera.translate(res.collisionNormal!.mulS(-(res.penetrationDepth! + 0.01)));
+                }
+            }
+            this.r.drawCollider(collider);
+        })
 
         this.r.drawCollider(this.p);
-        // this.r.drawPolygon(this.p2);
-        // this.r.drawPolygon(this.p3, true);
 
-        this.r.drawCollider(this.c);
+        if (this.static_response)
+        {
+            this.r.log("static collision response enabled", 25);
+        }
     }
 }

@@ -13,6 +13,13 @@ export class Camera
         this._scale = new Vector2(1, 1);
     }
 
+    reset(): void
+    {
+        this._translation.clear();
+        this._rotation= 0;
+        this._scale = new Vector2(1, 1);
+    }
+
     setPosition(p: Vector2): void
     {
         this._translation.x = p.x;

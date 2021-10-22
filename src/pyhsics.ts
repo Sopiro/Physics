@@ -27,11 +27,11 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 // Returns the fardest vertex in the 'dir' direction
 export function support(collider: Collider, dir: Vector2): Vector2
 {
-    if(collider instanceof Polygon)
+    if (collider instanceof Polygon)
     {
         let idx = 0;
         let maxValue = dir.dot(collider.vertices[idx]);
-    
+
         for (let i = 1; i < collider.vertices.length; i++)
         {
             let value = dir.dot(collider.vertices[i]);
@@ -41,10 +41,10 @@ export function support(collider: Collider, dir: Vector2): Vector2
                 maxValue = value;
             }
         }
-    
+
         return collider.vertices[idx];
     }
-    else if(collider instanceof Circle)
+    else if (collider instanceof Circle)
     {
         return dir.normalized().mulS(collider.radius);
     }
@@ -139,13 +139,15 @@ export interface EPAResult
 
 const TOLERANCE = 0.001;
 
-export function epa(c1: Collider, c2: Collider, gjkResult: Simplex, r: Renderer): EPAResult
+export function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
 {
     let polytope: Polytope = new Polytope(gjkResult);
 
-    while (true)
+    let closestEdge: ClosestEdgeInfo = { index: 0, distance: Infinity, normal: new Vector2() };
+
+    for (let i = 0; i < MAX_ITERATION; i++)
     {
-        let closestEdge: ClosestEdgeInfo = polytope.getClosestEdge();
+        closestEdge = polytope.getClosestEdge();
         let supportPoint = csoSupport(c1, c2, closestEdge.normal);
         let newDistance = closestEdge.normal.dot(supportPoint);
 
@@ -156,16 +158,15 @@ export function epa(c1: Collider, c2: Collider, gjkResult: Simplex, r: Renderer)
         }
         else
         {
-            // Visualizing result polytope
-            for (let i = 0; i < polytope.count; i++)
-                r.drawLineV(polytope.vertices[i], polytope.vertices[(i + 1) % polytope.count]);
-
-            return {
-                penetrationDepth: closestEdge.distance,
-                collisionNormal: closestEdge.normal
-            };
+            // If you didn't expand edge, you reached the most outer edge
+            break;
         }
     }
+
+    return {
+        penetrationDepth: closestEdge.distance,
+        collisionNormal: closestEdge.normal
+    };
 }
 
 export interface CollisionResult
@@ -175,7 +176,7 @@ export interface CollisionResult
     collisionNormal?: Vector2;
 }
 
-export function detectCollision(c1: Collider, c2: Collider, r: Renderer): CollisionResult
+export function detectCollision(c1: Collider, c2: Collider): CollisionResult
 {
     const gjkResult = gjk(c1, c2);
 
@@ -185,7 +186,7 @@ export function detectCollision(c1: Collider, c2: Collider, r: Renderer): Collis
     }
     else
     {
-        const epaResult: EPAResult = epa(c1, c2, gjkResult.simplex, r);
+        const epaResult: EPAResult = epa(c1, c2, gjkResult.simplex);
 
         return {
             collide: true,
