@@ -1,4 +1,6 @@
+import { Circle } from "./circle.js";
 import { Matrix3, Vector2 } from "./math.js";
+import { Polygon } from "./polygon.js";
 export class Renderer {
     constructor(gfx, width, height) {
         this.gfx = gfx;
@@ -100,17 +102,25 @@ export class Renderer {
                 break;
         }
     }
-    drawPolygon(p, b = false) {
-        this.setModelTransform(p.localToGlobal());
-        for (let i = 0; i < p.count; i++) {
-            if (b) {
-                this.drawCircleV(p.vertices[i], 5, true);
+    drawCollider(c, drawVerticesOnly = false) {
+        this.setModelTransform(c.localToGlobal());
+        if (c instanceof Polygon) {
+            for (let i = 0; i < c.count; i++) {
+                if (drawVerticesOnly) {
+                    this.drawCircleV(c.vertices[i], 5, true);
+                }
+                else {
+                    let curr = c.vertices[i];
+                    let next = c.vertices[(i + 1) % c.count];
+                    this.drawLineV(curr, next);
+                }
             }
-            else {
-                let curr = p.vertices[i];
-                let next = p.vertices[(i + 1) % p.count];
-                this.drawLineV(curr, next);
-            }
+        }
+        else if (c instanceof Circle) {
+            this.drawCircleV(c.center, c.radius);
+        }
+        else {
+            throw "Not supported shape";
         }
         this.resetModelTransform();
     }

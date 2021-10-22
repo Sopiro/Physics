@@ -1,3 +1,5 @@
+import { Circle } from "./circle.js";
+import { Collider } from "./collider.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
@@ -154,23 +156,35 @@ export class Renderer
         }
     }
 
-    drawPolygon(p: Polygon, b: boolean = false): void
+    drawCollider(c: Collider, drawVerticesOnly: boolean = false): void
     {
-        this.setModelTransform(p.localToGlobal());
+        this.setModelTransform(c.localToGlobal());
 
-        for (let i = 0; i < p.count; i++)
+        if (c instanceof Polygon)
         {
-            if (b)
+            for (let i = 0; i < c.count; i++)
             {
-                this.drawCircleV(p.vertices[i], 5, true);
-            }
-            else
-            {
-                let curr = p.vertices[i];
-                let next = p.vertices[(i + 1) % p.count];
-                this.drawLineV(curr, next);
+                if (drawVerticesOnly)
+                {
+                    this.drawCircleV(c.vertices[i], 5, true);
+                }
+                else
+                {
+                    let curr = c.vertices[i];
+                    let next = c.vertices[(i + 1) % c.count];
+                    this.drawLineV(curr, next);
+                }
             }
         }
+        else if (c instanceof Circle)
+        {
+            this.drawCircleV(c.center, c.radius);
+        }
+        else
+        {
+            throw "Not supported shape";
+        }
+
 
         this.resetModelTransform();
     }

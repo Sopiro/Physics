@@ -1,3 +1,4 @@
+import { Circle } from "./circle.js";
 import { toFixed, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
@@ -14,37 +15,44 @@ export function subPolygon(p1, p2) {
     return new Polygon(res, false);
 }
 // Returns the fardest vertex in the 'dir' direction
-export function support(vertices, dir) {
-    let idx = 0;
-    let maxValue = dir.dot(vertices[idx]);
-    for (let i = 1; i < vertices.length; i++) {
-        let value = dir.dot(vertices[i]);
-        if (value > maxValue) {
-            idx = i;
-            maxValue = value;
+export function support(collider, dir) {
+    if (collider instanceof Polygon) {
+        let idx = 0;
+        let maxValue = dir.dot(collider.vertices[idx]);
+        for (let i = 1; i < collider.vertices.length; i++) {
+            let value = dir.dot(collider.vertices[i]);
+            if (value > maxValue) {
+                idx = i;
+                maxValue = value;
+            }
         }
+        return collider.vertices[idx];
     }
-    return vertices[idx];
+    else if (collider instanceof Circle) {
+        return dir.normalized().mulS(collider.radius);
+    }
+    else {
+        throw "Not supported shape";
+    }
 }
-export function csoSupport(p1, p2, dir) {
-    const localDirP1 = p1.globalToLocal().mulVector(dir, 0);
-    const localDirP2 = p2.globalToLocal().mulVector(dir.mulS(-1), 0);
-    let supportP1 = support(p1.vertices, localDirP1);
-    let supportP2 = support(p2.vertices, localDirP2);
-    supportP1 = p1.localToGlobal().mulVector(supportP1, 1);
-    supportP2 = p2.localToGlobal().mulVector(supportP2, 1);
+export function csoSupport(c1, c2, dir) {
+    const localDirP1 = c1.globalToLocal().mulVector(dir, 0);
+    const localDirP2 = c2.globalToLocal().mulVector(dir.mulS(-1), 0);
+    let supportP1 = support(c1, localDirP1);
+    let supportP2 = support(c2, localDirP2);
+    supportP1 = c1.localToGlobal().mulVector(supportP1, 1);
+    supportP2 = c2.localToGlobal().mulVector(supportP2, 1);
     return supportP1.subV(supportP2);
 }
-const MAX_ITERATION = 10;
-export function gjk(p1, p2) {
+const MAX_ITERATION = 20;
+export function gjk(c1, c2) {
     const origin = new Vector2(0, 0);
     let simplex = new Simplex();
     let dir = new Vector2(1, 0); // Random initial direction
-    let supportPoint = csoSupport(p1, p2, dir);
+    let supportPoint = csoSupport(c1, c2, dir);
     simplex.addVertex(supportPoint);
     let result = { collide: false, simplex: simplex };
-    let k;
-    for (k = 0; k < MAX_ITERATION; k++) {
+    for (let k = 0; k < MAX_ITERATION; k++) {
         let closest = simplex.getClosest(origin);
         if (closest.result.fixed().equals(origin)) {
             result.collide = true;
@@ -58,7 +66,7 @@ export function gjk(p1, p2) {
             simplex = newSimplex;
         }
         dir = origin.subV(closest.result);
-        supportPoint = csoSupport(p1, p2, dir);
+        supportPoint = csoSupport(c1, c2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
         if (toFixed(dir.getLength() - dir.normalized().dot(supportPoint.subV(closest.result))) > 0) {
@@ -72,17 +80,15 @@ export function gjk(p1, p2) {
         else
             simplex.addVertex(supportPoint);
     }
-    if (k >= MAX_ITERATION)
-        throw "Exceed max iteration";
     result.simplex = simplex;
     return result;
 }
 const TOLERANCE = 0.001;
-export function epa(p1, p2, gjkResult, r) {
+export function epa(c1, c2, gjkResult, r) {
     let polytope = new Polytope(gjkResult);
     while (true) {
         let closestEdge = polytope.getClosestEdge();
-        let supportPoint = csoSupport(p1, p2, closestEdge.normal);
+        let supportPoint = csoSupport(c1, c2, closestEdge.normal);
         let newDistance = closestEdge.normal.dot(supportPoint);
         if (Math.abs(closestEdge.distance - newDistance) > TOLERANCE) {
             // Insert the support vertex so that it expands our polytope
@@ -99,13 +105,13 @@ export function epa(p1, p2, gjkResult, r) {
         }
     }
 }
-export function detectCollision(p1, p2, r) {
-    const gjkResult = gjk(p1, p2);
+export function detectCollision(c1, c2, r) {
+    const gjkResult = gjk(c1, c2);
     if (gjkResult.simplex.count != 3) {
         return { collide: false };
     }
     else {
-        const epaResult = epa(p1, p2, gjkResult.simplex, r);
+        const epaResult = epa(c1, c2, gjkResult.simplex, r);
         return {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,

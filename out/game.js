@@ -4,6 +4,7 @@ import * as Input from "./input.js";
 import { Simplex } from "./simplex.js";
 import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
+import { Circle } from "./circle.js";
 export class Game {
     constructor(renderer, width, height) {
         this.r = renderer;
@@ -18,6 +19,7 @@ export class Game {
         // this.p2 = new Polygon([new Vector2(-50, -50), new Vector2(0, 50), new Vector2(50, -50)], true);
         this.p2 = new Polygon([new Vector2(-30, -30), new Vector2(-50, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(80, 0)], true);
         this.p3 = subPolygon(this.p, this.p2);
+        this.c = new Circle(new Vector2(100, 100), 50);
         this.camera.translate(new Vector2(-width / 2.0, -height / 2.0));
     }
     update(delta) {
@@ -42,16 +44,16 @@ export class Game {
         this.r.drawLine(0, -1000, 0, 1000);
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
-        this.r.drawPolygon(this.p);
-        this.r.drawPolygon(this.p2);
-        this.r.drawPolygon(this.p3, true);
-        let res = detectCollision(this.p, this.p2, this.r);
-        // this.r.drawCircleV(res, 7);
+        let res = detectCollision(this.p, this.c, this.r);
         if (res.collide) {
             this.r.log("collide!");
             this.r.drawVectorP(new Vector2(), res.collisionNormal.mulS(res.penetrationDepth));
-            // this.p.translate(res.collisionNormal!.mulS(-res.penetrationDepth!));
-            // this.camera.translate(res.collisionNormal!.mulS(-res.penetrationDepth!));
+            this.p.translate(res.collisionNormal.mulS(-res.penetrationDepth));
+            this.camera.translate(res.collisionNormal.mulS(-res.penetrationDepth));
         }
+        this.r.drawCollider(this.p);
+        // this.r.drawPolygon(this.p2);
+        // this.r.drawPolygon(this.p3, true);
+        this.r.drawCollider(this.c);
     }
 }
