@@ -14,10 +14,9 @@ export class Game
     private time: number;
     private cursorPos: Vector2;
     private p: Collider;
-    private p2: Polygon;
 
     private colliders: Collider[];
-    private static_response = false;
+    private static_resolution = false;
 
     private camera: Camera;
 
@@ -33,9 +32,7 @@ export class Game
         this.cursorPos = new Vector2(0, 0);
 
         this.colliders = [];
-
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
-        this.p2 = new Polygon([new Vector2(-30, -30), new Vector2(-50, 0), new Vector2(0, 100), new Vector2(100, 100), new Vector2(80, 0)], true);
 
         this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
     }
@@ -57,8 +54,6 @@ export class Game
 
         this.p.translate(new Vector2(mx * speed, my * speed));
         this.p.rotate(mr * delta * 2.5);
-        // this.p2.rotate(delta);
-        this.p2.setPosition(new Vector2(100, 100));
 
         if (Input.mouses.curr_down && !Input.mouses.last_down)
         {
@@ -70,7 +65,7 @@ export class Game
 
         if (Input.curr_keys.r && !Input.last_keys.r)
         {
-            this.static_response = !this.static_response;
+            this.static_resolution = !this.static_resolution;
         }
 
         if (Input.curr_keys.n && !Input.last_keys.n)
@@ -103,7 +98,7 @@ export class Game
                 this.r.drawVector(new Vector2(700, 500), res.collisionNormal!.mulS(res.penetrationDepth!));
                 this.r.setCameraTransform(this.camera.getCameraTransform());
 
-                if (this.static_response)
+                if (this.static_resolution)
                 {
                     this.p.translate(res.collisionNormal!.mulS(-(res.penetrationDepth! + 0.01)));
                     this.camera.translate(res.collisionNormal!.mulS(-(res.penetrationDepth! + 0.01)));
@@ -114,9 +109,9 @@ export class Game
 
         this.r.drawCollider(this.p);
 
-        if (this.static_response)
+        if (this.static_resolution)
         {
-            this.r.log("static collision response enabled", 25);
+            this.r.log("static collision resolution enabled", 25);
         }
     }
 }

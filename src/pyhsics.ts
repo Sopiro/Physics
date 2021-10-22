@@ -3,7 +3,6 @@ import { Collider } from "./collider.js";
 import { toFixed, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { ClosestEdgeInfo, Polytope } from "./polytope.js";
-import { Renderer } from "./renderer.js";
 import { Simplex } from "./simplex.js";
 
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
