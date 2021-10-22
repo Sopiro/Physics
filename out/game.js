@@ -15,6 +15,8 @@ export class Game {
         this.cursorPos = new Vector2(0, 0);
         this.colliders = [];
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        this.p2 = new Polygon([new Vector2(100, 100), new Vector2(150, 200), new Vector2(200, 100)], false);
+        this.colliders.push(this.p2);
         this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
     }
     update(delta) {
@@ -55,8 +57,12 @@ export class Game {
                 this.r.log("collide!");
                 this.r.resetCameraTransform();
                 this.r.drawText(630, 150, "collision vector");
-                this.r.drawVector(new Vector2(700, 500), res.collisionNormal.mulS(res.penetrationDepth));
+                this.r.drawVector(new Vector2(700, 500), res.collisionNormal.mulS(res.penetrationDepth), 2);
                 this.r.setCameraTransform(this.camera.getCameraTransform());
+                this.r.drawVector(res.contactPonintA, res.collisionNormal.mulS(-res.penetrationDepth), 2);
+                // Draw contact point
+                // this.r.drawCircleV(res.contactPonintA!);
+                // this.r.drawCircleV(res.contactPonintB!);
                 if (this.static_resolution) {
                     this.p.translate(res.collisionNormal.mulS(-(res.penetrationDepth + 0.01)));
                     this.camera.translate(res.collisionNormal.mulS(-(res.penetrationDepth + 0.01)));
@@ -65,8 +71,8 @@ export class Game {
             this.r.drawCollider(collider);
         });
         this.r.drawCollider(this.p);
-        if (this.static_resolution) {
+        if (this.static_resolution)
             this.r.log("static collision resolution enabled", 25);
-        }
+        this.r.drawCollider(this.p2);
     }
 }

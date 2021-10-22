@@ -3,7 +3,23 @@ export class Polytope {
     constructor(simplex) {
         if (simplex.count != 3)
             throw "Input simplex isn't a triangle";
-        this.vertices = [simplex.vertices[0].copy(), simplex.vertices[1].copy(), simplex.vertices[2].copy(),];
+        this.vertices = [
+            simplex.vertices[0].copy(),
+            simplex.vertices[1].copy(),
+            simplex.vertices[2].copy()
+        ];
+        this.supports = [{
+                p1: simplex.supports[0].p1.copy(),
+                p2: simplex.supports[0].p2.copy()
+            },
+            {
+                p1: simplex.supports[1].p1.copy(),
+                p2: simplex.supports[1].p2.copy()
+            },
+            {
+                p1: simplex.supports[2].p1.copy(),
+                p2: simplex.supports[2].p2.copy()
+            }];
     }
     get count() {
         return this.vertices.length;

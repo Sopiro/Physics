@@ -1,10 +1,5 @@
-import { Vector2, Vector3, Matrix4, Matrix3 } from "./math.js";
-
-export interface UV
-{
-    u: number;
-    v: number;
-}
+import { Vector2 } from "./math.js";
+import { Pair, getUV, lerpVertex } from "./util.js";
 
 export interface ClosestWithInfo
 {
@@ -14,11 +9,14 @@ export interface ClosestWithInfo
 
 export class Simplex
 {
+    // assert(supports.p1 - support.p2 == vertex)
     public vertices: Vector2[];
+    public supports: Pair<Vector2, Vector2>[];
 
-    constructor(vertices: Vector2[] = [])
+    constructor()
     {
-        this.vertices = vertices;
+        this.vertices = [];
+        this.supports = [];
     }
 
     get count(): number
@@ -29,18 +27,7 @@ export class Simplex
     clear(): void
     {
         this.vertices = [];
-    }
-
-    // Returns barycentric weights u, v
-    getUV(a: Vector2, b: Vector2, p: Vector2): UV
-    {
-        let dir = b.subV(a);
-        const len = dir.getLength();
-        dir.normalize();
-
-        const region = dir.dot(p.subV(a)) / len;
-
-        return { u: 1 - region, v: region };
+        this.supports = [];
     }
 
     // Returns the closest point to the input q
@@ -54,14 +41,14 @@ export class Simplex
                 {
                     const a = this.vertices[0];
                     const b = this.vertices[1];
-                    const w = this.getUV(a, b, q);
+                    const w = getUV(a, b, q);
 
                     if (w.v <= 0)
                         return { result: a, info: [0] };
                     else if (w.v >= 1)
                         return { result: b, info: [1] };
                     else
-                        return { result: a.mulS(w.u).addV(b.mulS(w.v)), info: [0, 1] };
+                        return { result: lerpVertex(a, b, w.u, w.v), info: [0, 1] };
                 }
             case 3: // 2-Simplex: Triangle
                 {
@@ -69,9 +56,9 @@ export class Simplex
                     const b = this.vertices[1];
                     const c = this.vertices[2];
 
-                    const wab = this.getUV(a, b, q);
-                    const wbc = this.getUV(b, c, q);
-                    const wca = this.getUV(c, a, q);
+                    const wab = getUV(a, b, q);
+                    const wbc = getUV(b, c, q);
+                    const wca = getUV(c, a, q);
 
                     if (wca.u <= 0 && wab.v <= 0) // A area
                         return { result: a, info: [0] };
@@ -120,11 +107,13 @@ export class Simplex
         }
     }
 
-    addVertex(vertex: Vector2): void
+    addVertex(vertex: Vector2, supportPoints?: Pair<Vector2, Vector2>): void
     {
         if (this.count >= 3) throw "error";
 
         this.vertices.push(vertex);
+        if (supportPoints != undefined)
+            this.supports.push(supportPoints);
     }
 
     // Return true if this simplex contains input vertex

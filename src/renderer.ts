@@ -32,7 +32,7 @@ export class Renderer
         this.cameraTransform = cameraTransfrom;
     }
 
-    resetCameraTransform():void
+    resetCameraTransform(): void
     {
         this.cameraTransform.loadIdentity();
     }
