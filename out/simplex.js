@@ -1,11 +1,12 @@
 export class Simplex {
     constructor(vertices = []) {
         this.vertices = vertices;
-        this.count = vertices.length;
+    }
+    get count() {
+        return this.vertices.length;
     }
     clear() {
         this.vertices = [];
-        this.count = 0;
     }
     // Returns barycentric weights u, v
     getUV(a, b, p) {
@@ -85,7 +86,6 @@ export class Simplex {
         if (this.count >= 3)
             throw "error";
         this.vertices.push(vertex);
-        this.count++;
     }
     // Return true if this simplex contains input vertex
     containsVertex(vertex) {

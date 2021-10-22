@@ -36,7 +36,7 @@ export function csoSupport(p1, p2, dir) {
     return supportP1.subV(supportP2);
 }
 const MAX_ITERATION = 10;
-function gjk(p1, p2) {
+export function gjk(p1, p2) {
     const origin = new Vector2(0, 0);
     let simplex = new Simplex();
     let dir = new Vector2(1, 0); // Random initial direction
@@ -78,7 +78,7 @@ function gjk(p1, p2) {
     return result;
 }
 const TOLERANCE = 0.001;
-function epa(p1, p2, gjkResult, r) {
+export function epa(p1, p2, gjkResult, r) {
     let polytope = new Polytope(gjkResult);
     while (true) {
         let closestEdge = polytope.getClosestEdge();

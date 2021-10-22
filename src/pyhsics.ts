@@ -63,7 +63,7 @@ interface GJKResult
     simplex: Simplex;
 }
 
-function gjk(p1: Polygon, p2: Polygon): GJKResult
+export function gjk(p1: Polygon, p2: Polygon): GJKResult
 {
     const origin = new Vector2(0, 0);
     let simplex = new Simplex();
@@ -122,7 +122,7 @@ function gjk(p1: Polygon, p2: Polygon): GJKResult
     return result;
 }
 
-interface EPAResult
+export interface EPAResult
 {
     penetrationDepth: number;
     collisionNormal: Vector2;
@@ -130,7 +130,7 @@ interface EPAResult
 
 const TOLERANCE = 0.001;
 
-function epa(p1: Polygon, p2: Polygon, gjkResult: Simplex, r: Renderer): EPAResult
+export function epa(p1: Polygon, p2: Polygon, gjkResult: Simplex, r: Renderer): EPAResult
 {
     let polytope: Polytope = new Polytope(gjkResult);
 
@@ -159,7 +159,7 @@ function epa(p1: Polygon, p2: Polygon, gjkResult: Simplex, r: Renderer): EPAResu
     }
 }
 
-interface CollisionResult
+export interface CollisionResult
 {
     collide: boolean;
     penetrationDepth?: number;

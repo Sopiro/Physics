@@ -15,18 +15,20 @@ export interface ClosestWithInfo
 export class Simplex
 {
     public vertices: Vector2[];
-    public count: number;
 
     constructor(vertices: Vector2[] = [])
     {
         this.vertices = vertices;
-        this.count = vertices.length;
+    }
+
+    get count(): number
+    {
+        return this.vertices.length;
     }
 
     clear(): void
     {
         this.vertices = [];
-        this.count = 0;
     }
 
     // Returns barycentric weights u, v
@@ -123,7 +125,6 @@ export class Simplex
         if (this.count >= 3) throw "error";
 
         this.vertices.push(vertex);
-        this.count++;
     }
 
     // Return true if this simplex contains input vertex
