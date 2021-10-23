@@ -12,8 +12,9 @@ export function getUV(a, b, p) {
     const region = dir.dot(p.subV(a)) / len;
     return { u: 1 - region, v: region };
 }
-export function lerpVertex(a, b, u, v) {
-    return a.mulS(u).addV(b.mulS(v));
+// Linearly combine(interpolate) the vector using weights u, v
+export function lerpVector(a, b, uv) {
+    return a.mulS(uv.u).addV(b.mulS(uv.v));
 }
 export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     if (numVertices < 0)

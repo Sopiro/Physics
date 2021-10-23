@@ -26,9 +26,10 @@ export function getUV(a: Vector2, b: Vector2, p: Vector2): UV
     return { u: 1 - region, v: region };
 }
 
-export function lerpVertex(a: Vector2, b: Vector2, u: number, v: number): Vector2
+// Linearly combine(interpolate) the vector using weights u, v
+export function lerpVector(a: Vector2, b: Vector2, uv: UV): Vector2
 {
-    return a.mulS(u).addV(b.mulS(v));
+    return a.mulS(uv.u).addV(b.mulS(uv.v));
 }
 
 export function createRandomConvexCollider(radius: number = 50, numVertices: number = -1): Collider

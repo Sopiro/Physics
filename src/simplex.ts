@@ -1,5 +1,5 @@
 import { Vector2 } from "./math.js";
-import { Pair, getUV, lerpVertex } from "./util.js";
+import { Pair, getUV, lerpVector } from "./util.js";
 
 export interface ClosestWithInfo
 {
@@ -48,7 +48,7 @@ export class Simplex
                     else if (w.v >= 1)
                         return { result: b, info: [1] };
                     else
-                        return { result: lerpVertex(a, b, w.u, w.v), info: [0, 1] };
+                        return { result: lerpVector(a, b, w), info: [0, 1] };
                 }
             case 3: // 2-Simplex: Triangle
                 {
@@ -78,21 +78,21 @@ export class Simplex
                     if (wab.u > 0 && wab.v > 0 && w * area <= 0) // On the AB edge
                     {
                         return {
-                            result: a.mulS(wab.u).addV(b.mulS(wab.v)),
+                            result: lerpVector(a, b, wab),
                             info: area != 0 ? [0, 1] : [0, 1, 2]
                         };
                     }
                     else if (wbc.u > 0 && wbc.v > 0 && u * area <= 0) // On the BC edge
                     {
                         return {
-                            result: b.mulS(wbc.u).addV(c.mulS(wbc.v)),
+                            result: lerpVector(b, c, wbc),
                             info: area != 0 ? [1, 2] : [0, 1, 2]
                         };
                     }
                     else if (wca.u > 0 && wca.u > 0 && v * area <= 0) // On the CA edge
                     {
                         return {
-                            result: c.mulS(wca.u).addV(a.mulS(wca.v)),
+                            result: lerpVector(c, a, wca),
                             info: area != 0 ? [2, 0] : [0, 1, 2]
                         };
                     }
@@ -109,11 +109,19 @@ export class Simplex
 
     addVertex(vertex: Vector2, supportPoints?: Pair<Vector2, Vector2>): void
     {
-        if (this.count >= 3) throw "error";
+        if (this.count >= 3) throw "2-simplex can have verticies less than 4";
 
         this.vertices.push(vertex);
         if (supportPoints != undefined)
             this.supports.push(supportPoints);
+    }
+
+    removeVertex(index: number): void
+    {
+        if (this.count == 0) throw "no vertex to remove";
+
+        this.vertices.splice(index, 1);
+        this.supports.splice(index, 1);
     }
 
     // Return true if this simplex contains input vertex

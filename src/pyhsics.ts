@@ -1,10 +1,10 @@
 import { Circle } from "./circle.js";
-import { Collider } from "./collider.js";
+import { Collider, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { ClosestEdgeInfo, Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
-import { getUV, lerpVertex, toFixed } from "./util.js";
+import { getUV, lerpVector, toFixed } from "./util.js";
 
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 {
@@ -27,7 +27,7 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 // Returns the fardest vertex in the 'dir' direction
 function support(collider: Collider, dir: Vector2): Vector2
 {
-    if (collider instanceof Polygon)
+    if (collider.type == Type.Polygon && collider instanceof Polygon)
     {
         let idx = 0;
         let maxValue = dir.dot(collider.vertices[idx]);
@@ -44,7 +44,7 @@ function support(collider: Collider, dir: Vector2): Vector2
 
         return collider.vertices[idx];
     }
-    else if (collider instanceof Circle)
+    else if (collider.type == Type.Circle && collider instanceof Circle)
     {
         return dir.normalized().mulS(collider.radius);
     }
@@ -196,8 +196,8 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
         contactNormal: closestEdge.normal,
         // For each collider, linearly combine the support points corresponding to the vertices of the edge,
         // using the barycentric weights as coefficients
-        contactPointA: lerpVertex(supportA1, supportA2, uv.u, uv.v),
-        contactPointB: lerpVertex(supportB1, supportB2, uv.u, uv.v)
+        contactPointA: lerpVector(supportA1, supportA2, uv),
+        contactPointB: lerpVector(supportB1, supportB2, uv)
     };
 }
 

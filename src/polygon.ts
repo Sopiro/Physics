@@ -1,5 +1,5 @@
-import { Collider } from "./collider.js";
-import { Matrix3, Vector2 } from "./math.js";
+import { Collider, Type } from "./collider.js";
+import { Vector2 } from "./math.js";
 
 export class Polygon extends Collider
 {
@@ -8,7 +8,7 @@ export class Polygon extends Collider
 
     constructor(vertices: Vector2[], resetPosition: boolean = true)
     {
-        super();
+        super(Type.Polygon);
 
         this.vertices = vertices;
 

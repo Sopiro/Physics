@@ -74,7 +74,7 @@ export class Game
         if (Input.curr_keys.n && !Input.last_keys.n)
         {
             this.p = createRandomConvexCollider(Math.random() * 60 + 40);
-            this.camera.reset();
+            this.camera.resetTransform();
             this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         }
     }
@@ -83,8 +83,8 @@ export class Game
     {
         this.r.setCameraTransform(this.camera.getCameraTransform());
 
-        this.r.drawLine(-1000, 0, 1000, 0);
-        this.r.drawLine(0, -1000, 0, 1000);
+        this.r.drawLine(-10000, 0, 10000, 0);
+        this.r.drawLine(0, -10000, 0, 10000);
 
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
@@ -119,7 +119,5 @@ export class Game
 
         if (this.static_resolution)
             this.r.log("static collision resolution enabled", 25);
-
-        this.r.drawCollider(this.p2);
     }
 }

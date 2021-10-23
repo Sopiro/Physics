@@ -1,4 +1,4 @@
-import { Collider } from "./collider.js";
+import { Collider, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 
 export class Circle extends Collider
@@ -8,7 +8,7 @@ export class Circle extends Collider
 
     constructor(center: Vector2, radius: number)
     {
-        super();
+        super(Type.Circle);
 
         this.translate(center);
         this.center = new Vector2(0, 0);

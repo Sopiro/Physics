@@ -1,8 +1,8 @@
-import { Collider } from "./collider.js";
+import { Collider, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 export class Polygon extends Collider {
     constructor(vertices, resetPosition = true) {
-        super();
+        super(Type.Polygon);
         this.vertices = vertices;
         this.cm = new Vector2(0, 0);
         for (let i = 0; i < this.count; i++) {
