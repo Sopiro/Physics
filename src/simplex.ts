@@ -116,14 +116,6 @@ export class Simplex
             this.supports.push(supportPoints);
     }
 
-    removeVertex(index: number): void
-    {
-        if (this.count == 0) throw "no vertex to remove";
-
-        this.vertices.splice(index, 1);
-        this.supports.splice(index, 1);
-    }
-
     // Return true if this simplex contains input vertex
     containsVertex(vertex: Vector2): boolean
     {

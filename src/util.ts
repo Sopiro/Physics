@@ -3,6 +3,24 @@ import { Collider } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 
+export function subPolygon(p1: Polygon, p2: Polygon): Polygon
+{
+    let res: Vector2[] = [];
+
+    for (let i = 0; i < p1.count; i++)
+    {
+        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
+        for (let j = 0; j < p2.count; j++)
+        {
+            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
+
+            res.push(p1v.subV(p2v));
+        }
+    }
+
+    return new Polygon(res, false);
+}
+
 export function toFixed(value: number): number
 {
     return Math.round(value * 1e9) / 1e9;

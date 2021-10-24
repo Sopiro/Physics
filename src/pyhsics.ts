@@ -6,24 +6,6 @@ import { ClosestEdgeInfo, Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
 import { getUV, lerpVector, toFixed } from "./util.js";
 
-export function subPolygon(p1: Polygon, p2: Polygon): Polygon
-{
-    let res: Vector2[] = [];
-
-    for (let i = 0; i < p1.count; i++)
-    {
-        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
-        for (let j = 0; j < p2.count; j++)
-        {
-            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
-
-            res.push(p1v.subV(p2v));
-        }
-    }
-
-    return new Polygon(res, false);
-}
-
 // Returns the fardest vertex in the 'dir' direction
 function support(collider: Collider, dir: Vector2): Vector2
 {
@@ -206,7 +188,7 @@ export interface CollisionResult
 {
     collide: boolean;
     penetrationDepth?: number;
-    collisionNormal?: Vector2;
+    contactNormal?: Vector2;
     contactPonintA?: Vector2;
     contactPonintB?: Vector2;
 }
@@ -226,7 +208,7 @@ export function detectCollision(a: Collider, b: Collider): CollisionResult
         return {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
-            collisionNormal: epaResult.contactNormal,
+            contactNormal: epaResult.contactNormal,
             contactPonintA: epaResult.contactPointA,
             contactPonintB: epaResult.contactPointB,
         };
