@@ -11,7 +11,7 @@ export class Simplex {
         this.vertices = [];
         this.supports = [];
     }
-    // Returns the closest point to the input q
+    // Returns the point closest to the input q
     getClosest(q) {
         switch (this.count) {
             case 1: // 0-Simplex: Point

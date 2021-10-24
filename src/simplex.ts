@@ -30,7 +30,7 @@ export class Simplex
         this.supports = [];
     }
 
-    // Returns the closest point to the input q
+    // Returns the point closest to the input q
     getClosest(q: Vector2): ClosestWithInfo
     {
         switch (this.count)
