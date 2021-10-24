@@ -2,14 +2,14 @@
 
 2D Collision detection([GJK](http://allenchou.net/2013/12/game-physics-collision-detection-gjk/)) and Contact data generation([EPA](http://allenchou.net/2013/12/game-physics-contact-generation-epa/)) algorithm implemented in HTML canvas with Typescript.
 
-
+Live Demo: https://sopiro.github.io/physics/  
 Video: https://youtu.be/F0YXlAVnZKU
 
 ## Preview
 ![img](.github/gjk%2Bepa%20demo.gif)
 
 ## Features
-- Basic inputing, rendering system(Game engine-like)
+- Basic input, rendering system(Game engine-like)
 - Compute the closest distance between convex polygons (GJK)
 - Generate contact data (EPA)
 - Static collision resolution
