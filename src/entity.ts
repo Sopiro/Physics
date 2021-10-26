@@ -13,10 +13,30 @@ export class Entity
         this._scale = new Vector2(1, 1);
     }
 
+    update(delta: number): void
+    {
+
+    }
+
+    get translation(): Vector2
+    {
+        return this._translation;
+    }
+
+    get rotation(): number
+    {
+        return this._rotation;
+    }
+
+    get scale(): Vector2
+    {
+        return this._scale;
+    }
+
     resetTransform(): void
     {
         this._translation.clear();
-        this._rotation= 0;
+        this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
 
@@ -48,7 +68,7 @@ export class Entity
         this._scale.y = s.y;
     }
 
-    scale(s: Vector2): void
+    doScale(s: Vector2): void
     {
         this._scale.x *= s.x;
         this._scale.y *= s.y;

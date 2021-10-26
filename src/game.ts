@@ -16,6 +16,8 @@ export class Game
     private p: Collider;
     private p2: Collider;
 
+    private ground: Collider;
+
     private colliders: Collider[];
     private static_resolution = false;
 
@@ -34,10 +36,16 @@ export class Game
 
         this.colliders = [];
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        this.p.setPosition(new Vector2(0, 400));
+        this.p.setAngularVelocity(5);
         this.p2 = new Polygon([new Vector2(100, 100), new Vector2(150, 200), new Vector2(200, 100)], false);
+        this.p2.translate(new Vector2(0, 200));
+        this.colliders.push(this.p);
         this.colliders.push(this.p2);
 
-        this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
+        this.ground = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(600, 50), new Vector2(600, 0)], true, "ground");
+
+        this.colliders.push(this.ground);
     }
 
     update(delta: number): void
@@ -50,7 +58,11 @@ export class Game
         const my = Input.curr_keys.ArrowDown ? -1 : Input.curr_keys.ArrowUp ? 1 : 0;
         let mr = Input.curr_keys.e ? -1 : Input.curr_keys.q ? 1 : 0;
 
-        this.camera.translate(new Vector2(mx * speed, my * speed));
+        // this.camera.translate(new Vector2(mx * speed, my * speed));
+        // this.camera.setPosition(this.p.translation);
+        // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
+
+        this.camera.setPosition(new Vector2(-this.width / 2.0, -100));
 
         this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY - 1);
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
@@ -77,14 +89,22 @@ export class Game
             this.camera.resetTransform();
             this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         }
+
+        this.colliders.forEach(collider =>
+        {
+            if(collider.name != "ground")
+                collider.addVelocity(new Vector2(0, -9.8));
+            collider.update(delta);
+        });
     }
 
     render(): void
     {
         this.r.setCameraTransform(this.camera.getCameraTransform());
 
-        this.r.drawLine(-10000, 0, 10000, 0);
-        this.r.drawLine(0, -10000, 0, 10000);
+        // Draw axis
+        // this.r.drawLine(-10000, 0, 10000, 0);
+        // this.r.drawLine(0, -10000, 0, 10000);
 
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
@@ -100,11 +120,11 @@ export class Game
                 this.r.drawText(630, 150, "collision vector");
                 this.r.drawVector(new Vector2(700, 500), res.contactNormal!.mulS(res.penetrationDepth!), 2);
                 this.r.setCameraTransform(this.camera.getCameraTransform());
-                this.r.drawVector(res.contactPonintA!, res.contactNormal!.mulS(-res.penetrationDepth!), 2);
+                this.r.drawVector(res.contactPointAGlobal!, res.contactNormal!.mulS(-res.penetrationDepth!), 2);
 
                 // Draw contact point
-                // this.r.drawCircleV(res.contactPonintA!);
-                // this.r.drawCircleV(res.contactPonintB!);
+                this.r.drawCircleV(res.contactPointAGlobal!);
+                this.r.drawCircleV(res.contactPointBGlobal!);
 
                 if (this.static_resolution)
                 {
@@ -115,7 +135,7 @@ export class Game
             this.r.drawCollider(collider);
         })
 
-        this.r.drawCollider(this.p);
+        // this.r.drawCollider(this.p);
 
         if (this.static_resolution)
             this.r.log("static collision resolution enabled", 25);

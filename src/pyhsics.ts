@@ -131,8 +131,8 @@ interface EPAResult
 {
     penetrationDepth: number;
     contactNormal: Vector2;
-    contactPointA: Vector2;
-    contactPointB: Vector2;
+    contactPointAGlobal: Vector2;
+    contactPointBGlobal: Vector2;
 }
 
 const TOLERANCE = 0.001;
@@ -178,8 +178,8 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
         contactNormal: closestEdge.normal,
         // For each collider, linearly combine the support points corresponding to the vertices of the edge,
         // using the barycentric weights as coefficients
-        contactPointA: lerpVector(supportA1, supportA2, uv),
-        contactPointB: lerpVector(supportB1, supportB2, uv)
+        contactPointAGlobal: lerpVector(supportA1, supportA2, uv),
+        contactPointBGlobal: lerpVector(supportB1, supportB2, uv),
     };
 }
 
@@ -189,8 +189,8 @@ export interface CollisionResult
     collide: boolean;
     penetrationDepth?: number;
     contactNormal?: Vector2;
-    contactPonintA?: Vector2;
-    contactPonintB?: Vector2;
+    contactPointAGlobal?: Vector2;
+    contactPointBGlobal?: Vector2;
 }
 
 export function detectCollision(a: Collider, b: Collider): CollisionResult
@@ -209,8 +209,21 @@ export function detectCollision(a: Collider, b: Collider): CollisionResult
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
             contactNormal: epaResult.contactNormal,
-            contactPonintA: epaResult.contactPointA,
-            contactPonintB: epaResult.contactPointB,
+            contactPointAGlobal: epaResult.contactPointAGlobal,
+            contactPointBGlobal: epaResult.contactPointBGlobal,
         };
     }
+}
+
+export interface Contact
+{
+    globalPositionA: Vector2,
+    globalPositionB: Vector2,
+    localPositionA: Vector2,
+    localPositionB: Vector2,
+
+    normal: Vector2,
+    tangent: Vector2,
+
+    depth: number,
 }

@@ -111,8 +111,8 @@ function epa(c1, c2, gjkResult) {
         contactNormal: closestEdge.normal,
         // For each collider, linearly combine the support points corresponding to the vertices of the edge,
         // using the barycentric weights as coefficients
-        contactPointA: lerpVector(supportA1, supportA2, uv),
-        contactPointB: lerpVector(supportB1, supportB2, uv)
+        contactPointAGlobal: lerpVector(supportA1, supportA2, uv),
+        contactPointBGlobal: lerpVector(supportB1, supportB2, uv),
     };
 }
 export function detectCollision(a, b) {
@@ -126,8 +126,8 @@ export function detectCollision(a, b) {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
             contactNormal: epaResult.contactNormal,
-            contactPonintA: epaResult.contactPointA,
-            contactPonintB: epaResult.contactPointB,
+            contactPointAGlobal: epaResult.contactPointAGlobal,
+            contactPointBGlobal: epaResult.contactPointBGlobal,
         };
     }
 }

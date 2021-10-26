@@ -5,6 +5,17 @@ export class Entity {
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
+    update(delta) {
+    }
+    get translation() {
+        return this._translation;
+    }
+    get rotation() {
+        return this._rotation;
+    }
+    get scale() {
+        return this._scale;
+    }
     resetTransform() {
         this._translation.clear();
         this._rotation = 0;
@@ -28,7 +39,7 @@ export class Entity {
         this._scale.x = s.x;
         this._scale.y = s.y;
     }
-    scale(s) {
+    doScale(s) {
         this._scale.x *= s.x;
         this._scale.y *= s.y;
     }

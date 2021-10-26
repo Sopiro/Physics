@@ -6,9 +6,9 @@ export class Polygon extends Collider
     public readonly vertices: Vector2[];
     public readonly cm: Vector2;
 
-    constructor(vertices: Vector2[], resetPosition: boolean = true)
+    constructor(vertices: Vector2[], resetPosition: boolean = true, name = "poly")
     {
-        super(Type.Polygon);
+        super(Type.Polygon, name);
 
         this.vertices = vertices;
 
