@@ -67,10 +67,14 @@ export function createRandomConvexCollider(radius: number = 50, numVertices: num
 
     angles.sort();
 
-    return new Polygon(angles.map((angle) =>
+    let res = new Polygon(angles.map((angle) =>
     {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
+
+    res.inertia = res.mass * (radius * radius * 2) / 12.0;
+
+    return res;
 }
 
 export interface Pair<A, B>

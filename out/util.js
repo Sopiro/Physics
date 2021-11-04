@@ -37,9 +37,11 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     for (let i = 0; i < numVertices; i++)
         angles.push(Math.random() * Math.PI * 2);
     angles.sort();
-    return new Polygon(angles.map((angle) => {
+    let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
+    res.inertia = res.mass * (radius * radius * 2) / 12.0;
+    return res;
 }
 export function random(left = -1, right = 1) {
     if (left > right) {

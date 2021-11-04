@@ -7,6 +7,7 @@ import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
 import { createRandomConvexCollider, Pair } from "./util.js";
 import { Collider } from "./collider.js";
+import { Circle } from "./circle.js";
 export class Game
 {
     private r: Renderer;
@@ -36,14 +37,17 @@ export class Game
 
         this.colliders = [];
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        // this.p = new Circle(new Vector2(0, 0), 50);
         this.p.setPosition(new Vector2(0, 400));
         this.p.angularVelocity = 2;
         // this.p.setRotation(1);
         this.colliders.push(this.p);
 
-        this.ground = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(600, 50), new Vector2(600, 0)], true, "ground");
+        this.ground = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(700, 50), new Vector2(700, 0)], true, "ground");
+        this.ground.mass = Number.MAX_VALUE;
+        this.ground.inertia = Number.MAX_VALUE;
 
-        // this.colliders.push(this.ground);
+        this.colliders.push(this.ground);
     }
 
     update(delta: number): void
@@ -60,7 +64,7 @@ export class Game
         // this.camera.setPosition(this.p.translation);
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
 
-        this.camera.setPosition(new Vector2(-this.width / 2.0, -100));
+        this.camera.setPosition(new Vector2(-this.width / 2.0, -50));
 
         this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY - 1);
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
@@ -73,10 +77,8 @@ export class Game
             let nc = createRandomConvexCollider(Math.random() * 60 + 40);
             nc.setPosition(this.cursorPos);
 
-            nc.linearVelocity = new Vector2(0, 200).subV(this.cursorPos).normalized().mulS(Util.random(50, 150));
+            nc.linearVelocity = new Vector2(0, 300).subV(this.cursorPos).normalized().mulS(Util.random(50, 150));
             nc.angularVelocity = Util.random(-10, 10);
-            nc.mass = 10;
-            nc.inertia = Util.random(1, 100);
 
             this.colliders.push(nc);
         }
@@ -93,12 +95,11 @@ export class Game
             this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         }
 
-        // console.log(this.colliders[this.colliders.length - 1]);
-
         // Apply externel forces, yield tentative velocities
         this.colliders.forEach((collider, index) =>
         {
-            // collider.addVelocity(new Vector2(0, -9.8 * delta * 50));
+            if (collider.name != "ground")
+                collider.addVelocity(new Vector2(0, -9.8 * delta * 100));
             collider.update(delta);
 
             if (collider.translation.y < -100)
@@ -109,21 +110,22 @@ export class Game
 
         let pairs: Pair<Pair<Collider, Collider>, Contact>[] = [];
 
-        this.colliders.forEach(a =>
+        for (let i = 0; i < this.colliders.length; i++)
         {
-            this.colliders.forEach(b =>
+            let a = this.colliders[i];
+
+            for (let j = i + 1; j < this.colliders.length; j++)
             {
-                if (a === b)
-                    return;
+                let b = this.colliders[j];
 
                 let res = detectCollision(a, b);
 
                 if (res.collide)
                     pairs.push({ p1: { p1: a, p2: b }, p2: res });
-            });
-        });
+            }
+        }
 
-        for (let i = 0; i < 5; i++)
+        for (let i = 0; i < pairs.length; i++)
         {
             // Resolve violated velocity constraint
             pairs.forEach(pair =>
@@ -141,13 +143,15 @@ export class Game
                 let j_wb = rb.cross(contact.contactNormal!);
 
                 let beta = 0.5;
-                let restitution = 0.7;
+                let restitution = 0.3;
 
                 let relativeVelocity = b.linearVelocity.addV(new Vector2(-b.angularVelocity * rb.y, b.angularVelocity * rb.x))
                     .subV(a.linearVelocity.addV(new Vector2(-a.angularVelocity * ra.y, a.angularVelocity * ra.x)));
                 let approachingVelocity = relativeVelocity.dot(contact.contactNormal!);
-                let slop = 0.0;
-                let bias = -(beta / delta) * Math.max(contact.penetrationDepth! - slop, 0) + restitution * approachingVelocity;
+                let penetration_slop = 5e-5;
+                let restitution_slop = 0.5;
+                let bias = -(beta / delta) * Math.max(contact.penetrationDepth! - penetration_slop, 0) +
+                    restitution * Math.max(approachingVelocity - restitution_slop, 0);
 
                 let k =
                     a.inverseMass +

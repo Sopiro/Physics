@@ -4,10 +4,10 @@ export class Polygon extends Collider {
     constructor(vertices, resetPosition = true, name = "poly") {
         super(Type.Polygon, name);
         this.vertices = vertices;
-        this._mass = 10;
+        this._mass = 200;
         this._invMass = 1 / this.mass;
-        const h = 10;
-        const w = 10;
+        const h = 100;
+        const w = 100;
         this._inertia = (w * w + h * h) * this._mass / 12;
         this._invInertia = 1 / this._inertia;
         this._cm = new Vector2(0, 0);

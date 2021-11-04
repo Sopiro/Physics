@@ -9,10 +9,10 @@ export class Circle extends Collider
     {
         super(Type.Circle, name);
 
-        this._mass = 10;
+        this._mass = 200;
         this._invMass = 1 / this.mass;
 
-        this._inertia = this.mass * radius * radius / 2;
+        this._inertia = this.mass * radius * radius;
         this._invInertia = 1 / this._inertia;
 
         this.translate(center);
