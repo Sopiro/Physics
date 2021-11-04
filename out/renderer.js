@@ -119,12 +119,12 @@ export class Renderer {
                     this.drawLineV(curr, next);
                 }
             }
-            this.drawCircleV(c.cm, 1, true);
+            this.drawCircleV(c.centerOfMass, 1, true);
         }
         else if (c instanceof Circle) {
-            this.drawCircleV(c.center, c.radius);
-            this.drawCircleV(c.center, 1, true);
-            this.drawLineV(c.center, c.center.addV(new Vector2(c.radius, 0)));
+            this.drawCircleV(c.centerOfMass, c.radius);
+            this.drawCircleV(c.centerOfMass, 1, true);
+            this.drawLineV(c.centerOfMass, c.centerOfMass.addV(new Vector2(c.radius, 0)));
         }
         else {
             throw "Not supported shape";

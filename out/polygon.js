@@ -4,21 +4,27 @@ export class Polygon extends Collider {
     constructor(vertices, resetPosition = true, name = "poly") {
         super(Type.Polygon, name);
         this.vertices = vertices;
-        this.cm = new Vector2(0, 0);
+        this._mass = 10;
+        this._invMass = 1 / this.mass;
+        const h = 10;
+        const w = 10;
+        this._inertia = (w * w + h * h) * this._mass / 12;
+        this._invInertia = 1 / this._inertia;
+        this._cm = new Vector2(0, 0);
         for (let i = 0; i < this.count; i++) {
-            this.cm.x += this.vertices[i].x;
-            this.cm.y += this.vertices[i].y;
+            this._cm.x += this.vertices[i].x;
+            this._cm.y += this.vertices[i].y;
         }
-        this.cm.x /= this.count;
-        this.cm.y /= this.count;
+        this._cm.x /= this.count;
+        this._cm.y /= this.count;
         for (let i = 0; i < this.count; i++) {
-            this.vertices[i].x -= this.cm.x;
-            this.vertices[i].y -= this.cm.y;
+            this.vertices[i].x -= this._cm.x;
+            this.vertices[i].y -= this._cm.y;
         }
         if (!resetPosition)
-            this.translate(this.cm);
-        this.cm.x = 0;
-        this.cm.y = 0;
+            this.translate(this._cm);
+        this._cm.x = 0;
+        this._cm.y = 0;
     }
     get count() {
         return this.vertices.length;

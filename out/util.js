@@ -41,3 +41,12 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
 }
+export function random(left = -1, right = 1) {
+    if (left > right) {
+        let tmp = right;
+        right = left;
+        left = tmp;
+    }
+    let range = right - left;
+    return Math.random() * range + left;
+}

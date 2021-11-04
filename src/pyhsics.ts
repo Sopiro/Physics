@@ -184,16 +184,18 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
 }
 
 // [!]This all is in the world space
-export interface CollisionResult
+export interface Contact
 {
     collide: boolean;
     penetrationDepth?: number;
     contactNormal?: Vector2;
     contactPointAGlobal?: Vector2;
     contactPointBGlobal?: Vector2;
+    normalImpulseSum?: number;
+    tangentImpulseSum?: number;
 }
 
-export function detectCollision(a: Collider, b: Collider): CollisionResult
+export function detectCollision(a: Collider, b: Collider): Contact
 {
     const gjkResult = gjk(a, b);
 
@@ -211,19 +213,8 @@ export function detectCollision(a: Collider, b: Collider): CollisionResult
             contactNormal: epaResult.contactNormal,
             contactPointAGlobal: epaResult.contactPointAGlobal,
             contactPointBGlobal: epaResult.contactPointBGlobal,
+            normalImpulseSum: 0,
+            tangentImpulseSum: 0,
         };
     }
-}
-
-export interface Contact
-{
-    globalPositionA: Vector2,
-    globalPositionB: Vector2,
-    localPositionA: Vector2,
-    localPositionB: Vector2,
-
-    normal: Vector2,
-    tangent: Vector2,
-
-    depth: number,
 }

@@ -21,6 +21,9 @@ export class Vector2 {
         this.x *= -1;
         this.y *= -1;
     }
+    inverted() {
+        return new Vector2(this.x * -1, this.y * -1);
+    }
     normalize() {
         const len = this.getLength();
         if (len != 0) {
@@ -106,6 +109,9 @@ export class Vector3 {
         this.y *= -1;
         this.z *= -1;
     }
+    inverted() {
+        return new Vector3(this.x * -1, this.y * -1, this.z * -1);
+    }
     getLength() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
@@ -141,6 +147,90 @@ export class Vector3 {
             this.x = 0;
             this.y = 0;
             this.z = 0;
+        }
+    }
+}
+export class Vector4 {
+    constructor(x = 0, y = 0, z = 0, w = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+    }
+    clear() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.w = 0;
+    }
+    copy() {
+        return new Vector4(this.x, this.y, this.z, this.w);
+    }
+    toFixed() {
+        this.x = Math.round(this.x * 1e9) / 1e9;
+        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.z = Math.round(this.z * 1e9) / 1e9;
+        this.w = Math.round(this.w * 1e9) / 1e9;
+    }
+    fixed() {
+        return new Vector4(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9, Math.round(this.w * 1e9) / 1e9);
+    }
+    normalize() {
+        const len = this.getLength();
+        this.x /= len;
+        this.y /= len;
+        this.z /= len;
+        this.w /= len;
+    }
+    normalized() {
+        const len = this.getLength();
+        if (len != 0)
+            return this.divS(len);
+        else
+            return this;
+    }
+    invert() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        this.w *= -1;
+    }
+    inverted() {
+        return new Vector4(this.x * -1, this.y * -1, this.z * -1, this.w * -1);
+    }
+    getLength() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+    }
+    dot(v) {
+        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+    }
+    add(v) {
+        return new Vector4(this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w);
+    }
+    sub(v) {
+        return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
+    }
+    divS(v) {
+        return new Vector4(this.x / v, this.y / v, this.z / v, this.w / v);
+    }
+    divXYZW(x, y, z, w) {
+        return new Vector4(this.x / x, this.y / y, this.z / z, this.w / w);
+    }
+    mulS(v) {
+        return new Vector4(this.x * v, this.y * v, this.z * v, this.w * v);
+    }
+    mulXYZW(x, y, z, w) {
+        return new Vector4(this.x * x, this.y * y, this.z * z, this.w * w);
+    }
+    equals(v) {
+        return this.x == v.x && this.y == v.y && this.z == v.z && this.w == v.w;
+    }
+    unNaN() {
+        if (isNaN(this.x) || isNaN(this.y) || isNaN(this.z) || isNaN(this.w)) {
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.w = 0;
         }
     }
 }

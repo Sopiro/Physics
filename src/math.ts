@@ -37,6 +37,11 @@ export class Vector2
         this.y *= -1;
     }
 
+    inverted() : Vector2
+    {
+        return new Vector2(this.x * -1, this.y * -1);
+    }
+
     normalize(): void
     {
         const len = this.getLength();
@@ -171,6 +176,11 @@ export class Vector3
         this.z *= -1;
     }
 
+    inverted() : Vector3
+    {
+        return new Vector3(this.x * -1, this.y * -1, this.z * -1);
+    }
+
     getLength(): number
     {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
@@ -228,6 +238,137 @@ export class Vector3
             this.x = 0;
             this.y = 0;
             this.z = 0;
+        }
+    }
+}
+
+export class Vector4
+{
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+
+    constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+    }
+
+    clear(): void
+    {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.w = 0;
+    }
+
+    copy(): Vector4
+    {
+        return new Vector4(this.x, this.y, this.z, this.w);
+    }
+
+    toFixed(): void
+    {
+        this.x = Math.round(this.x * 1e9) / 1e9;
+        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.z = Math.round(this.z * 1e9) / 1e9;
+        this.w = Math.round(this.w * 1e9) / 1e9;
+    }
+
+    fixed(): Vector4
+    {
+        return new Vector4(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9, Math.round(this.w * 1e9) / 1e9);
+    }
+
+    normalize(): void
+    {
+        const len = this.getLength();
+
+        this.x /= len;
+        this.y /= len;
+        this.z /= len;
+        this.w /= len;
+    }
+
+    normalized(): Vector4
+    {
+        const len = this.getLength();
+
+        if (len != 0)
+            return this.divS(len);
+        else
+            return this;
+    }
+
+    invert(): void
+    {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        this.w *= -1;
+    }
+
+    inverted() : Vector4
+    {
+        return new Vector4(this.x * -1, this.y * -1, this.z * -1, this.w * -1);
+    }
+
+    getLength(): number
+    {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+    }
+
+    dot(v: Vector4): number
+    {
+        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+    }
+
+    add(v: Vector4): Vector4
+    {
+        return new Vector4(this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w);
+    }
+
+    sub(v: Vector4): Vector4
+    {
+        return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
+    }
+
+    divS(v: number): Vector4
+    {
+        return new Vector4(this.x / v, this.y / v, this.z / v, this.w / v);
+    }
+
+    divXYZW(x: number, y: number, z: number, w: number): Vector4
+    {
+        return new Vector4(this.x / x, this.y / y, this.z / z, this.w / w);
+    }
+
+    mulS(v: number): Vector4
+    {
+        return new Vector4(this.x * v, this.y * v, this.z * v, this.w * v);
+    }
+
+    mulXYZW(x: number, y: number, z: number, w: number): Vector4
+    {
+        return new Vector4(this.x * x, this.y * y, this.z * z, this.w * w);
+    }
+
+    equals(v: Vector4): boolean
+    {
+        return this.x == v.x && this.y == v.y && this.z == v.z && this.w == v.w;
+    }
+
+    unNaN(): void
+    {
+        if (isNaN(this.x) || isNaN(this.y) || isNaN(this.z) || isNaN(this.w))
+        {
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.w = 0;
         }
     }
 }

@@ -9,25 +9,54 @@ export class Collider extends Entity {
     constructor(type, name = "") {
         super();
         this.type = type;
-        this._velocity = new Vector2(0, 0);
+        this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this.name = name;
     }
+    get mass() {
+        return this._mass;
+    }
+    set mass(m) {
+        this._mass = m;
+        this._invMass = 1 / this._mass;
+    }
+    get inverseMass() {
+        return this._invMass;
+    }
+    get inertia() {
+        return this._inertia;
+    }
+    set inertia(i) {
+        this._inertia = i;
+        this._invInertia = 1 / i;
+    }
+    get inverseInertia() {
+        return this._invInertia;
+    }
+    get centerOfMass() {
+        return this._cm;
+    }
+    get linearVelocity() {
+        return this._linearVelocity;
+    }
+    set linearVelocity(v) {
+        this._linearVelocity.x = v.x;
+        this._linearVelocity.y = v.y;
+    }
+    get angularVelocity() {
+        return this._angularVelocity;
+    }
+    set angularVelocity(w) {
+        this._angularVelocity = w;
+    }
     update(delta) {
-        this._translation.x += this._velocity.x * delta;
-        this._translation.y += this._velocity.y * delta;
+        this._translation.x += this._linearVelocity.x * delta;
+        this._translation.y += this._linearVelocity.y * delta;
         this._rotation += this._angularVelocity * delta;
     }
-    setVelocity(v) {
-        this._velocity.x = v.x;
-        this._velocity.y = v.y;
-    }
     addVelocity(vt) {
-        this._velocity.x += vt.x;
-        this._velocity.y += vt.y;
-    }
-    setAngularVelocity(w) {
-        this._angularVelocity = w;
+        this._linearVelocity.x += vt.x;
+        this._linearVelocity.y += vt.y;
     }
     addAngularVelocity(wt) {
         this._angularVelocity += wt;

@@ -128,6 +128,8 @@ export function detectCollision(a, b) {
             contactNormal: epaResult.contactNormal,
             contactPointAGlobal: epaResult.contactPointAGlobal,
             contactPointBGlobal: epaResult.contactPointBGlobal,
+            normalImpulseSum: 0,
+            tangentImpulseSum: 0,
         };
     }
 }

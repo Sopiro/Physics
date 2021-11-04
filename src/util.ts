@@ -78,3 +78,16 @@ export interface Pair<A, B>
     p1: A;
     p2: B;
 }
+
+export function random(left: number = -1, right: number = 1): number
+{
+    if (left > right)
+    {
+        let tmp = right;
+        right = left;
+        left = tmp;
+    }
+
+    let range = right - left;
+    return Math.random() * range + left
+}
