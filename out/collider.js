@@ -5,6 +5,7 @@ export var Type;
     Type[Type["Circle"] = 0] = "Circle";
     Type[Type["Polygon"] = 1] = "Polygon";
 })(Type || (Type = {}));
+// Rigid body collider
 export class Collider extends Entity {
     constructor(type, name = "") {
         super();
@@ -50,8 +51,8 @@ export class Collider extends Entity {
         this._angularVelocity = w;
     }
     update(delta) {
-        this._translation.x += this._linearVelocity.x * delta;
-        this._translation.y += this._linearVelocity.y * delta;
+        this._position.x += this._linearVelocity.x * delta;
+        this._position.y += this._linearVelocity.y * delta;
         this._rotation += this._angularVelocity * delta;
     }
     addVelocity(vt) {

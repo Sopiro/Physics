@@ -2,13 +2,13 @@ import { Matrix3, Vector2 } from "./math.js";
 
 export class Entity
 {
-    protected _translation: Vector2;
+    protected _position: Vector2;
     protected _rotation: number;
     protected _scale: Vector2;
 
     constructor()
     {
-        this._translation = new Vector2(0, 0);
+        this._position = new Vector2(0, 0);
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
@@ -18,9 +18,15 @@ export class Entity
 
     }
 
-    get translation(): Vector2
+    get position(): Vector2
     {
-        return this._translation;
+        return this._position;
+    }
+
+    set position(p: Vector2)
+    {
+        this._position.x = p.x;
+        this._position.y = p.y;
     }
 
     get rotation(): number
@@ -28,44 +34,38 @@ export class Entity
         return this._rotation;
     }
 
+    set rotation(r: number)
+    {
+        this._rotation = r;
+    }
+
     get scale(): Vector2
     {
         return this._scale;
     }
 
+    set scale(s: Vector2)
+    {
+        this._scale.x = s.x;
+        this._scale.y = s.y;
+    }
+
     resetTransform(): void
     {
-        this._translation.clear();
+        this._position.clear();
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
 
-    setPosition(p: Vector2): void
-    {
-        this._translation.x = p.x;
-        this._translation.y = p.y;
-    }
-
     translate(t: Vector2): void
     {
-        this._translation.x += t.x;
-        this._translation.y += t.y;
-    }
-
-    setRotation(r: number): void
-    {
-        this._rotation = r;
+        this._position.x += t.x;
+        this._position.y += t.y;
     }
 
     rotate(r: number): void
     {
         this._rotation += r;
-    }
-
-    setScale(s: Vector2): void
-    {
-        this._scale.x = s.x;
-        this._scale.y = s.y;
     }
 
     doScale(s: Vector2): void
@@ -77,7 +77,7 @@ export class Entity
     // Returns local to global transform
     localToGlobal(): Matrix3
     {
-        return new Matrix3().translate(this._translation.x, this._translation.y)
+        return new Matrix3().translate(this._position.x, this._position.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
     }
@@ -87,6 +87,6 @@ export class Entity
     {
         return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
             .rotate(-this._rotation)
-            .translate(-this._translation.x, -this._translation.y);
+            .translate(-this._position.x, -this._position.y);
     }
 }

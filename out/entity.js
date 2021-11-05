@@ -1,43 +1,43 @@
 import { Matrix3, Vector2 } from "./math.js";
 export class Entity {
     constructor() {
-        this._translation = new Vector2(0, 0);
+        this._position = new Vector2(0, 0);
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
     update(delta) {
     }
-    get translation() {
-        return this._translation;
+    get position() {
+        return this._position;
+    }
+    set position(p) {
+        this._position.x = p.x;
+        this._position.y = p.y;
     }
     get rotation() {
         return this._rotation;
     }
+    set rotation(r) {
+        this._rotation = r;
+    }
     get scale() {
         return this._scale;
     }
+    set scale(s) {
+        this._scale.x = s.x;
+        this._scale.y = s.y;
+    }
     resetTransform() {
-        this._translation.clear();
+        this._position.clear();
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
-    setPosition(p) {
-        this._translation.x = p.x;
-        this._translation.y = p.y;
-    }
     translate(t) {
-        this._translation.x += t.x;
-        this._translation.y += t.y;
-    }
-    setRotation(r) {
-        this._rotation = r;
+        this._position.x += t.x;
+        this._position.y += t.y;
     }
     rotate(r) {
         this._rotation += r;
-    }
-    setScale(s) {
-        this._scale.x = s.x;
-        this._scale.y = s.y;
     }
     doScale(s) {
         this._scale.x *= s.x;
@@ -45,7 +45,7 @@ export class Entity {
     }
     // Returns local to global transform
     localToGlobal() {
-        return new Matrix3().translate(this._translation.x, this._translation.y)
+        return new Matrix3().translate(this._position.x, this._position.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
     }
@@ -53,6 +53,6 @@ export class Entity {
     globalToLocal() {
         return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
             .rotate(-this._rotation)
-            .translate(-this._translation.x, -this._translation.y);
+            .translate(-this._position.x, -this._position.y);
     }
 }
