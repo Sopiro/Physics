@@ -52,3 +52,18 @@ export function random(left = -1, right = 1) {
     let range = right - left;
     return Math.random() * range + left;
 }
+export function clamp(value, min, max) {
+    if (value < min)
+        return min;
+    else if (value > max)
+        return max;
+    else
+        return value;
+}
+export function createBox(position, wh, centered = true) {
+    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true);
+    box.translate(position);
+    if (!centered)
+        box.translate(wh.copy().divS(2));
+    return box;
+}

@@ -12,6 +12,9 @@ export class Collider extends Entity {
         this.type = type;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
+        this._friction = 0.8;
+        this._beta = 0.7;
+        this._restitution = 0.8;
         this.name = name;
     }
     get mass() {
@@ -19,7 +22,7 @@ export class Collider extends Entity {
     }
     set mass(m) {
         this._mass = m;
-        this._invMass = 1 / this._mass;
+        this._invMass = 1.0 / this._mass;
     }
     get inverseMass() {
         return this._invMass;
@@ -29,13 +32,22 @@ export class Collider extends Entity {
     }
     set inertia(i) {
         this._inertia = i;
-        this._invInertia = 1 / i;
+        this._invInertia = 1.0 / i;
     }
     get inverseInertia() {
         return this._invInertia;
     }
     get centerOfMass() {
         return this._cm;
+    }
+    get friction() {
+        return this._friction;
+    }
+    get contactBeta() {
+        return this._beta;
+    }
+    get restitution() {
+        return this._restitution;
     }
     get linearVelocity() {
         return this._linearVelocity;

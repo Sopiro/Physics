@@ -26,6 +26,9 @@ export class Polygon extends Collider {
         this._cm.x = 0;
         this._cm.y = 0;
     }
+    update(delta) {
+        super.update(delta);
+    }
     get count() {
         return this.vertices.length;
     }

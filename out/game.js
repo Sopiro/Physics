@@ -5,6 +5,7 @@ import * as Util from "./util.js";
 import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
 import { createRandomConvexCollider } from "./util.js";
+import { Circle } from "./circle.js";
 export class Game {
     constructor(renderer, width, height) {
         this.static_resolution = false;
@@ -16,9 +17,9 @@ export class Game {
         this.cursorPos = new Vector2(0, 0);
         this.colliders = [];
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
-        // this.p = new Circle(new Vector2(0, 0), 50);
+        this.p = new Circle(new Vector2(0, 0), 50);
         this.p.position = new Vector2(0, 400);
-        this.p.angularVelocity = 5;
+        this.p.angularVelocity = 10;
         // this.p.setRotation(1);
         this.colliders.push(this.p);
         this.ground = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(700, 50), new Vector2(700, 0)], true, "ground");
@@ -53,9 +54,10 @@ export class Game {
         // this.p.rotate(mr * delta * 2.5);
         if (Input.mouses.curr_down && !Input.mouses.last_down) {
             let nc = createRandomConvexCollider(Math.random() * 60 + 40);
+            // let nc = Util.createBox(this.cursorPos, new Vector2(100, 100));
             nc.position = this.cursorPos;
             nc.linearVelocity = new Vector2(0, 300).subV(this.cursorPos).normalized().mulS(Util.random(50, 150));
-            nc.angularVelocity = Util.random(-5, 5);
+            // nc.angularVelocity = Util.random(-5, 5);
             this.colliders.push(nc);
         }
         if (Input.curr_keys.r && !Input.last_keys.r) {
@@ -82,25 +84,26 @@ export class Game {
             }
         }
         // Resolve violated velocity constraint
-        for (let i = 0; i < pairs.length; i++) {
+        for (let i = 0; i < 1; i++) {
             pairs.forEach(pair => {
                 let a = pair.p1.p1;
                 let b = pair.p1.p2;
                 let contact = pair.p2;
                 let ra = contact.contactPointAGlobal.subV(a.localToGlobal().mulVector(a.centerOfMass, 1));
                 let rb = contact.contactPointBGlobal.subV(b.localToGlobal().mulVector(b.centerOfMass, 1));
-                // Jacobian
+                // Jacobian for non-penetration constraint
                 let j_va = contact.contactNormal.inverted();
                 let j_wa = -ra.cross(contact.contactNormal);
                 let j_vb = contact.contactNormal;
                 let j_wb = rb.cross(contact.contactNormal);
                 let beta = 0.5;
                 let restitution = 0.7;
+                // Relative velocity at contact point
                 let relativeVelocity = b.linearVelocity.addV(new Vector2(-b.angularVelocity * rb.y, b.angularVelocity * rb.x))
                     .subV(a.linearVelocity.addV(new Vector2(-a.angularVelocity * ra.y, a.angularVelocity * ra.x)));
                 let approachingVelocity = relativeVelocity.dot(contact.contactNormal);
-                let penetration_slop = 5e-5;
-                let restitution_slop = 0.5;
+                let penetration_slop = 0.5;
+                let restitution_slop = 0.2;
                 let bias = -(beta / delta) * Math.max(contact.penetrationDepth - penetration_slop, 0) +
                     restitution * Math.max(approachingVelocity - restitution_slop, 0);
                 let k = +a.inverseMass
@@ -108,14 +111,34 @@ export class Game {
                     + b.inverseMass
                     + j_wb * b.inverseInertia * j_wb;
                 let effectiveMass = 1.0 / k;
+                // Jacobian * velocity vector
                 let jv = +j_va.dot(a.linearVelocity)
                     + j_wa * a.angularVelocity
                     + j_vb.dot(b.linearVelocity)
                     + j_wb * b.angularVelocity;
                 let lambda = effectiveMass * -(jv + bias);
-                let previousLambda = contact.normalImpulseSum;
-                contact.normalImpulseSum = Math.max(0, contact.normalImpulseSum + lambda);
-                lambda = contact.normalImpulseSum - previousLambda;
+                let previousTotalLambda = contact.normalImpulseSum;
+                contact.normalImpulseSum = Math.max(0.0, contact.normalImpulseSum + lambda);
+                lambda = contact.normalImpulseSum - previousTotalLambda;
+                a.linearVelocity = a.linearVelocity.addV(j_va.mulS(a.inverseMass * lambda));
+                a.angularVelocity = a.angularVelocity + a.inverseInertia * j_wa * lambda;
+                b.linearVelocity = b.linearVelocity.addV(j_vb.mulS(b.inverseMass * lambda));
+                b.angularVelocity = b.angularVelocity + b.inverseInertia * j_wb * lambda;
+                j_va = contact.contactTangent.inverted();
+                j_wa = -ra.cross(contact.contactTangent);
+                j_vb = contact.contactTangent;
+                j_wb = rb.cross(contact.contactTangent);
+                jv =
+                    +j_va.dot(a.linearVelocity)
+                        + j_wa * a.angularVelocity
+                        + j_vb.dot(b.linearVelocity)
+                        + j_wb * b.angularVelocity;
+                lambda = effectiveMass * -jv;
+                previousTotalLambda = contact.tangentImpulseSum;
+                let friction = 0.4;
+                let maxFriction = friction * contact.normalImpulseSum;
+                contact.tangentImpulseSum = Util.clamp(contact.tangentImpulseSum + lambda, -maxFriction, maxFriction);
+                lambda = contact.tangentImpulseSum - previousTotalLambda;
                 a.linearVelocity = a.linearVelocity.addV(j_va.mulS(a.inverseMass * lambda));
                 a.angularVelocity = a.angularVelocity + a.inverseInertia * j_wa * lambda;
                 b.linearVelocity = b.linearVelocity.addV(j_vb.mulS(b.inverseMass * lambda));

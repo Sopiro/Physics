@@ -189,6 +189,7 @@ export interface Contact
     collide: boolean;
     penetrationDepth?: number;
     contactNormal?: Vector2;
+    contactTangent?: Vector2;
     contactPointAGlobal?: Vector2;
     contactPointBGlobal?: Vector2;
     normalImpulseSum?: number;
@@ -211,10 +212,11 @@ export function detectCollision(a: Collider, b: Collider): Contact
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
             contactNormal: epaResult.contactNormal,
+            contactTangent: new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x),
             contactPointAGlobal: epaResult.contactPointAGlobal,
             contactPointBGlobal: epaResult.contactPointBGlobal,
-            normalImpulseSum: 0,
-            tangentImpulseSum: 0,
+            normalImpulseSum: 0.0,
+            tangentImpulseSum: 0.0,
         };
     }
 }

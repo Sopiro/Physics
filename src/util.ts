@@ -95,3 +95,20 @@ export function random(left: number = -1, right: number = 1): number
     let range = right - left;
     return Math.random() * range + left
 }
+
+export function clamp(value: number, min: number, max: number)
+{
+    if (value < min) return min;
+    else if (value > max) return max;
+    else return value;
+}
+
+export function createBox(position: Vector2, wh: Vector2, centered: boolean = true): Polygon
+{
+    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true);
+    box.translate(position);
+    if (!centered)
+        box.translate(wh.copy().divS(2));
+
+    return box;
+}

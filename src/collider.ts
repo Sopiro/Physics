@@ -1,5 +1,6 @@
 import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
+import { toFixed } from "./util.js";
 
 export enum Type
 {
@@ -19,6 +20,9 @@ export class Collider extends Entity
     protected _cm!: Vector2;
     protected _linearVelocity: Vector2;
     protected _angularVelocity: number;
+    protected _friction: number;
+    protected _beta: number;
+    protected _restitution: number;
 
     public readonly name: string;
 
@@ -29,7 +33,9 @@ export class Collider extends Entity
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-
+        this._friction = 0.8;
+        this._beta = 0.7
+        this._restitution = 0.8;
         this.name = name;
     }
 
@@ -41,7 +47,7 @@ export class Collider extends Entity
     set mass(m: number)
     {
         this._mass = m;
-        this._invMass = 1 / this._mass;
+        this._invMass = 1.0 / this._mass;
     }
 
     get inverseMass(): number
@@ -57,7 +63,7 @@ export class Collider extends Entity
     set inertia(i: number)
     {
         this._inertia = i;
-        this._invInertia = 1 / i;
+        this._invInertia = 1.0 / i;
     }
 
     get inverseInertia(): number
@@ -68,6 +74,21 @@ export class Collider extends Entity
     get centerOfMass(): Vector2
     {
         return this._cm;
+    }
+
+    get friction(): number
+    {
+        return this._friction;
+    }
+
+    get contactBeta():number
+    {
+        return this._beta;
+    }
+
+    get restitution():number
+    {
+        return this._restitution;
     }
 
     get linearVelocity(): Vector2

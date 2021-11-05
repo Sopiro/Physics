@@ -126,10 +126,11 @@ export function detectCollision(a, b) {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
             contactNormal: epaResult.contactNormal,
+            contactTangent: new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x),
             contactPointAGlobal: epaResult.contactPointAGlobal,
             contactPointBGlobal: epaResult.contactPointBGlobal,
-            normalImpulseSum: 0,
-            tangentImpulseSum: 0,
+            normalImpulseSum: 0.0,
+            tangentImpulseSum: 0.0,
         };
     }
 }
