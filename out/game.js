@@ -104,8 +104,8 @@ export class Game {
                 let j_wa = -ra.cross(contact.contactNormal);
                 let j_vb = contact.contactNormal;
                 let j_wb = rb.cross(contact.contactNormal);
-                let beta = 0.5 * 0.5;
-                let restitution = 0.7 * 0.7;
+                let beta = a.contactBeta * b.contactBeta;
+                let restitution = a.restitution * b.restitution;
                 // Relative velocity at contact point
                 let relativeVelocity = b.linearVelocity.addV(Util.cross(b.angularVelocity, rb))
                     .subV(a.linearVelocity.addV(Util.cross(a.angularVelocity, ra)));
@@ -150,7 +150,7 @@ export class Game {
                 let massTangent = 1.0 / k;
                 lambda = massTangent * -jv;
                 previousTotalLambda = contact.tangentImpulseSum;
-                let friction = 0.4;
+                let friction = a.friction * b.friction;
                 let maxFriction = friction * contact.normalImpulseSum;
                 contact.tangentImpulseSum = Util.clamp(contact.tangentImpulseSum + lambda, -maxFriction, maxFriction);
                 lambda = contact.tangentImpulseSum - previousTotalLambda;
