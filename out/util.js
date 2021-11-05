@@ -29,7 +29,7 @@ export function lerpVector(a, b, uv) {
 }
 export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     if (numVertices < 0)
-        numVertices = Math.trunc(Math.random() * 10);
+        numVertices = Math.trunc(Math.random() * 7);
     if (numVertices == 0)
         return new Circle(new Vector2(), radius);
     numVertices += 2;
@@ -60,8 +60,8 @@ export function clamp(value, min, max) {
     else
         return value;
 }
-export function createBox(position, wh, centered = true) {
-    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true);
+export function createBox(position, wh, name = "box", centered = true) {
+    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true, name);
     box.translate(position);
     if (!centered)
         box.translate(wh.copy().divS(2));

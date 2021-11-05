@@ -16,12 +16,12 @@ canvas {
 }
 
 .head {
-    width: 800px;
+    width: 1280px;
 }
 
 .body {
     display: flex;
-    width: 800px;
+    width: 1280px;
 }
 
 h3{

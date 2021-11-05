@@ -2,7 +2,6 @@ import { detectCollision } from "./pyhsics.js";
 import { Vector2 } from "./math.js";
 import * as Input from "./input.js";
 import * as Util from "./util.js";
-import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
 import { createRandomConvexCollider } from "./util.js";
 import { Circle } from "./circle.js";
@@ -16,26 +15,32 @@ export class Game {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
         this.colliders = [];
-        this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
+        this.p = Util.createBox(new Vector2(), new Vector2(100, 100));
         this.p = new Circle(new Vector2(0, 0), 50);
-        this.p.position = new Vector2(0, 400);
+        this.p.position = new Vector2(0, height * 0.8);
         this.p.angularVelocity = 10;
         // this.p.setRotation(1);
         this.colliders.push(this.p);
-        this.ground = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(700, 50), new Vector2(700, 0)], true, "ground");
+        this.ground = Util.createBox(new Vector2(0, 0), new Vector2(width * 0.8, 20), "ground");
         this.ground.mass = Number.MAX_VALUE;
         this.ground.inertia = Number.MAX_VALUE;
-        this.wallL = new Polygon([new Vector2(0, 0), new Vector2(0, 300), new Vector2(50, 300), new Vector2(50, 0)], true, "ground");
-        this.wallL.position = new Vector2(-400, 100);
+        this.wallL = Util.createBox(new Vector2(0, 0), new Vector2(400, 20), "ground");
+        this.wallL.rotate(-Math.PI / 7);
+        this.wallL.translate(new Vector2(-500, height / 3.0));
         this.wallL.mass = Number.MAX_VALUE;
         this.wallL.inertia = Number.MAX_VALUE;
-        this.wallR = new Polygon([new Vector2(0, 0), new Vector2(0, 300), new Vector2(50, 300), new Vector2(50, 0)], true, "ground");
-        this.wallR.position = new Vector2(400, 100);
+        this.wallR = Util.createBox(new Vector2(0, 0), new Vector2(400, 20), "ground");
+        this.wallR.rotate(Math.PI / 7);
+        this.wallR.translate(new Vector2(500, height / 3.0));
         this.wallR.mass = Number.MAX_VALUE;
         this.wallR.inertia = Number.MAX_VALUE;
+        this.spinner = Util.createBox(new Vector2(0, 0), new Vector2(width / 3, 20), "ground");
+        this.spinner.translate(new Vector2(0, height / 2.0));
+        this.spinner.mass = Number.MAX_VALUE;
         this.colliders.push(this.ground);
         this.colliders.push(this.wallL);
         this.colliders.push(this.wallR);
+        this.colliders.push(this.spinner);
         this.camera.position = new Vector2(-this.width / 2.0, -50);
     }
     update(delta) {
@@ -67,6 +72,9 @@ export class Game {
             this.p = createRandomConvexCollider(Math.random() * 60 + 40);
             this.camera.resetTransform();
             this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
+        }
+        if (Input.curr_keys.c && !Input.last_keys.c) {
+            this.colliders = [this.ground, this.wallL, this.wallR, this.spinner];
         }
         // Apply externel forces, yield tentative velocities
         this.colliders.forEach((collider, index) => {
