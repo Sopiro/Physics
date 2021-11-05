@@ -211,8 +211,8 @@ export function detectCollision(a: Collider, b: Collider): Contact
         return {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
-            contactNormal: epaResult.contactNormal,
-            contactTangent: new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x),
+            contactNormal: epaResult.contactNormal.fixed(),
+            contactTangent: new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x).fixed(),
             contactPointAGlobal: epaResult.contactPointAGlobal,
             contactPointBGlobal: epaResult.contactPointBGlobal,
             normalImpulseSum: 0.0,

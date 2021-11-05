@@ -42,8 +42,7 @@ export class Game
         this.p = Util.createBox(new Vector2(), new Vector2(100, 100));
         this.p = new Circle(new Vector2(0, 0), 50);
         this.p.position = new Vector2(0, height * 0.8);
-        this.p.angularVelocity = 10;
-        // this.p.setRotation(1);
+        this.p.angularVelocity = 5;
         this.colliders.push(this.p);
 
         this.ground = Util.createBox(new Vector2(0, 0), new Vector2(width * 0.8, 20), "ground");
@@ -69,7 +68,7 @@ export class Game
         this.colliders.push(this.ground);
         this.colliders.push(this.wallL);
         this.colliders.push(this.wallR);
-        this.colliders.push(this.spinner);
+        // this.colliders.push(this.spinner);
 
         this.camera.position = new Vector2(-this.width / 2.0, -50);
     }
@@ -83,7 +82,6 @@ export class Game
         const mx = Input.curr_keys.ArrowLeft ? -1 : Input.curr_keys.ArrowRight ? 1 : 0;
         const my = Input.curr_keys.ArrowDown ? -1 : Input.curr_keys.ArrowUp ? 1 : 0;
         let mr = Input.curr_keys.e ? -1 : Input.curr_keys.q ? 1 : 0;
-
 
         this.camera.translate(new Vector2(mx * speed, my * speed));
         // this.camera.position = this.p.position;
@@ -101,7 +99,7 @@ export class Game
             // let nc = Util.createBox(this.cursorPos, new Vector2(100, 100));
             nc.position = this.cursorPos;
 
-            nc.linearVelocity = new Vector2(0, 300).subV(this.cursorPos).normalized().mulS(Util.random(50, 150));
+            // nc.linearVelocity = new Vector2(0, 300).subV(this.cursorPos).normalized().mulS(Util.random(50, 150));
             // nc.angularVelocity = Util.random(-5, 5);
 
             this.colliders.push(nc);
@@ -125,13 +123,13 @@ export class Game
         }
 
         // Apply externel forces, yield tentative velocities
-        this.colliders.forEach((collider, index) =>
+        this.colliders.forEach(collider =>
         {
             if (collider.name != "ground")
                 collider.addVelocity(new Vector2(0, -9.8 * delta * 100));
         });
 
-        let pairs: Pair<Pair<Collider, Collider>, Contact>[] = [];
+        let contactPairs: Pair<Pair<Collider, Collider>, Contact>[] = [];
 
         for (let i = 0; i < this.colliders.length; i++)
         {
@@ -144,14 +142,14 @@ export class Game
                 let res = detectCollision(a, b);
 
                 if (res.collide)
-                    pairs.push({ p1: { p1: a, p2: b }, p2: res });
+                    contactPairs.push({ p1: { p1: a, p2: b }, p2: res });
             }
         }
 
         // Resolve violated velocity constraint
         for (let i = 0; i < 10; i++)
         {
-            pairs.forEach(pair =>
+            contactPairs.forEach(pair =>
             {
                 let a: Collider = pair.p1.p1;
                 let b: Collider = pair.p1.p2;
@@ -173,8 +171,8 @@ export class Game
                 let relativeVelocity = b.linearVelocity.addV(Util.cross(b.angularVelocity, rb))
                     .subV(a.linearVelocity.addV(Util.cross(a.angularVelocity, ra)));
                 let approachingVelocity = relativeVelocity.dot(contact.contactNormal!);
-                let penetration_slop = 0.01;
-                let restitution_slop = 0.2;
+                let penetration_slop = 0.05;
+                let restitution_slop = 10.0;
 
                 let bias = -(beta / delta) * Math.max(contact.penetrationDepth! - penetration_slop, 0) +
                     restitution * Math.max(approachingVelocity - restitution_slop, 0);

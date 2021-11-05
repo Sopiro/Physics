@@ -33,8 +33,8 @@ export class Collider extends Entity
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._friction = 0.7;
-        this._beta = 0.5
+        this._friction = 1.0;
+        this._beta = 0.5;
         this._restitution = 0.7;
         this.name = name;
     }
