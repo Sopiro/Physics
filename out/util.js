@@ -67,3 +67,6 @@ export function createBox(position, wh, centered = true) {
         box.translate(wh.copy().divS(2));
     return box;
 }
+export function cross(scalar, vector) {
+    return new Vector2(-scalar * vector.y, scalar * vector.x);
+}

@@ -134,7 +134,7 @@ export class Game
         }
 
         // Resolve violated velocity constraint
-        for (let i = 0; i < 1; i++)
+        for (let i = 0; i < 10; i++)
         {
             pairs.forEach(pair =>
             {
@@ -151,14 +151,14 @@ export class Game
                 let j_vb = contact.contactNormal!;
                 let j_wb = rb.cross(contact.contactNormal!);
 
-                let beta = 0.5;
-                let restitution = 0.7;
+                let beta = 0.5 * 0.5;
+                let restitution = 0.7 * 0.7;
 
                 // Relative velocity at contact point
-                let relativeVelocity = b.linearVelocity.addV(new Vector2(-b.angularVelocity * rb.y, b.angularVelocity * rb.x))
-                    .subV(a.linearVelocity.addV(new Vector2(-a.angularVelocity * ra.y, a.angularVelocity * ra.x)));
+                let relativeVelocity = b.linearVelocity.addV(Util.cross(b.angularVelocity, rb))
+                    .subV(a.linearVelocity.addV(Util.cross(a.angularVelocity, ra)));
                 let approachingVelocity = relativeVelocity.dot(contact.contactNormal!);
-                let penetration_slop = 0.5;
+                let penetration_slop = 0.01;
                 let restitution_slop = 0.2;
 
                 let bias = -(beta / delta) * Math.max(contact.penetrationDepth! - penetration_slop, 0) +
@@ -170,7 +170,7 @@ export class Game
                     + b.inverseMass
                     + j_wb * b.inverseInertia * j_wb;
 
-                let effectiveMass = 1.0 / k;
+                let massNormal = 1.0 / k;
 
                 // Jacobian * velocity vector
                 let jv =
@@ -179,7 +179,7 @@ export class Game
                     + j_vb.dot(b.linearVelocity)
                     + j_wb * b.angularVelocity;
 
-                let lambda = effectiveMass * -(jv + bias);
+                let lambda = massNormal * -(jv + bias);
                 let previousTotalLambda = contact.normalImpulseSum!;
                 contact.normalImpulseSum = Math.max(0.0, contact.normalImpulseSum! + lambda);
                 lambda = contact.normalImpulseSum - previousTotalLambda;
@@ -189,6 +189,7 @@ export class Game
                 b.linearVelocity = b.linearVelocity.addV(j_vb.mulS(b.inverseMass * lambda));
                 b.angularVelocity = b.angularVelocity + b.inverseInertia * j_wb * lambda;
 
+                // Jacobian for friction constraint
                 j_va = contact.contactTangent!.inverted();
                 j_wa = -ra.cross(contact.contactTangent!);
                 j_vb = contact.contactTangent!;
@@ -200,7 +201,15 @@ export class Game
                     + j_vb.dot(b.linearVelocity)
                     + j_wb * b.angularVelocity;
 
-                lambda = effectiveMass * -jv;
+                k =
+                    + a.inverseMass
+                    + j_wa * a.inverseInertia * j_wa
+                    + b.inverseMass
+                    + j_wb * b.inverseInertia * j_wb;
+
+                let massTangent = 1.0 / k;
+
+                lambda = massTangent * -jv;
                 previousTotalLambda = contact.tangentImpulseSum!;
                 let friction = 0.4;
                 let maxFriction = friction * contact.normalImpulseSum!;

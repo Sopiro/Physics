@@ -112,3 +112,8 @@ export function createBox(position: Vector2, wh: Vector2, centered: boolean = tr
 
     return box;
 }
+
+export function cross(scalar: number, vector: Vector2): Vector2
+{
+    return new Vector2(-scalar * vector.y, scalar * vector.x);
+}
