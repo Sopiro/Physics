@@ -16,8 +16,6 @@ export class Engine
     private renderer: Renderer;
     private game: Game;
 
-    private readonly fixedDeltaTime: number = 1 / 144.0;
-
     constructor(width: number, height: number)
     {
         this.width = width;
@@ -84,7 +82,7 @@ export class Engine
 
         if (!this.paused)
         {
-            this.update(this.fixedDeltaTime);
+            this.update(delta / 1000.0);
             this.render();
         }
         else

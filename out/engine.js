@@ -4,7 +4,6 @@ import { Renderer } from "./renderer.js";
 import * as Input from "./input.js";
 export class Engine {
     constructor(width, height) {
-        this.fixedDeltaTime = 1 / 144.0;
         this.width = width;
         this.height = height;
         this.cvs = document.getElementById("canvas");
@@ -52,7 +51,7 @@ export class Engine {
         const fps = Math.round(1000 / delta);
         this.frameCounterElement.innerHTML = fps + "fps";
         if (!this.paused) {
-            this.update(this.fixedDeltaTime);
+            this.update(delta / 1000.0);
             this.render();
         }
         else {

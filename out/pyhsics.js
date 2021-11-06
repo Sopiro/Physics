@@ -1,5 +1,6 @@
 import { Circle } from "./circle.js";
-import { Type } from "./collider.js";
+import { Shape } from "./collider.js";
+import { Contact } from "./contact.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
@@ -7,7 +8,7 @@ import { Simplex } from "./simplex.js";
 import { getUV, lerpVector, toFixed } from "./util.js";
 // Returns the fardest vertex in the 'dir' direction
 function support(collider, dir) {
-    if (collider.type == Type.Polygon && collider instanceof Polygon) {
+    if (collider.shape == Shape.Polygon && collider instanceof Polygon) {
         let idx = 0;
         let maxValue = dir.dot(collider.vertices[idx]);
         for (let i = 1; i < collider.vertices.length; i++) {
@@ -19,7 +20,7 @@ function support(collider, dir) {
         }
         return collider.vertices[idx];
     }
-    else if (collider.type == Type.Circle && collider instanceof Circle) {
+    else if (collider.shape == Shape.Circle && collider instanceof Circle) {
         return dir.normalized().mulS(collider.radius);
     }
     else {
@@ -115,22 +116,24 @@ function epa(c1, c2, gjkResult) {
         contactPointBGlobal: lerpVector(supportB1, supportB2, uv),
     };
 }
+// [!]Basically all result vectors are on the global space
 export function detectCollision(a, b) {
     const gjkResult = gjk(a, b);
     if (gjkResult.simplex.count != 3) {
-        return { collide: false };
+        return null;
     }
     else {
         const epaResult = epa(a, b, gjkResult.simplex);
-        return {
-            collide: true,
-            penetrationDepth: epaResult.penetrationDepth,
-            contactNormal: epaResult.contactNormal.fixed(),
-            contactTangent: new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x).fixed(),
-            contactPointAGlobal: epaResult.contactPointAGlobal,
-            contactPointBGlobal: epaResult.contactPointBGlobal,
-            normalImpulseSum: 0.0,
-            tangentImpulseSum: 0.0,
-        };
+        let contact = new Contact();
+        contact.bodyA = a;
+        contact.bodyB = b;
+        contact.penetrationDepth = epaResult.penetrationDepth;
+        contact.contactNormal = epaResult.contactNormal.fixed();
+        contact.contactTangent = new Vector2(-epaResult.contactNormal.y, epaResult.contactNormal.x).fixed();
+        contact.contactPointAGlobal = epaResult.contactPointAGlobal;
+        contact.contactPointBGlobal = epaResult.contactPointBGlobal;
+        contact.contactPointALocal = a.globalToLocal().mulVector(epaResult.contactPointAGlobal, 1);
+        contact.contactPointBLocal = b.globalToLocal().mulVector(epaResult.contactPointBGlobal, 1);
+        return contact;
     }
 }

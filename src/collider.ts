@@ -1,42 +1,53 @@
 import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
-import { toFixed } from "./util.js";
+import * as Util from "./util.js";
 
-export enum Type
+export enum Shape
 {
     Circle = 0,
     Polygon
+}
+export enum Type
+{
+    Ground = 0,
+    Normal
 }
 
 // Rigid body collider
 export class Collider extends Entity
 {
+    public readonly shape: Shape;
+
+    private _mass!: number;
+    private _invMass!: number;
+    private _inertia!: number;
+    private _invInertia!: number;
+    private _cm!: Vector2;
+    private _linearVelocity: Vector2;
+    private _angularVelocity: number;
+    private _friction: number;
+    private _beta: number;
+    private _restitution: number;
+
     public readonly type: Type;
 
-    protected _mass!: number;
-    protected _invMass!: number;
-    protected _inertia!: number;
-    protected _invInertia!: number;
-    protected _cm!: Vector2;
-    protected _linearVelocity: Vector2;
-    protected _angularVelocity: number;
-    protected _friction: number;
-    protected _beta: number;
-    protected _restitution: number;
-
-    public readonly name: string;
-
-    constructor(type: Type, name: string = "")
+    constructor(shape: Shape, type: Type)
     {
         super();
-        this.type = type;
+        this.shape = shape;
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this._friction = 1.0;
         this._beta = 0.5;
         this._restitution = 0.7;
-        this.name = name;
+        this.type = type;
+
+        if(this.type == Type.Ground)
+        {
+            this.mass = Number.MAX_VALUE;
+            this.inertia = Number.MAX_VALUE;
+        }
     }
 
     get mass(): number
@@ -46,8 +57,8 @@ export class Collider extends Entity
 
     set mass(m: number)
     {
-        this._mass = m;
-        this._invMass = 1.0 / this._mass;
+        this._mass = Util.clamp(m, 0, Number.MAX_VALUE);
+        this._invMass = this._mass == 0 ? 0 : 1.0 / this._mass;
     }
 
     get inverseMass(): number
@@ -62,8 +73,8 @@ export class Collider extends Entity
 
     set inertia(i: number)
     {
-        this._inertia = i;
-        this._invInertia = 1.0 / i;
+        this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
+        this._invInertia = this._inertia == 0 ? 0 : 1.0 / i;
     }
 
     get inverseInertia(): number
@@ -76,19 +87,39 @@ export class Collider extends Entity
         return this._cm;
     }
 
+    protected set centerOfMass(cm: Vector2)
+    {
+        this._cm = cm;
+    }
+
     get friction(): number
     {
         return this._friction;
     }
 
-    get contactBeta():number
+    set friction(f: number)
+    {
+        this._friction = Util.clamp(f, 0, 1);
+    }
+
+    get contactBeta(): number
     {
         return this._beta;
     }
 
-    get restitution():number
+    set contactBeta(b: number)
+    {
+        this._beta = Util.clamp(b, 0, 1);
+    }
+
+    get restitution(): number
     {
         return this._restitution;
+    }
+
+    set restitution(r: number)
+    {
+        this._restitution = Util.clamp(r, 0, 1);
     }
 
     get linearVelocity(): Vector2

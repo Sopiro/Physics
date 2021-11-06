@@ -1,22 +1,19 @@
-import { Collider, Type } from "./collider.js";
+import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 
 export class Circle extends Collider
 {
     public readonly radius: number;
 
-    constructor(center: Vector2, radius: number, name = "ball")
+    constructor(center: Vector2, radius: number, type: Type = Type.Normal)
     {
-        super(Type.Circle, name);
+        super(Shape.Circle, type);
 
-        this._mass = 200;
-        this._invMass = 1 / this.mass;
-
-        this._inertia = this.mass * radius * radius;
-        this._invInertia = 1 / this._inertia;
+        this.mass = 200;
+        this.inertia = this.mass * radius * radius / 2.0;
+        this.centerOfMass = new Vector2(0, 0);
 
         this.translate(center);
-        this._cm = new Vector2(0, 0);
 
         this.radius = radius;
     }

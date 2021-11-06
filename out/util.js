@@ -1,4 +1,5 @@
 import { Circle } from "./circle.js";
+import { Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
@@ -10,7 +11,7 @@ export function subPolygon(p1, p2) {
             res.push(p1v.subV(p2v));
         }
     }
-    return new Polygon(res, false);
+    return new Polygon(res, Type.Normal, false);
 }
 export function toFixed(value) {
     return Math.round(value * 1e9) / 1e9;
@@ -40,6 +41,7 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
+    res.mass = 200;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
     return res;
 }
@@ -60,13 +62,9 @@ export function clamp(value, min, max) {
     else
         return value;
 }
-export function createBox(position, wh, name = "box", centered = true) {
-    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true, name);
-    box.translate(position);
-    if (!centered)
-        box.translate(wh.copy().divS(2));
-    return box;
-}
 export function cross(scalar, vector) {
     return new Vector2(-scalar * vector.y, scalar * vector.x);
+}
+export function calculateBoxInertia(w, h, mass) {
+    return (w * w + h * h) * mass / 12;
 }

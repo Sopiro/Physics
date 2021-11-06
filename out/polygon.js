@@ -1,30 +1,32 @@
-import { Collider, Type } from "./collider.js";
+import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
+import * as Util from "./util.js";
+const MASS = 200;
+const W = 100;
+const H = 100;
 export class Polygon extends Collider {
-    constructor(vertices, resetPosition = true, name = "poly") {
-        super(Type.Polygon, name);
+    constructor(vertices, type = Type.Normal, resetPosition = true) {
+        super(Shape.Polygon, type);
         this.vertices = vertices;
-        this._mass = 200;
-        this._invMass = 1 / this.mass;
-        const h = 100;
-        const w = 100;
-        this._inertia = (w * w + h * h) * this._mass / 12;
-        this._invInertia = 1 / this._inertia;
-        this._cm = new Vector2(0, 0);
-        for (let i = 0; i < this.count; i++) {
-            this._cm.x += this.vertices[i].x;
-            this._cm.y += this.vertices[i].y;
+        if (this.type == Type.Normal) {
+            this.mass = MASS;
+            this.inertia = Util.calculateBoxInertia(W, H, MASS);
         }
-        this._cm.x /= this.count;
-        this._cm.y /= this.count;
+        this.centerOfMass = new Vector2(0, 0);
         for (let i = 0; i < this.count; i++) {
-            this.vertices[i].x -= this._cm.x;
-            this.vertices[i].y -= this._cm.y;
+            this.centerOfMass.x += this.vertices[i].x;
+            this.centerOfMass.y += this.vertices[i].y;
+        }
+        this.centerOfMass.x /= this.count;
+        this.centerOfMass.y /= this.count;
+        for (let i = 0; i < this.count; i++) {
+            this.vertices[i].x -= this.centerOfMass.x;
+            this.vertices[i].y -= this.centerOfMass.y;
         }
         if (!resetPosition)
-            this.translate(this._cm);
-        this._cm.x = 0;
-        this._cm.y = 0;
+            this.translate(this.centerOfMass);
+        this.centerOfMass.x = 0;
+        this.centerOfMass.y = 0;
     }
     update(delta) {
         super.update(delta);

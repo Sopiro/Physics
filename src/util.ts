@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Collider } from "./collider.js";
+import { Collider, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 
@@ -18,7 +18,7 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
         }
     }
 
-    return new Polygon(res, false);
+    return new Polygon(res, Type.Normal, false);
 }
 
 export function toFixed(value: number): number
@@ -72,6 +72,7 @@ export function createRandomConvexCollider(radius: number = 50, numVertices: num
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
 
+    res.mass = 200;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
 
     return res;
@@ -103,17 +104,12 @@ export function clamp(value: number, min: number, max: number)
     else return value;
 }
 
-export function createBox(position: Vector2, wh: Vector2, name: string = "box", centered: boolean = true): Polygon
-{
-    let box = new Polygon([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], true, name);
-    box.translate(position);
-    if (!centered)
-        box.translate(wh.copy().divS(2));
-
-    return box;
-}
-
 export function cross(scalar: number, vector: Vector2): Vector2
 {
     return new Vector2(-scalar * vector.y, scalar * vector.x);
+}
+
+export function calculateBoxInertia(w: number, h: number, mass: number)
+{
+    return (w * w + h * h) * mass / 12;
 }
