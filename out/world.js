@@ -1,6 +1,6 @@
 import { Vector2 } from "./math.js";
 import { Type } from "./collider.js";
-import { detectCollision } from "./pyhsics.js";
+import { detectCollision } from "./detection.js";
 export class World {
     constructor(useFixedDelta) {
         this.colliders = [];
