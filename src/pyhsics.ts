@@ -106,7 +106,7 @@ function gjk(c1: Collider, c2: Collider): GJKResult
 
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
-        if (toFixed(dir.getLength() - dir.normalized().dot(supportPoint.support.subV(closest.result))) > 0)
+        if (toFixed(dir.length - dir.normalized().dot(supportPoint.support.subV(closest.result))) > 0)
         {
             result.collide = false;
             break;

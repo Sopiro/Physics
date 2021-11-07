@@ -59,7 +59,7 @@ export class Collider extends Entity {
         return this._friction;
     }
     set friction(f) {
-        this._friction = Util.clamp(f, 0, 1);
+        this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
     }
     get contactBeta() {
         return this._beta;

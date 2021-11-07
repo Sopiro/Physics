@@ -44,7 +44,7 @@ export class Vector2
 
     normalize(): void
     {
-        const len = this.getLength();
+        const len = this.length;
 
         if (len != 0)
         {
@@ -55,7 +55,7 @@ export class Vector2
 
     normalized(): Vector2
     {
-        const len = this.getLength();
+        const len = this.length;
 
         if (len != 0)
             return this.divS(len);
@@ -63,7 +63,7 @@ export class Vector2
             return this;
     }
 
-    getLength(): number
+    get length(): number
     {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }

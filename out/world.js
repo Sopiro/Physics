@@ -8,6 +8,7 @@ export class World {
         this.numIterations = 10;
         this.fixedDeltaTime = 1 / 144.0;
         this.gravity = -9.81 * 144;
+        this.sleep = 0.01;
         this.useFixedDelta = useFixedDelta;
     }
     update(delta) {
@@ -42,6 +43,7 @@ export class World {
                 contact.resolveConstraint();
             });
         }
+        // console.log(this.colliders[0].linearVelocity);
         // Update the positions using the new velocities
         this.colliders.forEach((c, index) => {
             c.position.x += c.linearVelocity.x * delta;
@@ -52,11 +54,15 @@ export class World {
             c.force.clear();
             c.torque = 0;
         });
+        // console.log(this.colliders[0].linearVelocity.getLength());
     }
     register(collider) {
         this.colliders.push(collider);
     }
     clear() {
         this.colliders = [];
+    }
+    get numColliders() {
+        return this.colliders.length;
     }
 }

@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Collider, Type } from "./collider.js";
+import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 
@@ -36,7 +36,7 @@ export interface UV
 export function getUV(a: Vector2, b: Vector2, p: Vector2): UV
 {
     let dir = b.subV(a);
-    const len = dir.getLength();
+    const len = dir.length;
     dir.normalize();
 
     const region = dir.dot(p.subV(a)) / len;
@@ -112,4 +112,31 @@ export function cross(scalar: number, vector: Vector2): Vector2
 export function calculateBoxInertia(w: number, h: number, mass: number)
 {
     return (w * w + h * h) * mass / 12;
+}
+
+export function checkInside(c: Collider, p: Vector2): boolean
+{
+    let localP = c.globalToLocal().mulVector(p, 1);
+
+    switch (c.shape)
+    {
+        case Shape.Circle:
+            return localP.length <= (c as Circle).radius;
+        case Shape.Polygon:
+            {
+                let poly = c as Polygon;
+
+                let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
+
+                for (let i = 1; i < poly.vertices.length; i++)
+                {
+                    let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
+                    if (dir * nDir < 0)
+                        return false
+                }
+                return true;
+            }
+        default:
+            throw "Not supported shape";
+    }
 }

@@ -101,7 +101,7 @@ export class Collider extends Entity
 
     set friction(f: number)
     {
-        this._friction = Util.clamp(f, 0, 1);
+        this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
     }
 
     get contactBeta(): number

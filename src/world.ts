@@ -11,6 +11,7 @@ export class World
     private readonly fixedDeltaTime: number = 1 / 144.0;
 
     private gravity = -9.81 * 144;
+    private sleep = 0.01;
 
     private useFixedDelta: boolean;
 
@@ -33,7 +34,7 @@ export class World
             if (c.type != Type.Ground)
                 c.addVelocity(new Vector2(0, this.gravity * delta));
         });
-        
+
         const contacts: Contact[] = [];
 
         // O(N^2) Crud collision detection
@@ -66,6 +67,8 @@ export class World
             });
         }
 
+        // console.log(this.colliders[0].linearVelocity);
+
         // Update the positions using the new velocities
         this.colliders.forEach((c, index) =>
         {
@@ -79,6 +82,8 @@ export class World
             c.force.clear();
             c.torque = 0;
         });
+
+        // console.log(this.colliders[0].linearVelocity.getLength());
     }
 
     register(collider: Collider): void
@@ -89,5 +94,10 @@ export class World
     clear(): void
     {
         this.colliders = [];
+    }
+
+    get numColliders(): number
+    {
+        return this.colliders.length;
     }
 }

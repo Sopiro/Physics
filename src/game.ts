@@ -28,6 +28,10 @@ export class Game
 
     private indicateCM: boolean = true;
 
+    private mouseBound = false;
+    private bindPosition!: Vector2;
+    private targetCollider!: Collider;
+
     constructor(renderer: Renderer, width: number, height: number)
     {
         this.r = renderer;
@@ -89,14 +93,46 @@ export class Game
         this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY - 1);
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
 
+        if (this.mouseBound)
+        {
+            if (Input.isMouseUp())
+            {
+                let bindInGlobal = this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(5000);
+                let torque = bindInGlobal.subV(this.targetCollider.localToGlobal().
+                    mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
+                this.targetCollider.addForce(force);
+                this.targetCollider.addTorque(torque)
+                this.mouseBound = false;
+            }
+        }
+
         if (Input.isMouseDown())
         {
-            let nc = createRandomConvexCollider(Math.random() * 60 + 40);
-            // let nc = new Box(this.cursorPos, new Vector2(100, 100));
-            nc.position = this.cursorPos;
-            // nc.angularVelocity = Util.random(-10, 10);
+            let skipGeneration = false;
 
-            this.world.register(nc);
+            for (let i = 0; i < this.world.colliders.length; i++)
+            {
+                let c = this.world.colliders[i];
+                if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos))
+                {
+                    this.mouseBound = true;
+                    this.bindPosition = c.globalToLocal().mulVector(this.cursorPos, 1);
+                    this.targetCollider = c;
+                    skipGeneration = true;
+                    break;
+                }
+            }
+
+            if (!skipGeneration)
+            {
+                let nc = createRandomConvexCollider(Math.random() * 60 + 40);
+                // let nc = new Box(this.cursorPos, new Vector2(100, 100));
+                nc.position = this.cursorPos;
+                // nc.angularVelocity = Util.random(-10, 10);
+
+                this.world.register(nc);
+            }
         }
 
         if (Input.isKeyDown("c"))
@@ -112,12 +148,6 @@ export class Game
         {
             this.indicateCM = !this.indicateCM;
         }
-
-        if (Input.isKeyPressed("w"))
-        {
-            this.p.addForce(new Vector2(0, 50000));
-            console.log(this.p.force);
-        }
     }
 
     render(): void
@@ -130,6 +160,11 @@ export class Game
 
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
+
+        if (this.mouseBound)
+        {
+            this.r.drawVectorP(this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1), this.cursorPos);
+        }
 
         this.world.colliders.forEach((collider) =>
         {

@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Type } from "./collider.js";
+import { Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
@@ -19,7 +19,7 @@ export function toFixed(value) {
 // Project point p to edge ab, calculate barycentric weights and return it
 export function getUV(a, b, p) {
     let dir = b.subV(a);
-    const len = dir.getLength();
+    const len = dir.length;
     dir.normalize();
     const region = dir.dot(p.subV(a)) / len;
     return { u: 1 - region, v: region };
@@ -67,4 +67,24 @@ export function cross(scalar, vector) {
 }
 export function calculateBoxInertia(w, h, mass) {
     return (w * w + h * h) * mass / 12;
+}
+export function checkInside(c, p) {
+    let localP = c.globalToLocal().mulVector(p, 1);
+    switch (c.shape) {
+        case Shape.Circle:
+            return localP.length <= c.radius;
+        case Shape.Polygon:
+            {
+                let poly = c;
+                let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
+                for (let i = 1; i < poly.vertices.length; i++) {
+                    let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
+                    if (dir * nDir < 0)
+                        return false;
+                }
+                return true;
+            }
+        default:
+            throw "Not supported shape";
+    }
 }

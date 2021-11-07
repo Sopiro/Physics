@@ -25,20 +25,20 @@ export class Vector2 {
         return new Vector2(this.x * -1, this.y * -1);
     }
     normalize() {
-        const len = this.getLength();
+        const len = this.length;
         if (len != 0) {
             this.x /= len;
             this.y /= len;
         }
     }
     normalized() {
-        const len = this.getLength();
+        const len = this.length;
         if (len != 0)
             return this.divS(len);
         else
             return this;
     }
-    getLength() {
+    get length() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
     dot(v) {
