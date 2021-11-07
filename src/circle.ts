@@ -9,7 +9,7 @@ export class Circle extends Collider
     {
         super(Shape.Circle, type);
 
-        this.mass = 200;
+        this.mass = 20;
         this.inertia = this.mass * radius * radius / 2.0;
         this.centerOfMass = new Vector2(0, 0);
 

@@ -145,7 +145,7 @@ export class Contact
         this.solverT = new ContactConstraintSolver(this);
     }
 
-    prepareResoultion(delta: number)
+    prepareResolution(delta: number)
     {
         this.solverN.init(this.contactNormal!, ConstraintType.Normal, delta);
         this.solverT.init(this.contactTangent!, ConstraintType.Tangent, delta);

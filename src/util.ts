@@ -72,7 +72,7 @@ export function createRandomConvexCollider(radius: number = 50, numVertices: num
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
 
-    res.mass = 200;
+    res.mass = 20;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
 
     return res;

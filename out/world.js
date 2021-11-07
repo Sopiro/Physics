@@ -13,11 +13,13 @@ export class World {
     update(delta) {
         if (this.useFixedDelta)
             delta = this.fixedDeltaTime;
-        // Apply externel forces, yield tentative velocities that possibly violate the constraint
-        this.colliders.forEach(collider => {
+        // Integrate forces, yield tentative velocities that possibly violate the constraint
+        this.colliders.forEach(c => {
+            c.addVelocity(c.force.mulS(c.inverseMass * delta));
+            c.addAngularVelocity(c.torque * c.inverseInertia * delta);
             // Apply gravity 
-            if (collider.type != Type.Ground)
-                collider.addVelocity(new Vector2(0, this.gravity * delta));
+            if (c.type != Type.Ground)
+                c.addVelocity(new Vector2(0, this.gravity * delta));
         });
         const contacts = [];
         // O(N^2) Crud collision detection
@@ -32,7 +34,7 @@ export class World {
         }
         // Prepare for resolution step
         contacts.forEach(contact => {
-            contact.prepareResoultion(delta);
+            contact.prepareResolution(delta);
         });
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < this.numIterations; i++) {
@@ -41,10 +43,14 @@ export class World {
             });
         }
         // Update the positions using the new velocities
-        this.colliders.forEach((collider, index) => {
-            collider.update(delta);
-            if (collider.position.y < -500)
+        this.colliders.forEach((c, index) => {
+            c.position.x += c.linearVelocity.x * delta;
+            c.position.y += c.linearVelocity.y * delta;
+            c.rotation += c.angularVelocity * delta;
+            if (c.position.y < -500)
                 this.colliders.splice(index, 1);
+            c.force.clear();
+            c.torque = 0;
         });
     }
     register(collider) {

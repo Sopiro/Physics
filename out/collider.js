@@ -15,6 +15,8 @@ export var Type;
 export class Collider extends Entity {
     constructor(shape, type) {
         super();
+        this._force = new Vector2();
+        this._torque = 0;
         this.shape = shape;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
@@ -51,7 +53,7 @@ export class Collider extends Entity {
         return this._cm;
     }
     set centerOfMass(cm) {
-        this._cm = cm;
+        this._cm = cm.copy();
     }
     get friction() {
         return this._friction;
@@ -75,8 +77,7 @@ export class Collider extends Entity {
         return this._linearVelocity;
     }
     set linearVelocity(v) {
-        this._linearVelocity.x = v.x;
-        this._linearVelocity.y = v.y;
+        this._linearVelocity = v.copy();
     }
     get angularVelocity() {
         return this._angularVelocity;
@@ -84,10 +85,23 @@ export class Collider extends Entity {
     set angularVelocity(w) {
         this._angularVelocity = w;
     }
-    update(delta) {
-        this._position.x += this._linearVelocity.x * delta;
-        this._position.y += this._linearVelocity.y * delta;
-        this._rotation += this._angularVelocity * delta;
+    get force() {
+        return this._force;
+    }
+    set force(f) {
+        this._force = f.copy();
+    }
+    get torque() {
+        return this._torque;
+    }
+    set torque(t) {
+        this._torque = t;
+    }
+    addForce(f) {
+        this._force = this._force.addV(f);
+    }
+    addTorque(t) {
+        this._torque += t;
     }
     addVelocity(vt) {
         this._linearVelocity.x += vt.x;

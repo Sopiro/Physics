@@ -2,9 +2,9 @@ import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
 
-const MASS = 200;
-const W = 100;
-const H = 100;
+const MASS = 20; // kg
+const W = 100; // cm
+const H = 100; // cm
 
 export class Polygon extends Collider
 {

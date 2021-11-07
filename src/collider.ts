@@ -18,7 +18,9 @@ export class Collider extends Entity
 {
     public readonly shape: Shape;
 
-    private _mass!: number;
+    private _force: Vector2 = new Vector2();
+    private _torque: number = 0;
+    private _mass!: number; // kg
     private _invMass!: number;
     private _inertia!: number;
     private _invInertia!: number;
@@ -43,7 +45,7 @@ export class Collider extends Entity
         this._restitution = 0.7;
         this.type = type;
 
-        if(this.type == Type.Ground)
+        if (this.type == Type.Ground)
         {
             this.mass = Number.MAX_VALUE;
             this.inertia = Number.MAX_VALUE;
@@ -89,7 +91,7 @@ export class Collider extends Entity
 
     protected set centerOfMass(cm: Vector2)
     {
-        this._cm = cm;
+        this._cm = cm.copy();
     }
 
     get friction(): number
@@ -129,8 +131,7 @@ export class Collider extends Entity
 
     set linearVelocity(v: Vector2)
     {
-        this._linearVelocity.x = v.x;
-        this._linearVelocity.y = v.y;
+        this._linearVelocity = v.copy();
     }
 
     get angularVelocity(): number
@@ -143,13 +144,35 @@ export class Collider extends Entity
         this._angularVelocity = w;
     }
 
-    update(delta: number)
+    get force(): Vector2
     {
-        this._position.x += this._linearVelocity.x * delta;
-        this._position.y += this._linearVelocity.y * delta;
-        this._rotation += this._angularVelocity * delta;
+        return this._force;
     }
 
+    set force(f: Vector2)
+    {
+        this._force = f.copy();
+    }
+
+    get torque(): number
+    {
+        return this._torque;
+    }
+
+    set torque(t)
+    {
+        this._torque = t;
+    }
+
+    addForce(f: Vector2): void
+    {
+        this._force = this._force.addV(f);
+    }
+
+    addTorque(t: number): void
+    {
+        this._torque += t;
+    }
 
     addVelocity(vt: Vector2): void //accelerate
     {

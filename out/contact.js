@@ -79,7 +79,7 @@ export class Contact {
         this.solverN = new ContactConstraintSolver(this);
         this.solverT = new ContactConstraintSolver(this);
     }
-    prepareResoultion(delta) {
+    prepareResolution(delta) {
         this.solverN.init(this.contactNormal, ConstraintType.Normal, delta);
         this.solverT.init(this.contactTangent, ConstraintType.Tangent, delta);
     }

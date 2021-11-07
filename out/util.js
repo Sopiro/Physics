@@ -41,7 +41,7 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
-    res.mass = 200;
+    res.mass = 20;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
     return res;
 }

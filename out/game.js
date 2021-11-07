@@ -10,7 +10,7 @@ export class Game {
     constructor(renderer, width, height) {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
-        this.indicateCM = false;
+        this.indicateCM = true;
         this.r = renderer;
         this.width = width;
         this.height = height;
@@ -54,27 +54,26 @@ export class Game {
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY - 1);
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
-        if (Input.mouses.curr_down && !Input.mouses.last_down) {
+        if (Input.isMouseDown()) {
             let nc = createRandomConvexCollider(Math.random() * 60 + 40);
             // let nc = new Box(this.cursorPos, new Vector2(100, 100));
             nc.position = this.cursorPos;
             // nc.angularVelocity = Util.random(-10, 10);
             this.world.register(nc);
         }
-        if (Input.curr_keys.n && !Input.last_keys.n) {
-            this.p = createRandomConvexCollider(Math.random() * 60 + 40);
-            this.camera.resetTransform();
-            this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
-        }
-        if (Input.curr_keys.c && !Input.last_keys.c) {
+        if (Input.isKeyDown("c")) {
             this.world.clear();
             this.world.register(this.ground);
             this.world.register(this.wallL);
             this.world.register(this.wallR);
             this.world.register(this.spinner);
         }
-        if (Input.curr_keys.m && !Input.last_keys.m) {
+        if (Input.isKeyDown("m")) {
             this.indicateCM = !this.indicateCM;
+        }
+        if (Input.isKeyPressed("w")) {
+            this.p.addForce(new Vector2(0, 50000));
+            console.log(this.p.force);
         }
     }
     render() {

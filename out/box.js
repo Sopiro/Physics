@@ -9,7 +9,7 @@ export class Box extends Polygon {
         if (!centered)
             this.translate(wh.copy().divS(2));
         if (type == Type.Normal) {
-            this.mass = 200;
+            this.mass = 20;
             this.inertia = Util.calculateBoxInertia(wh.x, wh.y, this.mass);
         }
     }
