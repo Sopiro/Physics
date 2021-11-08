@@ -1,3 +1,4 @@
+import * as Util from "./util.js";
 export class Vector2 {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -11,8 +12,8 @@ export class Vector2 {
         return new Vector2(this.x, this.y);
     }
     toFixed() {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.x = Util.toFixed(this.x);
+        this.y = Util.toFixed(this.y);
     }
     fixed() {
         return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
@@ -84,9 +85,9 @@ export class Vector3 {
         return new Vector3(this.x, this.y, this.z);
     }
     toFixed() {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
-        this.z = Math.round(this.z * 1e9) / 1e9;
+        this.x = Util.toFixed(this.x);
+        this.y = Util.toFixed(this.y);
+        this.z = Util.toFixed(this.z);
     }
     fixed() {
         return new Vector3(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9);

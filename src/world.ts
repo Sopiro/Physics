@@ -2,6 +2,7 @@ import { Vector2 } from "./math.js";
 import { Collider, Type } from "./collider.js";
 import { detectCollision } from "./detection.js";
 import { Contact } from "./contact.js";
+import * as Util from "./util.js";
 
 export class World
 {

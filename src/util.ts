@@ -23,7 +23,7 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 
 export function toFixed(value: number): number
 {
-    return Math.round(value * 1e9) / 1e9;
+    return Math.round(value * 1e13) / 1e13;
 }
 
 export interface UV

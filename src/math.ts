@@ -1,3 +1,5 @@
+import * as Util from "./util.js";
+
 export class Vector2
 {
     x: number;
@@ -22,8 +24,8 @@ export class Vector2
 
     toFixed(): void
     {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.x = Util.toFixed(this.x);
+        this.y = Util.toFixed(this.y);
     }
 
     fixed(): Vector2
@@ -37,7 +39,7 @@ export class Vector2
         this.y *= -1;
     }
 
-    inverted() : Vector2
+    inverted(): Vector2
     {
         return new Vector2(this.x * -1, this.y * -1);
     }
@@ -140,9 +142,9 @@ export class Vector3
 
     toFixed(): void
     {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
-        this.z = Math.round(this.z * 1e9) / 1e9;
+        this.x = Util.toFixed(this.x);
+        this.y = Util.toFixed(this.y);
+        this.z = Util.toFixed(this.z);
     }
 
     fixed(): Vector3
@@ -176,7 +178,7 @@ export class Vector3
         this.z *= -1;
     }
 
-    inverted() : Vector3
+    inverted(): Vector3
     {
         return new Vector3(this.x * -1, this.y * -1, this.z * -1);
     }
@@ -311,7 +313,7 @@ export class Vector4
         this.w *= -1;
     }
 
-    inverted() : Vector4
+    inverted(): Vector4
     {
         return new Vector4(this.x * -1, this.y * -1, this.z * -1, this.w * -1);
     }
