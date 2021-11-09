@@ -6,6 +6,7 @@ import { Polygon } from "./polygon.js";
 import { Camera } from "./camera.js";
 import { createRandomConvexCollider } from "./util.js";
 import { Collider } from "./collider.js";
+import { Circle } from "./circle.js";
 export class Game
 {
     private r: Renderer;
@@ -34,7 +35,11 @@ export class Game
 
         this.colliders = [];
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
-        this.p2 = new Polygon([new Vector2(100, 100), new Vector2(150, 200), new Vector2(200, 100)], false);
+        // this.p = new Circle(new Vector2(), 100);
+        // this.p.rotate(0.6);
+        this.p.translate(new Vector2(55, -10))
+        this.p2 = new Polygon([new Vector2(100, 100), new Vector2(100, 300), new Vector2(300, 300), new Vector2(300, 100)], false);
+        this.p2 = new Circle(new Vector2(100, 100), 100);
         this.colliders.push(this.p2);
 
         this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
@@ -100,11 +105,13 @@ export class Game
                 this.r.drawText(630, 150, "collision vector");
                 this.r.drawVector(new Vector2(700, 500), res.contactNormal!.mulS(res.penetrationDepth!), 2);
                 this.r.setCameraTransform(this.camera.getCameraTransform());
-                this.r.drawVector(res.contactPonintA!, res.contactNormal!.mulS(-res.penetrationDepth!), 2);
+                // this.r.drawVector(res.contactPonintA!, res.contactNormal!.mulS(-res.penetrationDepth!), 2);
 
-                // Draw contact point
-                // this.r.drawCircleV(res.contactPonintA!);
-                // this.r.drawCircleV(res.contactPonintB!);
+                res.contactPonits!.forEach(cp =>
+                {
+                    this.r.drawCircleV(cp);
+                    this.r.drawVectorP(cp, cp.addV(res.contactNormal!.mulS(-res.penetrationDepth!)));
+                });
 
                 if (this.static_resolution)
                 {

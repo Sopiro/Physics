@@ -8,11 +8,11 @@ export enum Type
 
 export class Collider extends Entity
 {
-    public readonly type: Type;
+    public readonly shape: Type;
 
     constructor(type: Type)
     {
         super();
-        this.type = type;
+        this.shape = type;
     }
 }

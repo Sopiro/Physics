@@ -1,13 +1,14 @@
 import { Circle } from "./circle.js";
-import { Type } from "./collider.js";
+import { Type as Shape } from "./collider.js";
+import { Edge } from "./edge.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
-import { getUV, lerpVector, toFixed } from "./util.js";
+import { toFixed } from "./util.js";
 // Returns the fardest vertex in the 'dir' direction
 function support(collider, dir) {
-    if (collider.type == Type.Polygon && collider instanceof Polygon) {
+    if (collider.shape == Shape.Polygon && collider instanceof Polygon) {
         let idx = 0;
         let maxValue = dir.dot(collider.vertices[idx]);
         for (let i = 1; i < collider.vertices.length; i++) {
@@ -17,10 +18,10 @@ function support(collider, dir) {
                 maxValue = value;
             }
         }
-        return collider.vertices[idx];
+        return { vertex: collider.vertices[idx], index: idx };
     }
-    else if (collider.type == Type.Circle && collider instanceof Circle) {
-        return dir.normalized().mulS(collider.radius);
+    else if (collider.shape == Shape.Circle && collider instanceof Circle) {
+        return { vertex: dir.normalized().mulS(collider.radius), index: -1 };
     }
     else {
         throw "Not supported shape";
@@ -29,8 +30,8 @@ function support(collider, dir) {
 function csoSupport(c1, c2, dir) {
     const localDirP1 = c1.globalToLocal().mulVector(dir, 0);
     const localDirP2 = c2.globalToLocal().mulVector(dir.mulS(-1), 0);
-    let supportP1 = support(c1, localDirP1);
-    let supportP2 = support(c2, localDirP2);
+    let supportP1 = support(c1, localDirP1).vertex;
+    let supportP2 = support(c2, localDirP2).vertex;
     supportP1 = c1.localToGlobal().mulVector(supportP1, 1);
     supportP2 = c2.localToGlobal().mulVector(supportP2, 1);
     return {
@@ -79,6 +80,33 @@ function gjk(c1, c2) {
     result.simplex = simplex;
     return result;
 }
+function findFarthestEdge(c, dir) {
+    let localDir = c.globalToLocal().mulVector(dir, 0);
+    let farthest = support(c, localDir);
+    let curr = farthest.vertex;
+    let idx = farthest.index;
+    let localToGlobal = c.localToGlobal();
+    switch (c.shape) {
+        case Shape.Circle:
+            {
+                curr = localToGlobal.mulVector(curr, 1);
+                let tangent = new Vector2(-dir.y, dir.x);
+                tangent = tangent.mulS(0.5);
+                return new Edge(curr.subV(tangent), curr.addV(tangent));
+            }
+        case Shape.Polygon:
+            {
+                let p = c;
+                let prev = p.vertices[(idx - 1 + p.count) % p.count];
+                let next = p.vertices[(idx + 1) % p.count];
+                let e1 = curr.subV(prev).normalized();
+                let e2 = curr.subV(next).normalized();
+                let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
+                curr = localToGlobal.mulVector(curr, 1);
+                return w ? new Edge(localToGlobal.mulVector(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector(next, 1));
+            }
+    }
+}
 const TOLERANCE = 0.001;
 function epa(c1, c2, gjkResult) {
     let polytope = new Polytope(gjkResult);
@@ -90,30 +118,57 @@ function epa(c1, c2, gjkResult) {
         if (Math.abs(closestEdge.distance - newDistance) > TOLERANCE) {
             // Insert the support vertex so that it expands our polytope
             polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint.support);
-            polytope.supports.splice(closestEdge.index + 1, 0, { p1: supportPoint.supportA, p2: supportPoint.supportB });
         }
         else {
             // If you didn't expand edge, you reached the most outer edge
             break;
         }
     }
-    // Calcalate the contact point
-    const a = polytope.vertices[closestEdge.index];
-    const b = polytope.vertices[(closestEdge.index + 1) % polytope.count];
-    const supportA1 = polytope.supports[closestEdge.index].p1;
-    const supportB1 = polytope.supports[closestEdge.index].p2;
-    const supportA2 = polytope.supports[(closestEdge.index + 1) % polytope.count].p1;
-    const supportB2 = polytope.supports[(closestEdge.index + 1) % polytope.count].p2;
-    // Project origin onto the closest CSO edge, compute the barycentric weights
-    const uv = getUV(a, b, new Vector2(0, 0));
     return {
         penetrationDepth: closestEdge.distance,
         contactNormal: closestEdge.normal,
-        // For each collider, linearly combine the support points corresponding to the vertices of the edge,
-        // using the barycentric weights as coefficients
-        contactPointA: lerpVector(supportA1, supportA2, uv),
-        contactPointB: lerpVector(supportB1, supportB2, uv)
     };
+}
+function clipEdge(edge, p, dir, remove = false) {
+    let d1 = edge.p1.subV(p).dot(dir);
+    let d2 = edge.p2.subV(p).dot(dir);
+    if (d1 >= 0 && d2 >= 0)
+        return;
+    let per = Math.abs(d1) + Math.abs(d2);
+    if (d1 < 0) {
+        if (remove)
+            edge.p1 = edge.p2;
+        else
+            edge.p1 = edge.p1.addV(edge.p2.subV(edge.p1).mulS(-d1 / per));
+    }
+    else if (d2 < 0) {
+        if (remove)
+            edge.p2 = edge.p1;
+        else
+            edge.p2 = edge.p2.addV(edge.p1.subV(edge.p2).mulS(-d2 / per));
+    }
+}
+function findContactPoints(n, a, b) {
+    // collision normal in the world space
+    let edgeA = findFarthestEdge(a, n);
+    let edgeB = findFarthestEdge(b, n.mulS(-1));
+    let ref = edgeA;
+    let inc = edgeB;
+    let flip = false;
+    if (Math.abs(edgeA.dir.dot(n)) >= Math.abs(edgeB.dir.dot(n)) || b.shape == Shape.Circle) {
+        ref = edgeB;
+        inc = edgeA;
+        flip = true;
+    }
+    clipEdge(inc, ref.p1, ref.dir);
+    clipEdge(inc, ref.p2, ref.dir.mulS(-1));
+    clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
+    let contactPoints;
+    if (inc.length <= 1.4143)
+        contactPoints = [inc.p1];
+    else
+        contactPoints = [inc.p1, inc.p2];
+    return contactPoints;
 }
 export function detectCollision(a, b) {
     const gjkResult = gjk(a, b);
@@ -122,12 +177,12 @@ export function detectCollision(a, b) {
     }
     else {
         const epaResult = epa(a, b, gjkResult.simplex);
+        let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
         return {
             collide: true,
             penetrationDepth: epaResult.penetrationDepth,
             contactNormal: epaResult.contactNormal,
-            contactPonintA: epaResult.contactPointA,
-            contactPonintB: epaResult.contactPointB,
+            contactPonits: contactPoints
         };
     }
 }

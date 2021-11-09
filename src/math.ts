@@ -22,13 +22,13 @@ export class Vector2
 
     toFixed(): void
     {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
+        this.x = Math.round(this.x * 1e13) / 1e13;
+        this.y = Math.round(this.y * 1e13) / 1e13;
     }
 
     fixed(): Vector2
     {
-        return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
+        return new Vector2(Math.round(this.x * 1e13) / 1e13, Math.round(this.y * 1e13) / 1e13);
     }
 
     invert(): void
@@ -55,7 +55,7 @@ export class Vector2
         if (len != 0)
             return this.divS(len);
         else
-            return this;
+            return this.copy();
     }
 
     getLength(): number
@@ -135,14 +135,14 @@ export class Vector3
 
     toFixed(): void
     {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
-        this.z = Math.round(this.z * 1e9) / 1e9;
+        this.x = Math.round(this.x * 1e13) / 1e13;
+        this.y = Math.round(this.y * 1e13) / 1e13;
+        this.z = Math.round(this.z * 1e13) / 1e13;
     }
 
     fixed(): Vector3
     {
-        return new Vector3(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9);
+        return new Vector3(Math.round(this.x * 1e13) / 1e13, Math.round(this.y * 1e13) / 1e13, Math.round(this.z * 1e13) / 1e13);
     }
 
     normalize(): void

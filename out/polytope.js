@@ -8,18 +8,6 @@ export class Polytope {
             simplex.vertices[1].copy(),
             simplex.vertices[2].copy()
         ];
-        this.supports = [{
-                p1: simplex.supports[0].p1.copy(),
-                p2: simplex.supports[0].p2.copy()
-            },
-            {
-                p1: simplex.supports[1].p1.copy(),
-                p2: simplex.supports[1].p2.copy()
-            },
-            {
-                p1: simplex.supports[2].p1.copy(),
-                p2: simplex.supports[2].p2.copy()
-            }];
     }
     get count() {
         return this.vertices.length;

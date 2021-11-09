@@ -7,6 +7,6 @@ export var Type;
 export class Collider extends Entity {
     constructor(type) {
         super();
-        this.type = type;
+        this.shape = type;
     }
 }
