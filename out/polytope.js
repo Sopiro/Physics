@@ -24,6 +24,7 @@ export class Polytope {
     get count() {
         return this.vertices.length;
     }
+    // Returns the edge closest to the origin
     getClosestEdge() {
         let minIndex = 0;
         let minDistance = Infinity;

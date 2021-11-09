@@ -83,7 +83,7 @@ function gjk(c1, c2) {
 const TOLERANCE = 0.001;
 function epa(c1, c2, gjkResult) {
     let polytope = new Polytope(gjkResult);
-    let closestEdge = { index: 0, distance: Infinity, normal: new Vector2() };
+    let closestEdge = { index: 0, distance: Infinity, normal: new Vector2(0, 0) };
     for (let i = 0; i < MAX_ITERATION; i++) {
         closestEdge = polytope.getClosestEdge();
         let supportPoint = csoSupport(c1, c2, closestEdge.normal);
@@ -116,9 +116,10 @@ function epa(c1, c2, gjkResult) {
         contactPointBGlobal: lerpVector(supportB1, supportB2, uv),
     };
 }
-// [!]Basically all result vectors are on the global space
+// Returns contact data if collide, otherwise returns null
 export function detectCollision(a, b) {
     const gjkResult = gjk(a, b);
+    // EPA needs a full n-simplex to start
     if (gjkResult.simplex.count != 3) {
         return null;
     }

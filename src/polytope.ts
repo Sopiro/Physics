@@ -42,6 +42,7 @@ export class Polytope
         return this.vertices.length;
     }
 
+    // Returns the edge closest to the origin
     getClosestEdge(): ClosestEdgeInfo
     {
         let minIndex = 0;

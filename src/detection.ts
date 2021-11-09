@@ -142,7 +142,7 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
 {
     let polytope: Polytope = new Polytope(gjkResult);
 
-    let closestEdge: ClosestEdgeInfo = { index: 0, distance: Infinity, normal: new Vector2() };
+    let closestEdge: ClosestEdgeInfo = { index: 0, distance: Infinity, normal: new Vector2(0, 0) };
 
     for (let i = 0; i < MAX_ITERATION; i++)
     {
@@ -184,11 +184,12 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
     };
 }
 
-// [!]Basically all result vectors are on the global space
+// Returns contact data if collide, otherwise returns null
 export function detectCollision(a: Collider, b: Collider): Contact | null
 {
     const gjkResult = gjk(a, b);
 
+    // EPA needs a full n-simplex to start
     if (gjkResult.simplex.count != 3)
     {
         return null;

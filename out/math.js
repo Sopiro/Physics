@@ -63,6 +63,9 @@ export class Vector2 {
     equals(v) {
         return this.x == v.x && this.y == v.y;
     }
+    to(v) {
+        return v.subV(this);
+    }
     unNaN() {
         if (isNaN(this.x) || isNaN(this.y)) {
             this.x = 0;
@@ -142,6 +145,9 @@ export class Vector3 {
     }
     equals(v) {
         return this.x == v.x && this.y == v.y && this.z == v.z;
+    }
+    to(v) {
+        return v.sub(this);
     }
     unNaN() {
         if (isNaN(this.x) || isNaN(this.y) || isNaN(this.z)) {

@@ -79,8 +79,8 @@ export class Game {
                 }
             }
             if (!skipGeneration) {
-                // let nc = createRandomConvexCollider(Math.random() * 60 + 40);
-                let nc = new Box(this.cursorPos, new Vector2(100, 100));
+                let nc = Util.createRandomConvexCollider(Math.random() * 60 + 40);
+                // let nc = new Box(this.cursorPos, new Vector2(100, 100));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
                 this.world.register(nc);
