@@ -84,14 +84,14 @@ export class Game
     {
         const speed = delta * 500;
 
-        const mx = Input.curr_keys.ArrowLeft ? -1 : Input.curr_keys.ArrowRight ? 1 : 0;
-        const my = Input.curr_keys.ArrowDown ? -1 : Input.curr_keys.ArrowUp ? 1 : 0;
-        let mr = Input.curr_keys.e ? -1 : Input.curr_keys.q ? 1 : 0;
+        const mx = Input.isKeyPressed("ArrowLeft") ? -1 : Input.isKeyPressed("ArrowRight") ? 1 : 0;
+        const my = Input.isKeyPressed("ArrowDown") ? -1 : Input.isKeyPressed("ArrowUp") ? 1 : 0;
+        let mr = Input.isKeyPressed("e") ? -1 : Input.isKeyPressed("q") ? 1 : 0;
 
         this.camera.translate(new Vector2(mx * speed, my * speed));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
 
-        this.cursorPos = new Vector2(Input.mouses.currX, this.height - Input.mouses.currY - 1);
+        this.cursorPos = new Vector2(Input.mousePosition.x, this.height - Input.mousePosition.y - 1);
         this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
 
         if (this.mouseBound)

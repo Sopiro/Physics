@@ -6,15 +6,15 @@ import * as Input from "./input.js";
 
 export class Engine
 {
-    private width: number;
-    private height: number;
-    private cvs: HTMLCanvasElement;
-    private gfx: CanvasRenderingContext2D;
-    private frameCounterElement: any;
-    private paused: boolean;
-    private time: number;
-    private renderer: Renderer;
-    private game: Game;
+    public width: number;
+    public height: number;
+    public cvs: HTMLCanvasElement;
+    public gfx: CanvasRenderingContext2D;
+    public frameCounterElement: any;
+    public paused: boolean;
+    public time: number;
+    public renderer: Renderer;
+    public game: Game;
 
     constructor(width: number, height: number)
     {
@@ -29,40 +29,12 @@ export class Engine
         this.frameCounterElement = document.getElementById("frame_counter");
 
         this.paused = false;
-        // Registers event listeners
-        this.cvs.addEventListener("mousedown", (e) =>
-        {
-            if (e.button != 0) return;
-
-            Input.mouses.curr_down = true;
-        }, false);
-        window.addEventListener("mouseup", (e) =>
-        {
-            if (e.button != 0) return;
-
-            Input.mouses.curr_down = false;
-        }, false);
-        window.addEventListener("keydown", (e) =>
-        {
-            if (e.key == "Escape") this.paused = !this.paused;
-
-            Input.curr_keys[e.key] = true;
-        });
-        window.addEventListener("keyup", (e) =>
-        {
-            Input.curr_keys[e.key] = false;
-        });
-        window.addEventListener("mousemove", (e) =>
-        {
-            let rect = this.cvs.getBoundingClientRect();
-
-            Input.mouses.currX = e.clientX - rect.left;
-            Input.mouses.currY = e.clientY - rect.top;
-        });
-
+        
         this.time = 0;
         this.renderer = new Renderer(this.gfx, this.width, this.height);
         this.game = new Game(this.renderer, this.width, this.height);
+
+        Input.init(this);
     }
 
     start(): void
@@ -97,15 +69,7 @@ export class Engine
     update(delta: number): void 
     {
         this.game.update(delta);
-
-        // Update inputs
-        Input.mouses.dx = Input.mouses.currX - Input.mouses.lastX;
-        Input.mouses.dy = Input.mouses.currY - Input.mouses.lastY;
-        Input.mouses.lastX = Input.mouses.currX;
-        Input.mouses.lastY = Input.mouses.currY;
-        Input.mouses.last_down = Input.mouses.curr_down;
-
-        Object.assign(Input.last_keys, Input.curr_keys);
+        Input.update();
     }
 
     render(): void

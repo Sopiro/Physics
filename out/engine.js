@@ -12,33 +12,10 @@ export class Engine {
         this.gfx = this.cvs.getContext("2d");
         this.frameCounterElement = document.getElementById("frame_counter");
         this.paused = false;
-        // Registers event listeners
-        this.cvs.addEventListener("mousedown", (e) => {
-            if (e.button != 0)
-                return;
-            Input.mouses.curr_down = true;
-        }, false);
-        window.addEventListener("mouseup", (e) => {
-            if (e.button != 0)
-                return;
-            Input.mouses.curr_down = false;
-        }, false);
-        window.addEventListener("keydown", (e) => {
-            if (e.key == "Escape")
-                this.paused = !this.paused;
-            Input.curr_keys[e.key] = true;
-        });
-        window.addEventListener("keyup", (e) => {
-            Input.curr_keys[e.key] = false;
-        });
-        window.addEventListener("mousemove", (e) => {
-            let rect = this.cvs.getBoundingClientRect();
-            Input.mouses.currX = e.clientX - rect.left;
-            Input.mouses.currY = e.clientY - rect.top;
-        });
         this.time = 0;
         this.renderer = new Renderer(this.gfx, this.width, this.height);
         this.game = new Game(this.renderer, this.width, this.height);
+        Input.init(this);
     }
     start() {
         window.requestAnimationFrame(this.run.bind(this));
@@ -62,13 +39,7 @@ export class Engine {
     }
     update(delta) {
         this.game.update(delta);
-        // Update inputs
-        Input.mouses.dx = Input.mouses.currX - Input.mouses.lastX;
-        Input.mouses.dy = Input.mouses.currY - Input.mouses.lastY;
-        Input.mouses.lastX = Input.mouses.currX;
-        Input.mouses.lastY = Input.mouses.currY;
-        Input.mouses.last_down = Input.mouses.curr_down;
-        Object.assign(Input.last_keys, Input.curr_keys);
+        Input.update();
     }
     render() {
         this.gfx.clearRect(0, 0, this.width, this.height);
