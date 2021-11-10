@@ -61,6 +61,9 @@ export class World {
     register(collider) {
         this.colliders.push(collider);
     }
+    unregister(index) {
+        this.colliders.splice(index, 1);
+    }
     clear() {
         this.colliders = [];
     }

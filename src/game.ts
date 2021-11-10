@@ -136,6 +136,19 @@ export class Game
             }
         }
 
+        if (Input.isMouseDown(1))
+        {
+            for (let i = 0; i < this.world.colliders.length; i++)
+            {
+                let c = this.world.colliders[i];
+                if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos))
+                {
+                    this.world.unregister(i);
+                    break;
+                }
+            }
+        }
+
         if (Input.isKeyDown("c"))
         {
             this.world.clear();

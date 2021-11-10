@@ -96,6 +96,11 @@ export class World
         this.colliders.push(collider);
     }
 
+    unregister(index: number)
+    {
+        this.colliders.splice(index, 1);
+    }
+
     clear(): void
     {
         this.colliders = [];
