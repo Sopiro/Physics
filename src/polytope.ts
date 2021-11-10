@@ -1,6 +1,5 @@
 import { Vector2 } from "./math.js";
 import { Simplex } from "./simplex.js";
-import { Pair } from "./util.js";
 
 export interface ClosestEdgeInfo
 {
@@ -12,29 +11,15 @@ export interface ClosestEdgeInfo
 export class Polytope
 {
     public readonly vertices: Vector2[];
-    public readonly supports: Pair<Vector2, Vector2>[];
 
     constructor(simplex: Simplex)
     {
         if (simplex.count != 3) throw "Input simplex isn't a triangle";
-        
+
         this.vertices = [
             simplex.vertices[0].copy(),
             simplex.vertices[1].copy(),
             simplex.vertices[2].copy()];
-
-        this.supports = [{
-            p1: simplex.supports[0].p1.copy(),
-            p2: simplex.supports[0].p2.copy()
-        },
-        {
-            p1: simplex.supports[1].p1.copy(),
-            p2: simplex.supports[1].p2.copy()
-        },
-        {
-            p1: simplex.supports[2].p1.copy(),
-            p2: simplex.supports[2].p2.copy()
-        }];
     }
 
     public get count(): number

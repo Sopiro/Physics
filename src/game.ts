@@ -7,6 +7,7 @@ import { Collider, Type } from "./collider.js";
 import { World } from "./world.js";
 import { Box } from "./box.js";
 import { detectCollision } from "./detection.js";
+import { Circle } from "./circle.js";
 
 export class Game
 {
@@ -127,7 +128,7 @@ export class Game
             if (!skipGeneration)
             {
                 let nc = Util.createRandomConvexCollider(Math.random() * 60 + 40);
-                // let nc = new Box(this.cursorPos, new Vector2(100, 100));
+                // let nc = new Box(new Vector2(), new Vector2(100, 100));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
 
@@ -161,19 +162,25 @@ export class Game
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
 
-        this.world.colliders.forEach(c =>
-        {
-            let res = detectCollision(this.ground, c);
-            if (res != null)
-            {
-                this.r.drawCircleV(res.contactPointAGlobal, 10);
-            }
-        });
-        
+        // this.world.colliders.forEach(c =>
+        // {
+        //     let res = detectCollision(this.ground, c);
+        //     if (res != null)
+        //     {
+        //         let i = 0;
+        //         let mid = new Vector2();
+        //         for (; i < res.contactPoints!.length; i++)
+        //         {
+        //             mid = mid.addV(res.contactPoints[i]);
+        //             this.r.drawCircleV(res.contactPoints[i]);
+        //         }
+        //         mid = mid.divS(i);
+        //         this.r.drawVectorP(mid, mid.addV(res.contactNormal.mulS(20)))
+        //     }
+        // });
+
         if (this.mouseBound)
-        {
             this.r.drawVectorP(this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1), this.cursorPos);
-        }
 
         this.world.colliders.forEach((collider) =>
         {

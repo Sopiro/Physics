@@ -7,6 +7,7 @@ export class World {
         // Number of resolution iterations
         this.numIterations = 10;
         this.fixedDeltaTime = 1 / 144.0;
+        this.manifolds = [];
         this.gravity = -9.81 * 144;
         this.sleep = 0.01;
         this.useFixedDelta = useFixedDelta;
@@ -22,25 +23,26 @@ export class World {
             if (c.type != Type.Ground)
                 c.addVelocity(new Vector2(0, this.gravity * delta));
         });
-        const contacts = [];
+        let newManifolds = [];
         // O(N^2) Crud collision detection
         for (let i = 0; i < this.colliders.length; i++) {
             let a = this.colliders[i];
             for (let j = i + 1; j < this.colliders.length; j++) {
                 let b = this.colliders[j];
-                let contact = detectCollision(a, b);
-                if (contact != null)
-                    contacts.push(contact);
+                let manifold = detectCollision(a, b);
+                if (manifold != null)
+                    newManifolds.push(manifold);
             }
         }
+        this.manifolds = newManifolds;
         // Prepare for resolution step
-        contacts.forEach(contact => {
-            contact.prepareResolution(delta);
+        this.manifolds.forEach(manifold => {
+            manifold.prepare(delta);
         });
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < this.numIterations; i++) {
-            contacts.forEach(contact => {
-                contact.resolveConstraint();
+            this.manifolds.forEach(manifold => {
+                manifold.solve();
             });
         }
         // console.log(this.colliders[0].linearVelocity);

@@ -2,14 +2,12 @@ import { getUV, lerpVector } from "./util.js";
 export class Simplex {
     constructor() {
         this.vertices = [];
-        this.supports = [];
     }
     get count() {
         return this.vertices.length;
     }
     clear() {
         this.vertices = [];
-        this.supports = [];
     }
     // Returns the point closest to the input q
     getClosest(q) {
@@ -81,8 +79,6 @@ export class Simplex {
         if (this.count >= 3)
             throw "2-simplex can have verticies less than 4";
         this.vertices.push(vertex);
-        if (supportPoints != undefined)
-            this.supports.push(supportPoints);
     }
     // Return true if this simplex contains input vertex
     containsVertex(vertex) {

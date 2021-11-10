@@ -11,12 +11,10 @@ export class Simplex
 {
     // assert(supports.p1 - support.p2 == vertex)
     public vertices: Vector2[];
-    public supports: Pair<Vector2, Vector2>[];
 
     constructor()
     {
         this.vertices = [];
-        this.supports = [];
     }
 
     get count(): number
@@ -27,7 +25,6 @@ export class Simplex
     clear(): void
     {
         this.vertices = [];
-        this.supports = [];
     }
 
     // Returns the point closest to the input q
@@ -112,8 +109,6 @@ export class Simplex
         if (this.count >= 3) throw "2-simplex can have verticies less than 4";
 
         this.vertices.push(vertex);
-        if (supportPoints != undefined)
-            this.supports.push(supportPoints);
     }
 
     // Return true if this simplex contains input vertex

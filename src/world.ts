@@ -1,8 +1,7 @@
 import { Vector2 } from "./math.js";
 import { Collider, Type } from "./collider.js";
 import { detectCollision } from "./detection.js";
-import { Contact } from "./contact.js";
-import * as Util from "./util.js";
+import { ContactManifold } from "./contact.js";
 
 export class World
 {
@@ -10,6 +9,8 @@ export class World
     // Number of resolution iterations
     private numIterations: number = 10;
     private readonly fixedDeltaTime: number = 1 / 144.0;
+
+    private manifolds: ContactManifold[] = [];
 
     private gravity = -9.81 * 144;
     private sleep = 0.01;
@@ -36,7 +37,7 @@ export class World
                 c.addVelocity(new Vector2(0, this.gravity * delta));
         });
 
-        const contacts: Contact[] = [];
+        let newManifolds: ContactManifold[] = [];
 
         // O(N^2) Crud collision detection
         for (let i = 0; i < this.colliders.length; i++)
@@ -47,24 +48,27 @@ export class World
             {
                 let b = this.colliders[j];
 
-                let contact = detectCollision(a, b);
-                if (contact != null)
-                    contacts.push(contact);
+                let manifold = detectCollision(a, b);
+
+                if (manifold != null)
+                    newManifolds.push(manifold);
             }
         }
 
+        this.manifolds = newManifolds;
+
         // Prepare for resolution step
-        contacts.forEach(contact =>
+        this.manifolds.forEach(manifold =>
         {
-            contact.prepareResolution(delta);
+            manifold.prepare(delta);
         });
 
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < this.numIterations; i++)
         {
-            contacts.forEach(contact =>
+            this.manifolds.forEach(manifold =>
             {
-                contact.resolveConstraint();
+                manifold.solve();
             });
         }
 
