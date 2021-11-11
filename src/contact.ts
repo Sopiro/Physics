@@ -114,7 +114,7 @@ class ContactConstraintSolver
                     break;
                 }
         }
-        lambda = this.impulseSum - oldImpulseSum;
+        lambda = Util.toFixed(this.impulseSum - oldImpulseSum);
 
         // Apply impulse
         a.linearVelocity = a.linearVelocity.addV(this.jacobian.va.mulS(a.inverseMass * lambda));

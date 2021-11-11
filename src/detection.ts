@@ -237,6 +237,8 @@ function clipEdge(edge: Edge, p: Vector2, dir: Vector2, remove: boolean = false)
     }
 }
 
+// Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
+// merging threshold should be sqrt(2) * minimum edge length
 const CONTACT_MERGE_THRESHOLD = 1.4143;
 
 function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
@@ -261,8 +263,10 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
     clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
 
     let contactPoints: Vector2[];
+
+    // If two points are closer than threshold, merge them into one point.
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
-        contactPoints = [inc.p1];
+        contactPoints = [inc.midPoint];
     else
         contactPoints = [inc.p1, inc.p2];
 

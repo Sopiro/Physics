@@ -149,6 +149,8 @@ function clipEdge(edge, p, dir, remove = false) {
             edge.p2 = edge.p2.addV(edge.p1.subV(edge.p2).mulS(-d2 / per));
     }
 }
+// Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
+// merging threshold should be sqrt(2) * minimum edge length
 const CONTACT_MERGE_THRESHOLD = 1.4143;
 function findContactPoints(n, a, b) {
     // collision normal in the world space
@@ -166,8 +168,9 @@ function findContactPoints(n, a, b) {
     clipEdge(inc, ref.p2, ref.dir.mulS(-1));
     clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
     let contactPoints;
+    // If two points are closer than threshold, merge them into one point.
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
-        contactPoints = [inc.p1];
+        contactPoints = [inc.midPoint];
     else
         contactPoints = [inc.p1, inc.p2];
     return contactPoints;

@@ -71,8 +71,6 @@ export class World
             });
         }
 
-        // console.log(this.colliders[0].linearVelocity);
-
         // Update the positions using the new velocities
         this.colliders.forEach((c, index) =>
         {
@@ -86,8 +84,6 @@ export class World
             c.force.clear();
             c.torque = 0;
         });
-
-        // console.log(this.colliders[0].linearVelocity.getLength());
     }
 
     register(collider: Collider): void

@@ -43,7 +43,6 @@ export class World {
                 manifold.solve();
             });
         }
-        // console.log(this.colliders[0].linearVelocity);
         // Update the positions using the new velocities
         this.colliders.forEach((c, index) => {
             c.position.x += c.linearVelocity.x * delta;
@@ -54,7 +53,6 @@ export class World {
             c.force.clear();
             c.torque = 0;
         });
-        // console.log(this.colliders[0].linearVelocity.getLength());
     }
     register(collider) {
         this.colliders.push(collider);
