@@ -7,12 +7,13 @@ export class World
 {
     public colliders: Collider[] = [];
     // Number of resolution iterations
-    public numIterations: number = 10;
+    public numIterations: number = 50;
     public fixedDeltaTime: number = 1 / 144.0;
 
     public manifolds: ContactManifold[] = [];
 
     public static gravity = -9.81 * 144;
+    public applyGravity = true;
 
     private useFixedDelta: boolean;
 
@@ -32,7 +33,7 @@ export class World
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
 
             // Apply gravity 
-            if (c.type != Type.Ground)
+            if (c.type != Type.Ground && this.applyGravity)
                 c.addVelocity(new Vector2(0, World.gravity * delta));
         });
 

@@ -169,6 +169,11 @@ export class Game
         {
             this.indicateCP = !this.indicateCP;
         }
+
+        if (Input.isKeyDown("g"))
+        {
+            this.world.applyGravity = !this.world.applyGravity;
+        }
     }
 
     render(): void

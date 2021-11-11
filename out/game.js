@@ -110,6 +110,9 @@ export class Game {
         if (Input.isKeyDown("p")) {
             this.indicateCP = !this.indicateCP;
         }
+        if (Input.isKeyDown("g")) {
+            this.world.applyGravity = !this.world.applyGravity;
+        }
     }
     render() {
         this.r.setCameraTransform(this.camera.getCameraTransform());

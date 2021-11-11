@@ -5,9 +5,10 @@ export class World {
     constructor(useFixedDelta) {
         this.colliders = [];
         // Number of resolution iterations
-        this.numIterations = 10;
+        this.numIterations = 50;
         this.fixedDeltaTime = 1 / 144.0;
         this.manifolds = [];
+        this.applyGravity = true;
         this.useFixedDelta = useFixedDelta;
     }
     update(delta) {
@@ -18,7 +19,7 @@ export class World {
             c.addVelocity(c.force.mulS(c.inverseMass * delta));
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
             // Apply gravity 
-            if (c.type != Type.Ground)
+            if (c.type != Type.Ground && this.applyGravity)
                 c.addVelocity(new Vector2(0, World.gravity * delta));
         });
         let newManifolds = [];

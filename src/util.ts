@@ -1,3 +1,4 @@
+import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
@@ -50,13 +51,18 @@ export function lerpVector(a: Vector2, b: Vector2, uv: UV): Vector2
     return a.mulS(uv.u).addV(b.mulS(uv.v));
 }
 
+const maxVertices = 8;
+
 export function createRandomConvexCollider(radius: number = 50, numVertices: number = -1): Collider
 {
     if (numVertices < 0)
-        numVertices = Math.trunc(Math.random() * 7);
+        numVertices = Math.trunc(Math.random() * maxVertices);
 
     if (numVertices == 0)
         return new Circle(new Vector2(), radius);
+
+    if (numVertices == maxVertices - 1)
+        return new Box(new Vector2(), new Vector2(radius * 2, radius * 2));
 
     numVertices += 2;
 
