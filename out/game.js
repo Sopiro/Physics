@@ -9,7 +9,7 @@ export class Game {
     constructor(renderer, width, height) {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
-        this.indicateCM = true;
+        this.indicateCM = false;
         this.indicateCP = false;
         this.mouseBound = false;
         this.r = renderer;
@@ -20,7 +20,7 @@ export class Game {
         this.world = new World(false);
         // Register colliders to the physics world
         {
-            this.p = new Box(new Vector2(), new Vector2(100, 100));
+            this.p = new Box(new Vector2(), new Vector2(50, 50));
             // this.p = new Circle(new Vector2(0, 0), 50);
             this.p.position = new Vector2(0, height * 0.8);
             this.p.angularVelocity = 5;
@@ -39,6 +39,8 @@ export class Game {
             // this.world.register(this.wallL);
             this.world.register(this.wallR);
             // this.world.register(this.spinner);
+            // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
+            // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
         }
     }
     update(delta) {
@@ -79,8 +81,8 @@ export class Game {
                 }
             }
             if (!skipGeneration) {
-                let nc = Util.createRandomConvexCollider(Math.random() * 60 + 40);
-                // let nc = new Box(new Vector2(), new Vector2(100, 100));
+                let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
+                // let nc = new Box(new Vector2(), new Vector2(50, 50));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
                 this.world.register(nc);

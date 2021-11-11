@@ -6,7 +6,6 @@ import { Camera } from "./camera.js";
 import { Collider, Type } from "./collider.js";
 import { World } from "./world.js";
 import { Box } from "./box.js";
-import { detectCollision } from "./detection.js";
 import { Circle } from "./circle.js";
 
 export class Game
@@ -27,7 +26,7 @@ export class Game
 
     private camera: Camera;
 
-    private indicateCM: boolean = true;
+    private indicateCM: boolean = false;
     private indicateCP: boolean = false;
 
     private mouseBound = false;
@@ -46,7 +45,7 @@ export class Game
 
         // Register colliders to the physics world
         {
-            this.p = new Box(new Vector2(), new Vector2(100, 100));
+            this.p = new Box(new Vector2(), new Vector2(50, 50));
             // this.p = new Circle(new Vector2(0, 0), 50);
             this.p.position = new Vector2(0, height * 0.8);
             this.p.angularVelocity = 5;
@@ -70,6 +69,8 @@ export class Game
             // this.world.register(this.wallL);
             this.world.register(this.wallR);
             // this.world.register(this.spinner);
+            // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
+            // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
         }
     }
 
@@ -128,8 +129,8 @@ export class Game
 
             if (!skipGeneration)
             {
-                let nc = Util.createRandomConvexCollider(Math.random() * 60 + 40);
-                // let nc = new Box(new Vector2(), new Vector2(100, 100));
+                let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
+                // let nc = new Box(new Vector2(), new Vector2(50, 50));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
 
