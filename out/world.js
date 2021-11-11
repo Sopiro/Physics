@@ -8,8 +8,6 @@ export class World {
         this.numIterations = 10;
         this.fixedDeltaTime = 1 / 144.0;
         this.manifolds = [];
-        this.gravity = -9.81 * 144;
-        this.sleep = 0.01;
         this.useFixedDelta = useFixedDelta;
     }
     update(delta) {
@@ -21,7 +19,7 @@ export class World {
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
             // Apply gravity 
             if (c.type != Type.Ground)
-                c.addVelocity(new Vector2(0, this.gravity * delta));
+                c.addVelocity(new Vector2(0, World.gravity * delta));
         });
         let newManifolds = [];
         // O(N^2) Crud collision detection
@@ -71,3 +69,4 @@ export class World {
         return this.colliders.length;
     }
 }
+World.gravity = -9.81 * 144;

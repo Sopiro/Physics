@@ -28,6 +28,7 @@ export class Game
     private camera: Camera;
 
     private indicateCM: boolean = true;
+    private indicateCP: boolean = false;
 
     private mouseBound = false;
     private bindPosition!: Vector2;
@@ -162,6 +163,11 @@ export class Game
         {
             this.indicateCM = !this.indicateCM;
         }
+
+        if (Input.isKeyDown("p"))
+        {
+            this.indicateCP = !this.indicateCP;
+        }
     }
 
     render(): void
@@ -175,22 +181,21 @@ export class Game
         // this.r.drawVectorP(new Vector2(), this.cursorPos);
         // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
 
-        // this.world.colliders.forEach(c =>
-        // {
-        //     let res = detectCollision(this.ground, c);
-        //     if (res != null)
-        //     {
-        //         let i = 0;
-        //         let mid = new Vector2();
-        //         for (; i < res.contactPoints!.length; i++)
-        //         {
-        //             mid = mid.addV(res.contactPoints[i]);
-        //             this.r.drawCircleV(res.contactPoints[i]);
-        //         }
-        //         mid = mid.divS(i);
-        //         this.r.drawVectorP(mid, mid.addV(res.contactNormal.mulS(20)))
-        //     }
-        // });
+        if (this.indicateCP)
+        {
+            this.world.manifolds.forEach(m =>
+            {
+                let i = 0;
+                let mid = new Vector2();
+                for (; i < m.numContacts; i++)
+                {
+                    mid = mid.addV(m.contactPoints[i]);
+                    this.r.drawCircleV(m.contactPoints[i]);
+                }
+                mid = mid.divS(i);
+                this.r.drawVectorP(m.contactPoints[0], m.contactPoints[0].addV(m.contactNormal.mulS(20)))
+            });
+        }
 
         if (this.mouseBound)
             this.r.drawVectorP(this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1), this.cursorPos);

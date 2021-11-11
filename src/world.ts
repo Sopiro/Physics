@@ -7,13 +7,12 @@ export class World
 {
     public colliders: Collider[] = [];
     // Number of resolution iterations
-    private numIterations: number = 10;
-    private readonly fixedDeltaTime: number = 1 / 144.0;
+    public numIterations: number = 10;
+    public fixedDeltaTime: number = 1 / 144.0;
 
-    private manifolds: ContactManifold[] = [];
+    public manifolds: ContactManifold[] = [];
 
-    private gravity = -9.81 * 144;
-    private sleep = 0.01;
+    public static gravity = -9.81 * 144;
 
     private useFixedDelta: boolean;
 
@@ -34,7 +33,7 @@ export class World
 
             // Apply gravity 
             if (c.type != Type.Ground)
-                c.addVelocity(new Vector2(0, this.gravity * delta));
+                c.addVelocity(new Vector2(0, World.gravity * delta));
         });
 
         let newManifolds: ContactManifold[] = [];
