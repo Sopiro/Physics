@@ -5,7 +5,7 @@ export class World {
     constructor(useFixedDelta) {
         this.colliders = [];
         // Number of resolution iterations
-        this.numIterations = 50;
+        this.numIterations = 10;
         this.fixedDeltaTime = 1 / 144.0;
         this.manifolds = [];
         this.applyGravity = true;

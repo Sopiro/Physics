@@ -138,7 +138,7 @@ export class Game
             }
         }
 
-        if (Input.isMouseDown(1))
+        if (Input.isMouseDown(2))
         {
             for (let i = 0; i < this.world.colliders.length; i++)
             {

@@ -7,7 +7,7 @@ export class World
 {
     public colliders: Collider[] = [];
     // Number of resolution iterations
-    public numIterations: number = 50;
+    public numIterations: number = 10;
     public fixedDeltaTime: number = 1 / 144.0;
 
     public manifolds: ContactManifold[] = [];

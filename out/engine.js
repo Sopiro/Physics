@@ -11,6 +11,11 @@ export class Engine {
         this.cvs.setAttribute("height", this.height.toString());
         this.gfx = this.cvs.getContext("2d");
         this.frameCounterElement = document.getElementById("frame_counter");
+        // Remove the default pop-up context menu
+        this.cvs.oncontextmenu = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
         this.paused = false;
         this.time = 0;
         this.renderer = new Renderer(this.gfx, this.width, this.height);

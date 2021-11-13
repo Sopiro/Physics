@@ -28,6 +28,13 @@ export class Engine
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
         this.frameCounterElement = document.getElementById("frame_counter");
 
+        // Remove the default pop-up context menu
+        this.cvs.oncontextmenu = (e) =>
+        {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
         this.paused = false;
         
         this.time = 0;
