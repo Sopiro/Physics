@@ -114,10 +114,10 @@ export class Game {
             this.indicateCP = !this.indicateCP;
         }
         if (Input.isKeyDown("g")) {
-            this.world.applyGravity = !this.world.applyGravity;
+            World.applyGravity = !World.applyGravity;
         }
         if (Input.isKeyDown("w")) {
-            this.world.warmStartingEnabled = !this.world.warmStartingEnabled;
+            World.warmStartingEnabled = !World.warmStartingEnabled;
         }
     }
     render() {

@@ -10,7 +10,6 @@ export class World {
         this.numIterations = 15;
         this.fixedDeltaTime = 1 / 144.0;
         this.manifolds = [];
-        this.applyGravity = true;
         this.useFixedDelta = useFixedDelta;
     }
     update(delta) {
@@ -21,7 +20,7 @@ export class World {
             c.addVelocity(c.force.mulS(c.inverseMass * delta));
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
             // Apply gravity 
-            if (c.type != Type.Ground && this.applyGravity)
+            if (c.type != Type.Ground && World.applyGravity)
                 c.addVelocity(new Vector2(0, World.gravity * delta));
         });
         let newManifolds = [];
@@ -97,5 +96,6 @@ export class World {
 }
 World.cid = 0;
 World.gravity = -9.81 * 144;
+World.applyGravity = true;
 World.warmStartThreshold = 0.2;
 World.warmStartingEnabled = true;

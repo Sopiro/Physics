@@ -17,7 +17,7 @@ export class World
     public manifolds: ContactManifold[] = [];
 
     public static gravity = -9.81 * 144;
-    public applyGravity = true;
+    public static applyGravity = true;
 
     private useFixedDelta: boolean;
     private static warmStartThreshold = 0.2;
@@ -39,7 +39,7 @@ export class World
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
 
             // Apply gravity 
-            if (c.type != Type.Ground && this.applyGravity)
+            if (c.type != Type.Ground && World.applyGravity)
                 c.addVelocity(new Vector2(0, World.gravity * delta));
         });
 

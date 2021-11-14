@@ -1,6 +1,6 @@
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
-import { World } from "./world";
+import { World } from "./world.js";
 var ConstraintType;
 (function (ConstraintType) {
     ConstraintType[ConstraintType["Normal"] = 0] = "Normal";

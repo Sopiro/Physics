@@ -1,7 +1,7 @@
-import { Collider } from "./collider";
+import { Collider } from "./collider.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
-import { World } from "./world";
+import { World } from "./world.js";
 
 enum ConstraintType
 {
