@@ -33,6 +33,8 @@ export class Collider extends Entity
 
     public readonly type: Type;
 
+    public id!: number;
+
     constructor(shape: Shape, type: Type)
     {
         super();

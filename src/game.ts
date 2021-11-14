@@ -48,8 +48,8 @@ export class Game
             this.p = new Box(new Vector2(), new Vector2(50, 50));
             // this.p = new Circle(new Vector2(0, 0), 50);
             this.p.position = new Vector2(0, height * 0.8);
-            this.p.angularVelocity = 5;
-            this.world.register(this.p);
+            // this.p.angularVelocity = 5;
+            // this.world.register(this.p);
 
             this.ground = new Box(new Vector2(0, 0), new Vector2(width * 0.8, 20), Type.Ground);
 
@@ -71,6 +71,11 @@ export class Game
             // this.world.register(this.spinner);
             // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
             // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
+
+            for(let i = 0; i < 10; i++)
+            {
+                this.world.register(new Box(new Vector2(0, 50 + i * 60), new Vector2(50, 50)));
+            }
         }
     }
 
@@ -129,8 +134,8 @@ export class Game
 
             if (!skipGeneration)
             {
-                let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
-                // let nc = new Box(new Vector2(), new Vector2(50, 50));
+                // let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
+                let nc = new Box(new Vector2(), new Vector2(50, 50));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
 
@@ -173,6 +178,11 @@ export class Game
         if (Input.isKeyDown("g"))
         {
             this.world.applyGravity = !this.world.applyGravity;
+        }
+
+        if(Input.isKeyDown("w"))
+        {
+            this.world.warmStartingEnabled = !this.world.warmStartingEnabled;
         }
     }
 

@@ -103,7 +103,7 @@ export function random(left: number = -1, right: number = 1): number
     return Math.random() * range + left
 }
 
-export function clamp(value: number, min: number, max: number)
+export function clamp(value: number, min: number, max: number): number
 {
     if (value < min) return min;
     else if (value > max) return max;
@@ -115,7 +115,7 @@ export function cross(scalar: number, vector: Vector2): Vector2
     return new Vector2(-scalar * vector.y, scalar * vector.x);
 }
 
-export function calculateBoxInertia(w: number, h: number, mass: number)
+export function calculateBoxInertia(w: number, h: number, mass: number): number
 {
     return (w * w + h * h) * mass / 12;
 }
@@ -145,4 +145,16 @@ export function checkInside(c: Collider, p: Vector2): boolean
         default:
             throw "Not supported shape";
     }
+}
+
+// Cantor pairing function
+// https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function
+export function make_pair_natural(a: number, b: number): number
+{
+    return (a + b) * (a + b + 1) / 2 + b;
+}
+
+export function squared_distance(a: Vector2, b: Vector2): number
+{
+    return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }

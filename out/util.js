@@ -92,3 +92,11 @@ export function checkInside(c, p) {
             throw "Not supported shape";
     }
 }
+// Cantor pairing function
+// https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function
+export function make_pair_natural(a, b) {
+    return (a + b) * (a + b + 1) / 2 + b;
+}
+export function squared_distance(a, b) {
+    return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}

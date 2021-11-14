@@ -1,6 +1,7 @@
 import { Collider } from "./collider";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
+import { World } from "./world";
 
 enum ConstraintType
 {
@@ -18,7 +19,7 @@ interface Jacobian
 
 class ContactConstraintSolver
 {
-    public static penetration_slop = 0.1;
+    public static penetration_slop = 0.2;
     public static restitution_slop = 10.0; // This has to be greater than (gravity * delta)
 
     private readonly manifold: ContactManifold;
@@ -38,13 +39,13 @@ class ContactConstraintSolver
     private restitution!: number;
     private friction!: number;
 
-    private impulseSum: number = 0.0; // For accumulated impulse
+    public impulseSum: number = 0.0; // For accumulated impulse
 
-    constructor(contact: ContactManifold, contactPoint: Vector2)
+    constructor(manifold: ContactManifold, contactPoint: Vector2)
     {
-        this.manifold = contact;
-        this.a = contact.bodyA;
-        this.b = contact.bodyB;
+        this.manifold = manifold;
+        this.a = manifold.bodyA;
+        this.b = manifold.bodyB;
         this.contactPoint = contactPoint;
         this.ra = this.contactPoint.subV(this.a.localToGlobal().mulVector(this.a.centerOfMass, 1));
         this.rb = this.contactPoint.subV(this.b.localToGlobal().mulVector(this.b.centerOfMass, 1));
@@ -72,8 +73,8 @@ class ContactConstraintSolver
                 .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal!);
 
-            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0) +
-                this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
+            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0);
+            // this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
         }
 
         let k: number =
@@ -83,19 +84,25 @@ class ContactConstraintSolver
             + this.jacobian.wb * this.b.inverseInertia * this.jacobian.wb;
 
         this.effectiveMass = 1.0 / k;
+
+        if(World.warmStartingEnabled)
+        {
+            // Apply the accumulated impulse comes from previous time step
+            this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * this.impulseSum));
+            this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * this.impulseSum;
+            this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * this.impulseSum));
+            this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * this.impulseSum;
+        }
     }
 
     solve(friendNormal?: ContactConstraintSolver)
     {
-        const a = this.manifold.bodyA;
-        const b = this.manifold.bodyB;;
-
         // Jacobian * velocity vector
         let jv: number =
-            + this.jacobian.va.dot(a.linearVelocity)
-            + this.jacobian.wa * a.angularVelocity
-            + this.jacobian.vb.dot(b.linearVelocity)
-            + this.jacobian.wb * b.angularVelocity;
+            + this.jacobian.va.dot(this.a.linearVelocity)
+            + this.jacobian.wa * this.a.angularVelocity
+            + this.jacobian.vb.dot(this.b.linearVelocity)
+            + this.jacobian.wb * this.b.angularVelocity;
 
         let lambda = this.effectiveMass * -(jv + this.bias);
 
@@ -117,10 +124,10 @@ class ContactConstraintSolver
         lambda = Util.toFixed(this.impulseSum - oldImpulseSum);
 
         // Apply impulse
-        a.linearVelocity = a.linearVelocity.addV(this.jacobian.va.mulS(a.inverseMass * lambda));
-        a.angularVelocity = a.angularVelocity + a.inverseInertia * this.jacobian.wa * lambda;
-        b.linearVelocity = b.linearVelocity.addV(this.jacobian.vb.mulS(b.inverseMass * lambda));
-        b.angularVelocity = b.angularVelocity + b.inverseInertia * this.jacobian.wb * lambda;
+        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * lambda));
+        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * lambda;
+        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * lambda));
+        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * lambda;
     }
 }
 

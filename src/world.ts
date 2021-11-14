@@ -2,12 +2,16 @@ import { Vector2 } from "./math.js";
 import { Collider, Type } from "./collider.js";
 import { detectCollision } from "./detection.js";
 import { ContactManifold } from "./contact.js";
+import * as Util from "./util.js";
 
 export class World
 {
+    private static cid = 0;
+    public cmap: Map<number, ContactManifold> = new Map();
+
     public colliders: Collider[] = [];
     // Number of resolution iterations
-    public numIterations: number = 10;
+    public numIterations: number = 15;
     public fixedDeltaTime: number = 1 / 144.0;
 
     public manifolds: ContactManifold[] = [];
@@ -16,6 +20,8 @@ export class World
     public applyGravity = true;
 
     private useFixedDelta: boolean;
+    private static warmStartThreshold = 0.2;
+    public static warmStartingEnabled = true;
 
     constructor(useFixedDelta: boolean)
     {
@@ -39,6 +45,8 @@ export class World
 
         let newManifolds: ContactManifold[] = [];
 
+        let numWarmStarts = 0;
+
         // O(N^2) Crud collision detection
         for (let i = 0; i < this.colliders.length; i++)
         {
@@ -48,12 +56,48 @@ export class World
             {
                 let b = this.colliders[j];
 
-                let manifold = detectCollision(a, b);
+                let key = Util.make_pair_natural(a.id, b.id);
 
-                if (manifold != null)
-                    newManifolds.push(manifold);
+                let newManifold = detectCollision(a, b);
+
+                if (newManifold != null)
+                {
+                    if (this.cmap.has(key))
+                    {
+                        let oldManifold = this.cmap.get(key)!;
+
+                        for (let n = 0; n < newManifold.numContacts; n++)
+                        {
+                            let o = 0;
+                            for (; o < oldManifold.numContacts; o++)
+                            {
+                                let dist = Util.squared_distance(newManifold.contactPoints[n], oldManifold.contactPoints[o]);
+
+                                if (dist < World.warmStartThreshold)
+                                    break;
+                            }
+
+                            if (o < oldManifold.numContacts && World.warmStartingEnabled)
+                            {
+                                numWarmStarts++;
+
+                                newManifold.solversN[n].impulseSum = oldManifold.solversN[o].impulseSum;
+                                newManifold.solversT[n].impulseSum = oldManifold.solversT[o].impulseSum;
+                            }
+                        }
+                    }
+
+                    this.cmap.set(key, newManifold);
+                    newManifolds.push(newManifold);
+                }
+                else
+                {
+                    this.cmap.delete(key);
+                }
             }
         }
+
+        // console.log(numWarms);
 
         this.manifolds = newManifolds;
 
@@ -89,6 +133,7 @@ export class World
 
     register(collider: Collider): void
     {
+        collider.id = World.cid++;
         this.colliders.push(collider);
     }
 
