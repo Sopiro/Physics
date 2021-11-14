@@ -39,9 +39,9 @@ export class Game
         this.width = width;
         this.height = height;
         this.camera = new Camera();
-        this.camera.position = new Vector2(-this.width / 2.0, -50);
+        this.camera.position = new Vector2(-this.width / 2.0, -10);
 
-        this.world = new World(false);
+        this.world = new World(true);
 
         // Register colliders to the physics world
         {
@@ -51,7 +51,7 @@ export class Game
             // this.p.angularVelocity = 5;
             // this.world.register(this.p);
 
-            this.ground = new Box(new Vector2(0, 0), new Vector2(width * 0.8, 20), Type.Ground);
+            this.ground = new Box(new Vector2(0, 0), new Vector2(width * 5, 40), Type.Ground);
 
             this.wallL = new Box(new Vector2(0, 0), new Vector2(400, 20), Type.Ground);
             this.wallL.rotate(-Math.PI / 7);
@@ -74,7 +74,7 @@ export class Game
 
             for(let i = 0; i < 10; i++)
             {
-                this.world.register(new Box(new Vector2(0, 50 + i * 60), new Vector2(50, 50)));
+                this.world.register(new Box(new Vector2(0, 31 + i * 31), new Vector2(30, 30)));
             }
         }
     }
@@ -206,10 +206,10 @@ export class Game
                 for (; i < m.numContacts; i++)
                 {
                     mid = mid.addV(m.contactPoints[i]);
-                    this.r.drawCircleV(m.contactPoints[i]);
+                    this.r.drawCircleV(m.contactPoints[i], 4);
                 }
                 mid = mid.divS(i);
-                this.r.drawVectorP(m.contactPoints[0], m.contactPoints[0].addV(m.contactNormal.mulS(20)))
+                this.r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5)
             });
         }
 

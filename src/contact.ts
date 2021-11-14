@@ -20,7 +20,7 @@ interface Jacobian
 class ContactConstraintSolver
 {
     public static penetration_slop = 0.2;
-    public static restitution_slop = 10.0; // This has to be greater than (gravity * delta)
+    public static restitution_slop = 300.0; // This has to be greater than (gravity * delta)
 
     private readonly manifold: ContactManifold;
 
@@ -73,8 +73,8 @@ class ContactConstraintSolver
                 .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal!);
 
-            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0);
-            // this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
+            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0) +
+                this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
         }
 
         let k: number =
@@ -85,7 +85,7 @@ class ContactConstraintSolver
 
         this.effectiveMass = 1.0 / k;
 
-        if(World.warmStartingEnabled)
+        if (World.warmStartingEnabled)
         {
             // Apply the accumulated impulse comes from previous time step
             this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * this.impulseSum));

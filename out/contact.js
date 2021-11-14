@@ -33,8 +33,8 @@ class ContactConstraintSolver {
             let relativeVelocity = this.b.linearVelocity.addV(Util.cross(this.b.angularVelocity, this.rb))
                 .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal);
-            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth - ContactConstraintSolver.penetration_slop, 0.0);
-            // this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
+            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth - ContactConstraintSolver.penetration_slop, 0.0) +
+                this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
         }
         let k = +this.a.inverseMass
             + this.jacobian.wa * this.a.inverseInertia * this.jacobian.wa
@@ -79,7 +79,7 @@ class ContactConstraintSolver {
     }
 }
 ContactConstraintSolver.penetration_slop = 0.2;
-ContactConstraintSolver.restitution_slop = 10.0; // This has to be greater than (gravity * delta)
+ContactConstraintSolver.restitution_slop = 300.0; // This has to be greater than (gravity * delta)
 export class ContactManifold {
     constructor(bodyA, bodyB, contactPoints, penetrationDepth, contactNormal) {
         this.solversN = [];
