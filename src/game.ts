@@ -27,7 +27,7 @@ export class Game
     private camera: Camera;
 
     private indicateCM: boolean = false;
-    private indicateCP: boolean = false;
+    private indicateCP: boolean = true;
 
     private mouseBound = false;
     private bindPosition!: Vector2;
@@ -72,9 +72,10 @@ export class Game
             // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
             // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
 
-            for(let i = 0; i < 10; i++)
+            for (let i = 0; i < 10; i++)
             {
-                this.world.register(new Box(new Vector2(0, 31 + i * 31), new Vector2(30, 30)));
+                this.world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
+                // this.world.register(new Circle(new Vector2(0, 70.1 + i * 100), 50));
             }
         }
     }
@@ -180,7 +181,7 @@ export class Game
             World.applyGravity = !World.applyGravity;
         }
 
-        if(Input.isKeyDown("w"))
+        if (Input.isKeyDown("w"))
         {
             World.warmStartingEnabled = !World.warmStartingEnabled;
         }

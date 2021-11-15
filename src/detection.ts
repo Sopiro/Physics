@@ -251,7 +251,7 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
     let inc = edgeB;
     let flip = false;
 
-    if (Math.abs(edgeA.dir.dot(n)) >= Math.abs(edgeB.dir.dot(n)) || b.shape == Shape.Circle)
+    if (Math.abs(edgeA.dir.dot(n)) >= Math.abs(edgeB.dir.dot(n)))
     {
         ref = edgeB;
         inc = edgeA;

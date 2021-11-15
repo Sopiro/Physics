@@ -22,15 +22,15 @@ export class Vector2
         return new Vector2(this.x, this.y);
     }
 
-    toFixed(): void
+    toFixed(limit = 1e13): void
     {
-        this.x = Util.toFixed(this.x);
-        this.y = Util.toFixed(this.y);
+        this.x = Util.toFixed(this.x, limit);
+        this.y = Util.toFixed(this.y, limit);
     }
 
-    fixed(): Vector2
+    fixed(limit = 1e13): Vector2
     {
-        return new Vector2(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9);
+        return new Vector2(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit));
     }
 
     invert(): void
@@ -145,16 +145,16 @@ export class Vector3
         return new Vector3(this.x, this.y, this.z);
     }
 
-    toFixed(): void
+    toFixed(limit = 1e13): void
     {
-        this.x = Util.toFixed(this.x);
-        this.y = Util.toFixed(this.y);
-        this.z = Util.toFixed(this.z);
+        this.x = Util.toFixed(this.x, limit);
+        this.y = Util.toFixed(this.y, limit);
+        this.z = Util.toFixed(this.z, limit);
     }
 
-    fixed(): Vector3
+    fixed(limit = 1e13): Vector3
     {
-        return new Vector3(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9);
+        return new Vector3(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit), Util.toFixed(this.z, limit));
     }
 
     normalize(): void

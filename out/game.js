@@ -10,7 +10,7 @@ export class Game {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
         this.indicateCM = false;
-        this.indicateCP = false;
+        this.indicateCP = true;
         this.mouseBound = false;
         this.r = renderer;
         this.width = width;
@@ -42,7 +42,8 @@ export class Game {
             // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
             // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
             for (let i = 0; i < 10; i++) {
-                this.world.register(new Box(new Vector2(0, 31 + i * 31), new Vector2(30, 30)));
+                this.world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
+                // this.world.register(new Circle(new Vector2(0, 70.1 + i * 100), 50));
             }
         }
     }

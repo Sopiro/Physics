@@ -14,8 +14,8 @@ export function subPolygon(p1, p2) {
     }
     return new Polygon(res, Type.Normal, false);
 }
-export function toFixed(value) {
-    return Math.round(value * 1e13) / 1e13;
+export function toFixed(value, limit = 1e13) {
+    return Math.round(value * limit) / limit;
 }
 // Project point p to edge ab, calculate barycentric weights and return it
 export function getUV(a, b, p) {
