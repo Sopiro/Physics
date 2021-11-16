@@ -91,8 +91,7 @@ function findFarthestEdge(c, dir) {
             {
                 curr = localToGlobal.mulVector(curr, 1);
                 let tangent = new Vector2(-dir.y, dir.x);
-                tangent = tangent.mulS(0.5);
-                return new Edge(curr.subV(tangent), curr.addV(tangent));
+                return new Edge(curr, curr.addV(tangent));
             }
         case Shape.Polygon:
             {
@@ -155,11 +154,15 @@ function findContactPoints(n, a, b) {
     let ref = edgeA;
     let inc = edgeB;
     let flip = false;
-    if (Math.abs(edgeA.dir.dot(n)) >= Math.abs(edgeB.dir.dot(n)) || b.shape == Shape.Circle) {
+    if (Math.abs(edgeA.dir.dot(n)) > Math.abs(edgeB.dir.dot(n))) {
         ref = edgeB;
         inc = edgeA;
         flip = true;
     }
+    // r.drawCircleV(ref.p1, 15);
+    // r.drawCircleV(ref.p2, 15);
+    // r.drawCircleV(inc.p1, 10);
+    // r.drawCircleV(inc.p2, 10);
     clipEdge(inc, ref.p1, ref.dir);
     clipEdge(inc, ref.p2, ref.dir.mulS(-1));
     clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
