@@ -20,7 +20,7 @@ export class World
     public static applyGravity = true;
 
     private useFixedDelta: boolean;
-    private static warmStartThreshold = 0.2;
+    public static warmStartThreshold = 0.2;
     public static warmStartingEnabled = true;
 
     constructor(useFixedDelta: boolean)

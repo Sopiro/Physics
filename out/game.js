@@ -10,7 +10,7 @@ export class Game {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
         this.indicateCM = false;
-        this.indicateCP = true;
+        this.indicateCP = false;
         this.mouseBound = false;
         this.r = renderer;
         this.width = width;

@@ -27,7 +27,7 @@ export class Game
     private camera: Camera;
 
     private indicateCM: boolean = false;
-    private indicateCP: boolean = true;
+    private indicateCP: boolean = false;
 
     private mouseBound = false;
     private bindPosition!: Vector2;
