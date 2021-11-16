@@ -6,11 +6,11 @@ export class Engine {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.cvs = document.getElementById("canvas");
+        this.cvs = document.querySelector("#canvas");
         this.cvs.setAttribute("width", this.width.toString());
         this.cvs.setAttribute("height", this.height.toString());
         this.gfx = this.cvs.getContext("2d");
-        this.frameCounterElement = document.getElementById("frame_counter");
+        this.frameCounterElement = document.querySelector(".frame_counter");
         // Remove the default pop-up context menu
         this.cvs.oncontextmenu = (e) => {
             e.preventDefault();

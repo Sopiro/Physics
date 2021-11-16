@@ -62,8 +62,8 @@ export class Game
             this.wallR.translate(new Vector2(500, height / 3.0));
 
             this.spinner = new Box(new Vector2(0, 0), new Vector2(width / 4, 15), Type.Ground);
-            this.spinner.translate(new Vector2(0, height / 2.0));
-            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 500);
+            this.spinner.translate(new Vector2(-width / 3, height / 10));
+            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 10);
 
             this.world.register(this.ground);
             // this.world.register(this.wallL);
@@ -75,7 +75,7 @@ export class Game
             for (let i = 0; i < 10; i++)
             {
                 this.world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
-                // this.world.register(new Circle(new Vector2(0, 70.1 + i * 100), 50));
+                // this.world.register(new Circle(new Vector2(0, 71 + i * 100), 50));
             }
         }
     }
@@ -149,7 +149,7 @@ export class Game
             for (let i = 0; i < this.world.colliders.length; i++)
             {
                 let c = this.world.colliders[i];
-                if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos))
+                if (Util.checkInside(c, this.cursorPos))
                 {
                     this.world.unregister(i);
                     break;
@@ -161,7 +161,6 @@ export class Game
         {
             this.world.clear();
             this.world.register(this.ground);
-            this.world.register(this.wallL);
             this.world.register(this.wallR);
             this.world.register(this.spinner);
         }

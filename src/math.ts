@@ -22,13 +22,13 @@ export class Vector2
         return new Vector2(this.x, this.y);
     }
 
-    toFixed(limit = 1e13): void
+    toFixed(limit = 1e-13): void
     {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);
     }
 
-    fixed(limit = 1e13): Vector2
+    fixed(limit = 1e-13): Vector2
     {
         return new Vector2(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit));
     }
@@ -145,21 +145,21 @@ export class Vector3
         return new Vector3(this.x, this.y, this.z);
     }
 
-    toFixed(limit = 1e13): void
+    toFixed(limit = 1e-13): void
     {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);
         this.z = Util.toFixed(this.z, limit);
     }
 
-    fixed(limit = 1e13): Vector3
+    fixed(limit = 1e-13): Vector3
     {
         return new Vector3(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit), Util.toFixed(this.z, limit));
     }
 
     normalize(): void
     {
-        const len = this.getLength();
+        const len = this.length;
 
         this.x /= len;
         this.y /= len;
@@ -168,7 +168,7 @@ export class Vector3
 
     normalized(): Vector3
     {
-        const len = this.getLength();
+        const len = this.length;
 
         if (len != 0)
             return this.divS(len);
@@ -188,7 +188,7 @@ export class Vector3
         return new Vector3(this.x * -1, this.y * -1, this.z * -1);
     }
 
-    getLength(): number
+    get length(): number
     {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
@@ -439,8 +439,6 @@ export class Matrix3
     {
         let res = new Vector2(0, 0);
 
-        if (z == undefined) z = 1;
-
         res.x = this.m00 * right.x + this.m01 * right.y + this.m02 * z;
         res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * z;
 
@@ -459,9 +457,6 @@ export class Matrix3
 
     scale(x: number, y: number): Matrix3
     {
-        if (y == undefined)
-            y = x;
-
         let scale = new Matrix3();
         scale.m00 = x;
         scale.m11 = y;

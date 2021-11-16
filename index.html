@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <title>Physics 2D</title>
 
     <script src="./out/main.js" type="Module"></script>
@@ -12,26 +20,199 @@
 </head>
 
 <body>
-    <div class="head">
-        <p id="title">Rigid Body Simulation</p>
-        <p id="frame_counter">0fps</p>
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col m-0">
+                <div class="row">
+                    <div class="col title fs-1">Rigid Body Simulation</div>
+                    <div class="col align-self-end frame_counter fs-5 text-end">0fps</div>
+                </div>
+                <canvas id="canvas"></canvas>
+            </div>
 
-    <div class="body">
-        <canvas id="canvas"></canvas>
-    </div>
+            <div class="col fw-normal" style="margin-top: 4rem; margin-right: 1rem;">
+                <div class="row">
+                    <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <option value="1" selected>Demo1</option>
+                        <option value="2">Demo2</option>
+                        <option value="3">Demo3</option>
+                        <option value="4">Demo4</option>
+                    </select>
+                </div>
 
-    <div class="foot">
-        <h3>ESC to pause simulation</h3>
-        <h3>Click the air to generate random shaped collider</h3>
-        <h3>Drag the collider to add force</h3>
-        <h3>Right click the collider to remove</h3>
-        <h3>Arrow keys to move around</h3>
-        <h3>C to remove all bodies</h3>
-        <h3>M to indicate the center of mass</h3>
-        <h3>P to indicate contact points</h3>
-        <h3>G to toggle gravity force</h3>
-        <h3>W to toggle warm starting</h3>
+                <p class="row mb-2">
+                    <button class="btn btn-primary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShorcut" aria-expanded="false" aria-controls="collapseExample">
+                        Shorcuts
+                    </button>
+                </p>
+
+                <div class="row collapse mb-2" id="collapseShorcut">
+                    <div class="card card-body">
+                        <div class="row">
+                            - ESC to pause simulation
+                        </div>
+                        <div class="row">
+                            - Click the air to generate random shaped collider
+                        </div>
+                        <div class="row">
+                            - Drag the collider to add force
+                        </div>
+                        <div class="row">
+                            - Right click the collider to remove
+                        </div>
+                        <div class="row">
+                            - Arrow keys to move around
+                        </div>
+                        <div class="row">
+                            - C to remove all bodies
+                        </div>
+                        <div class="row">
+                            - M to indicate the center of mass
+                        </div>
+                        <div class="row">
+                            - P to indicate contact points
+                        </div>
+                        <div class="row">
+                            - G to toggle gravity force
+                        </div>
+                        <div class="row">
+                            - W to toggle warm starting
+                        </div>
+                    </div>
+                </div>
+
+                <p class="row">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNewCollider" aria-expanded="false" aria-controls="collapseExample">
+                        New Collider Setting
+                    </button>
+                </p>
+
+                <div class="row collapse" id="collapseNewCollider">
+                    <div class="card card-body">
+                        <div class="row">
+                            Shape
+                            <div class="container">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+                                    <label class="form-check-label" for="exampleRadios1">
+                                        Box
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
+                                    <label class="form-check-label" for="exampleRadios1">
+                                        Circle
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+                                    <label class="form-check-label" for="exampleRadios2">
+                                        Random
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label for="fps" class="form-label p-0 mb-0">Mass</label>
+                                <input type="range" class="form-range " id="fps">
+                            </div>
+                            <div class="row">
+                                <label for="fps" class="form-label p-0 mb-0">Size</label>
+                                <input type="range" class="form-range " id="fps">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="pause">Pause</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="pause">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="gravity">Apply gravity</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="gravity" checked>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="correction">Position correction</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="correction" checked>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="accumulation">Impulse accumulation</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="accumulation" checked>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="warmstarting">Warm starting</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="warmstarting" checked>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="indicateContact">Indicate contact points</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="indicateContact">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label for="fps" class="form-label p-0 mb-0">FPS</label>
+                    <input type="range" class="form-range " id="fps">
+                </div>
+
+                <div class="row">
+                    <label for="iterations" class="form-label p-0 mb-0">Iterations</label>
+                    <input type="range" class="form-range " id="iterations">
+                </div>
+
+                <p class="row">
+                    <button class="btn btn-primary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseExample">
+                        Advanced
+                    </button>
+                </p>
+
+                <div class="row collapse" id="collapseAdvanced">
+                    <div class="card card-body">
+                        <div class="row">
+                            <label for="gravity" class="form-label p-0 mb-0">Gravity force</label>
+                            <input type="range" class="form-range " id="gravity">
+                        </div>
+                        <div class="row">
+                            <label for="positoinCorrection" class="form-label p-0 mb-0">Position correction beta</label>
+                            <input type="range" class="form-range " id="positoinCorrection">
+                        </div>
+                        <div class="row">
+                            <label for="penetrationSlop" class="form-label p-0 mb-0">Penetration slop</label>
+                            <input type="range" class="form-range " id="penetrationSlop">
+                        </div>
+                        <div class="row">
+                            <label for="restitutionSlop" class="form-label p-0 mb-0">Resitution slop</label>
+                            <input type="range" class="form-range " id="restitutionSlop">
+                        </div>
+                        <div class="row">
+                            <label for="warmThreshold" class="form-label p-0 mb-0">Warm starting threshold</label>
+                            <input type="range" class="form-range " id="warmThreshold">
+                        </div>
+                        <div class="row">
+                            <label for="friction" class="form-label p-0 mb-0">Friction</label>
+                            <input type="range" class="form-range " id="friction">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 

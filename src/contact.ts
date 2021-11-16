@@ -20,7 +20,7 @@ interface Jacobian
 class ContactConstraintSolver
 {
     public static penetration_slop = 0.2;
-    public static restitution_slop = 300.0; // This has to be greater than (gravity * delta)
+    public static restitution_slop = 1000.0; // This has to be greater than (gravity * delta)
 
     private readonly manifold: ContactManifold;
 
@@ -73,8 +73,8 @@ class ContactConstraintSolver
                 .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal!);
 
-            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0);
-            // this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
+            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - ContactConstraintSolver.penetration_slop, 0.0) +
+                this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
         }
 
         let k: number =

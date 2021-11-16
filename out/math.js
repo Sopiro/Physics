@@ -11,11 +11,11 @@ export class Vector2 {
     copy() {
         return new Vector2(this.x, this.y);
     }
-    toFixed(limit = 1e13) {
+    toFixed(limit = 1e-13) {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);
     }
-    fixed(limit = 1e13) {
+    fixed(limit = 1e-13) {
         return new Vector2(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit));
     }
     invert() {
@@ -87,22 +87,22 @@ export class Vector3 {
     copy() {
         return new Vector3(this.x, this.y, this.z);
     }
-    toFixed(limit = 1e13) {
+    toFixed(limit = 1e-13) {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);
         this.z = Util.toFixed(this.z, limit);
     }
-    fixed(limit = 1e13) {
+    fixed(limit = 1e-13) {
         return new Vector3(Util.toFixed(this.x, limit), Util.toFixed(this.y, limit), Util.toFixed(this.z, limit));
     }
     normalize() {
-        const len = this.getLength();
+        const len = this.length;
         this.x /= len;
         this.y /= len;
         this.z /= len;
     }
     normalized() {
-        const len = this.getLength();
+        const len = this.length;
         if (len != 0)
             return this.divS(len);
         else
@@ -116,7 +116,7 @@ export class Vector3 {
     inverted() {
         return new Vector3(this.x * -1, this.y * -1, this.z * -1);
     }
-    getLength() {
+    get length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
     dot(v) {
@@ -292,8 +292,6 @@ export class Matrix3 {
     }
     mulVector(right, z) {
         let res = new Vector2(0, 0);
-        if (z == undefined)
-            z = 1;
         res.x = this.m00 * right.x + this.m01 * right.y + this.m02 * z;
         res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * z;
         return res;
@@ -305,8 +303,6 @@ export class Matrix3 {
         return res;
     }
     scale(x, y) {
-        if (y == undefined)
-            y = x;
         let scale = new Matrix3();
         scale.m00 = x;
         scale.m11 = y;

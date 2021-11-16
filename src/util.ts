@@ -22,9 +22,9 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
     return new Polygon(res, Type.Normal, false);
 }
 
-export function toFixed(value: number, limit = 1e13): number
+export function toFixed(value: number, limit = 1e-13): number
 {
-    return Math.round(value * limit) / limit;
+    return Math.round(value / limit) * limit;
 }
 
 export interface UV

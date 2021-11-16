@@ -21,12 +21,12 @@ export class Engine
         this.width = width;
         this.height = height;
 
-        this.cvs = document.getElementById("canvas") as HTMLCanvasElement;
+        this.cvs = document.querySelector("#canvas") as HTMLCanvasElement;
         this.cvs.setAttribute("width", this.width.toString());
         this.cvs.setAttribute("height", this.height.toString());
 
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
-        this.frameCounterElement = document.getElementById("frame_counter");
+        this.frameCounterElement = document.querySelector(".frame_counter");
 
         // Remove the default pop-up context menu
         this.cvs.oncontextmenu = (e) =>
