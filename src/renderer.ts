@@ -3,6 +3,7 @@ import { Collider } from "./collider.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
+import { AABB } from "./detection.js";
 
 export class Renderer
 {
@@ -162,9 +163,9 @@ export class Renderer
         }
     }
 
-    drawCollider(c: Collider, drawCenterOfMass: boolean = false, drawVerticesOnly: boolean = false): void
+    drawCollider(c: Collider, drawCenterOfMass: boolean = false, drawVerticesOnly: boolean = false, lineWidth: number = 1): void
     {
-        this.setModelTransform(c.localToGlobal());
+        this.setModelTransform(c.localToGlobal);
 
         if (c instanceof Polygon)
         {
@@ -178,7 +179,7 @@ export class Renderer
                 {
                     let curr = c.vertices[i];
                     let next = c.vertices[(i + 1) % c.count];
-                    this.drawLineV(curr, next);
+                    this.drawLineV(curr, next, lineWidth);
                 }
             }
         }
@@ -196,5 +197,13 @@ export class Renderer
             this.drawCircleV(c.centerOfMass, 1, true);
 
         this.resetModelTransform();
+    }
+
+    drawAABB(aabb: AABB, lineWidth = 1)
+    {
+        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth);
+        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth);
+        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth);
+        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth);
     }
 }

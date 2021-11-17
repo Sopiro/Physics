@@ -14,8 +14,8 @@ class ContactConstraintSolver {
         this.a = manifold.bodyA;
         this.b = manifold.bodyB;
         this.contactPoint = contactPoint;
-        this.ra = this.contactPoint.subV(this.a.localToGlobal().mulVector(this.a.centerOfMass, 1));
-        this.rb = this.contactPoint.subV(this.b.localToGlobal().mulVector(this.b.centerOfMass, 1));
+        this.ra = this.contactPoint.subV(this.a.localToGlobal.mulVector(this.a.centerOfMass, 1));
+        this.rb = this.contactPoint.subV(this.b.localToGlobal.mulVector(this.b.centerOfMass, 1));
     }
     init(dir, constraintType, delta) {
         this.constraintType = constraintType;
@@ -84,6 +84,7 @@ export class ContactManifold {
     constructor(bodyA, bodyB, contactPoints, penetrationDepth, contactNormal) {
         this.solversN = [];
         this.solversT = [];
+        this.persistent = false;
         this.bodyA = bodyA;
         this.bodyB = bodyB;
         this.contactPoints = contactPoints;

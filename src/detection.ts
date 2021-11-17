@@ -8,6 +8,54 @@ import { ClosestEdgeInfo, Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
 import * as Util from "./util.js";
 
+export interface AABB
+{
+    min: Vector2;
+    max: Vector2;
+}
+
+export function createAABB(c: Collider): AABB
+{
+    switch (c.shape)
+    {
+        case Shape.Circle:
+            let circle = c as Circle;
+            let cmInGlobal = c.localToGlobal.mulVector(c.centerOfMass, 1);
+
+            return {
+                min: new Vector2(cmInGlobal.x - circle.radius, cmInGlobal.y - circle.radius),
+                max: new Vector2(cmInGlobal.x + circle.radius, cmInGlobal.y + circle.radius)
+            };
+        case Shape.Polygon:
+            let poly = c as Polygon;
+
+            const lTg = poly.localToGlobal;
+
+            let res = { min: lTg.mulVector(poly.vertices[0], 1), max: lTg.mulVector(poly.vertices[0], 1) };
+
+            for (let i = 1; i < poly.count; i++)
+            {
+                let gv = lTg.mulVector(poly.vertices[i], 1);
+                if (gv.x < res.min.x) res.min.x = gv.x;
+                else if (gv.x > res.max.x) res.max.x = gv.x;
+                if (gv.y < res.min.y) res.min.y = gv.y;
+                else if (gv.y > res.max.y) res.max.y = gv.y;
+            }
+
+            return res;
+        default:
+            throw "Not supported shape";
+    }
+}
+
+export function testCollideAABB(a: AABB, b: AABB): boolean
+{
+    if (a.min.x > b.max.x || a.max.x < b.min.x) return false;
+    if (a.min.y > b.max.y || a.max.y < b.min.y) return false;
+
+    return true;
+}
+
 interface SupportResult
 {
     vertex: Vector2;
@@ -53,14 +101,14 @@ interface CSOSupportResult
 
 function csoSupport(c1: Collider, c2: Collider, dir: Vector2): CSOSupportResult
 {
-    const localDirP1 = c1.globalToLocal().mulVector(dir, 0);
-    const localDirP2 = c2.globalToLocal().mulVector(dir.mulS(-1), 0);
+    const localDirP1 = c1.globalToLocal.mulVector(dir, 0);
+    const localDirP2 = c2.globalToLocal.mulVector(dir.mulS(-1), 0);
 
     let supportP1 = support(c1, localDirP1).vertex;
     let supportP2 = support(c2, localDirP2).vertex;
 
-    supportP1 = c1.localToGlobal().mulVector(supportP1, 1);
-    supportP2 = c2.localToGlobal().mulVector(supportP2, 1);
+    supportP1 = c1.localToGlobal.mulVector(supportP1, 1);
+    supportP2 = c2.localToGlobal.mulVector(supportP2, 1);
 
     return {
         support: supportP1.subV(supportP2),
@@ -175,12 +223,12 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
 
 function findFarthestEdge(c: Collider, dir: Vector2): Edge
 {
-    let localDir = c.globalToLocal().mulVector(dir, 0)
+    let localDir = c.globalToLocal.mulVector(dir, 0)
     let farthest = support(c, localDir);
     let curr = farthest.vertex;
     let idx = farthest.index;
 
-    let localToGlobal = c.localToGlobal();
+    let localToGlobal = c.localToGlobal;
 
     switch (c.shape)
     {
@@ -276,6 +324,14 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
 // Returns contact data if collide, otherwise returns null
 export function detectCollision(a: Collider, b: Collider): ContactManifold | null
 {
+    // Broad Phase
+    let boundingBoxA = createAABB(a);
+    let boundingBoxB = createAABB(b);
+
+    if (!testCollideAABB(boundingBoxA, boundingBoxB))
+        return null;
+
+    // Narrow Phase
     const gjkResult = gjk(a, b);
 
     // EPA needs a full n-simplex to start
@@ -295,7 +351,7 @@ export function detectCollision(a: Collider, b: Collider): ContactManifold | nul
             b = tmp;
             epaResult.contactNormal.invert();
         }
-        
+
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
 
         let contact = new ContactManifold(a, b, contactPoints, epaResult.penetrationDepth, epaResult.contactNormal.fixed());

@@ -5,12 +5,14 @@ import { Camera } from "./camera.js";
 import { Type } from "./collider.js";
 import { World } from "./world.js";
 import { Box } from "./box.js";
+import { createAABB } from "./detection.js";
 export class Game {
     constructor(renderer, width, height) {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
         this.indicateCM = false;
         this.indicateCP = false;
+        this.showBoundingBox = false;
         this.mouseBound = false;
         this.r = renderer;
         this.width = width;
@@ -34,7 +36,7 @@ export class Game {
             this.wallR.translate(new Vector2(500, height / 3.0));
             this.spinner = new Box(new Vector2(0, 0), new Vector2(width / 4, 15), Type.Ground);
             this.spinner.translate(new Vector2(-width / 3, height / 10));
-            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 10);
+            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 1);
             this.world.register(this.ground);
             // this.world.register(this.wallL);
             this.world.register(this.wallR);
@@ -60,12 +62,12 @@ export class Game {
         this.camera.translate(new Vector2(mx * speed, my * speed));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         this.cursorPos = new Vector2(Input.mousePosition.x, this.height - Input.mousePosition.y - 1);
-        this.cursorPos = this.camera.getTransform().mulVector(this.cursorPos, 1);
+        this.cursorPos = this.camera.transform.mulVector(this.cursorPos, 1);
         if (this.mouseBound) {
             if (Input.isMouseUp()) {
-                let bindInGlobal = this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(5000);
-                let torque = bindInGlobal.subV(this.targetCollider.localToGlobal().
+                let bindInGlobal = this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(500);
+                let torque = bindInGlobal.subV(this.targetCollider.localToGlobal.
                     mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
                 this.targetCollider.addForce(force);
                 this.targetCollider.addTorque(torque);
@@ -78,15 +80,15 @@ export class Game {
                 let c = this.world.colliders[i];
                 if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos)) {
                     this.mouseBound = true;
-                    this.bindPosition = c.globalToLocal().mulVector(this.cursorPos, 1);
+                    this.bindPosition = c.globalToLocal.mulVector(this.cursorPos, 1);
                     this.targetCollider = c;
                     skipGeneration = true;
                     break;
                 }
             }
             if (!skipGeneration) {
-                // let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
-                let nc = new Box(new Vector2(), new Vector2(50, 50));
+                let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
+                // let nc = new Box(new Vector2(), new Vector2(50, 50));
                 nc.position = this.cursorPos;
                 // nc.angularVelocity = Util.random(-10, 10);
                 this.world.register(nc);
@@ -119,9 +121,12 @@ export class Game {
         if (Input.isKeyDown("w")) {
             World.warmStartingEnabled = !World.warmStartingEnabled;
         }
+        if (Input.isKeyDown("b")) {
+            this.showBoundingBox = !this.showBoundingBox;
+        }
     }
     render() {
-        this.r.setCameraTransform(this.camera.getCameraTransform());
+        this.r.setCameraTransform(this.camera.cameraTransform);
         // Draw axis
         // this.r.drawLine(-10000, 0, 10000, 0);
         // this.r.drawLine(0, -10000, 0, 10000);
@@ -140,9 +145,13 @@ export class Game {
             });
         }
         if (this.mouseBound)
-            this.r.drawVectorP(this.targetCollider.localToGlobal().mulVector(this.bindPosition, 1), this.cursorPos);
+            this.r.drawVectorP(this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
         this.world.colliders.forEach((collider) => {
             this.r.drawCollider(collider, this.indicateCM);
+            if (this.showBoundingBox) {
+                let aabb = createAABB(collider);
+                this.r.drawAABB(aabb);
+            }
         });
     }
 }

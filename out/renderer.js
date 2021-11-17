@@ -106,8 +106,8 @@ export class Renderer {
                 break;
         }
     }
-    drawCollider(c, drawCenterOfMass = false, drawVerticesOnly = false) {
-        this.setModelTransform(c.localToGlobal());
+    drawCollider(c, drawCenterOfMass = false, drawVerticesOnly = false, lineWidth = 1) {
+        this.setModelTransform(c.localToGlobal);
         if (c instanceof Polygon) {
             for (let i = 0; i < c.count; i++) {
                 if (drawVerticesOnly) {
@@ -116,7 +116,7 @@ export class Renderer {
                 else {
                     let curr = c.vertices[i];
                     let next = c.vertices[(i + 1) % c.count];
-                    this.drawLineV(curr, next);
+                    this.drawLineV(curr, next, lineWidth);
                 }
             }
         }
@@ -130,5 +130,11 @@ export class Renderer {
         if (drawCenterOfMass)
             this.drawCircleV(c.centerOfMass, 1, true);
         this.resetModelTransform();
+    }
+    drawAABB(aabb, lineWidth = 1) {
+        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth);
+        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth);
+        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth);
+        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth);
     }
 }

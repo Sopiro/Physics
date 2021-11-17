@@ -44,13 +44,13 @@ export class Entity {
         this._scale.y *= s.y;
     }
     // Returns local to global transform
-    localToGlobal() {
+    get localToGlobal() {
         return new Matrix3().translate(this._position.x, this._position.y)
             .rotate(this._rotation)
             .scale(this._scale.x, this._scale.y);
     }
     // Returns global to local transform
-    globalToLocal() {
+    get globalToLocal() {
         return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
             .rotate(-this._rotation)
             .translate(-this._position.x, -this._position.y);

@@ -3,10 +3,10 @@ export class Camera extends Entity {
     constructor() {
         super();
     }
-    getTransform() {
-        return super.localToGlobal();
+    get transform() {
+        return super.localToGlobal;
     }
-    getCameraTransform() {
-        return super.globalToLocal();
+    get cameraTransform() {
+        return super.globalToLocal;
     }
 }

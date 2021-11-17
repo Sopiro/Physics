@@ -75,7 +75,7 @@ export class Entity
     }
 
     // Returns local to global transform
-    localToGlobal(): Matrix3
+    get localToGlobal(): Matrix3
     {
         return new Matrix3().translate(this._position.x, this._position.y)
             .rotate(this._rotation)
@@ -83,7 +83,7 @@ export class Entity
     }
 
     // Returns global to local transform
-    globalToLocal(): Matrix3
+    get globalToLocal(): Matrix3
     {
         return new Matrix3().scale(1.0 / this._scale.x, 1.0 / this._scale.y)
             .rotate(-this._rotation)

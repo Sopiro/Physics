@@ -10,10 +10,10 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 
     for (let i = 0; i < p1.count; i++)
     {
-        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
+        let p1v = p1.localToGlobal.mulVector(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++)
         {
-            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
+            let p2v = p2.localToGlobal.mulVector(p2.vertices[j], 1);
 
             res.push(p1v.subV(p2v));
         }
@@ -78,7 +78,7 @@ export function createRandomConvexCollider(radius: number = 50, numVertices: num
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
 
-    res.mass = 20;
+    res.mass = 2;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
 
     return res;
@@ -122,7 +122,7 @@ export function calculateBoxInertia(w: number, h: number, mass: number): number
 
 export function checkInside(c: Collider, p: Vector2): boolean
 {
-    let localP = c.globalToLocal().mulVector(p, 1);
+    let localP = c.globalToLocal.mulVector(p, 1);
 
     switch (c.shape)
     {

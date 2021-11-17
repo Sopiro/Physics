@@ -46,6 +46,7 @@ export class World {
                                 numWarmStarts++;
                                 newManifold.solversN[n].impulseSum = oldManifold.solversN[o].impulseSum;
                                 newManifold.solversT[n].impulseSum = oldManifold.solversT[o].impulseSum;
+                                newManifold.persistent = true;
                             }
                         }
                     }

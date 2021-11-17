@@ -1,7 +1,7 @@
 import { Collider, Shape, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
-const MASS = 20; // kg
+const MASS = 2; // kg
 const W = 100; // cm
 const H = 100; // cm
 export class Polygon extends Collider {
@@ -34,8 +34,8 @@ export class Polygon extends Collider {
     get count() {
         return this.vertices.length;
     }
-    getGlobalVertices() {
-        const transform = this.localToGlobal();
+    get globalVertices() {
+        const transform = this.localToGlobal;
         let res = [];
         for (let i = 0; i < this.count; i++)
             res.push(transform.mulVector(this.vertices[i], 1));

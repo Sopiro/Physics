@@ -6,9 +6,9 @@ import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
-        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
+        let p1v = p1.localToGlobal.mulVector(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++) {
-            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
+            let p2v = p2.localToGlobal.mulVector(p2.vertices[j], 1);
             res.push(p1v.subV(p2v));
         }
     }
@@ -45,7 +45,7 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
-    res.mass = 20;
+    res.mass = 2;
     res.inertia = res.mass * (radius * radius * 2) / 12.0;
     return res;
 }
@@ -73,7 +73,7 @@ export function calculateBoxInertia(w, h, mass) {
     return (w * w + h * h) * mass / 12;
 }
 export function checkInside(c, p) {
-    let localP = c.globalToLocal().mulVector(p, 1);
+    let localP = c.globalToLocal.mulVector(p, 1);
     switch (c.shape) {
         case Shape.Circle:
             return localP.length <= c.radius;
