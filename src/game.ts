@@ -8,6 +8,7 @@ import { World } from "./world.js";
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
+import { GenerationShape, Settings } from "./settings.js";
 
 export class Game
 {
@@ -16,20 +17,12 @@ export class Game
     private height: number;
     private time: number = 0;
     private cursorPos: Vector2 = new Vector2(0, 0);
-
+    private camera: Camera;
     private world: World;
 
-    private p: Collider;
     private ground: Collider;
-    private wallL: Collider;
     private wallR: Collider;
     private spinner: Collider;
-
-    private camera: Camera;
-
-    private indicateCM: boolean = false;
-    private indicateCP: boolean = false;
-    private showBoundingBox: boolean = false;
 
     private mouseBound = false;
     private bindPosition!: Vector2;
@@ -47,17 +40,7 @@ export class Game
 
         // Register colliders to the physics world
         {
-            this.p = new Box(new Vector2(), new Vector2(50, 50));
-            // this.p = new Circle(new Vector2(0, 0), 50);
-            this.p.position = new Vector2(0, height * 0.8);
-            // this.p.angularVelocity = 5;
-            // this.world.register(this.p);
-
             this.ground = new Box(new Vector2(0, 0), new Vector2(width * 5, 40), Type.Ground);
-
-            this.wallL = new Box(new Vector2(0, 0), new Vector2(400, 20), Type.Ground);
-            this.wallL.rotate(-Math.PI / 7);
-            this.wallL.translate(new Vector2(-500, height / 3.0));
 
             this.wallR = new Box(new Vector2(0, 0), new Vector2(400, 20), Type.Ground);
             this.wallR.rotate(Math.PI / 7);
@@ -68,11 +51,7 @@ export class Game
             this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 1);
 
             this.world.register(this.ground);
-            // this.world.register(this.wallL);
             this.world.register(this.wallR);
-            // this.world.register(this.spinner);
-            // this.world.register(new Circle(new Vector2(300, height * 0.8), 50));
-            // this.world.register(new Circle(new Vector2(-300, height * 0.8), 50));
 
             for (let i = 0; i < 10; i++)
             {
@@ -137,10 +116,31 @@ export class Game
 
             if (!skipGeneration)
             {
-                let nc = Util.createRandomConvexCollider(Math.random() * 30 + 20);
-                // let nc = new Box(new Vector2(), new Vector2(50, 50));
+                let nc!: Collider;
+
+                let ncs = Settings.newColliderSettings;
+
+                switch (ncs.shape)
+                {
+                    case GenerationShape.Box:
+                        {
+                            nc = new Box(new Vector2(), new Vector2(ncs.size, ncs.size));
+                            break;
+                        }
+                    case GenerationShape.Circle:
+                        {
+                            nc = new Circle(new Vector2(), ncs.size / 2)
+                            break;
+                        }
+                    case GenerationShape.Random:
+                        {
+                            nc = Util.createRandomConvexCollider(Math.random() * ncs.size / 3 + ncs.size / 2);
+                            break;
+                        }
+                }
+
                 nc.position = this.cursorPos;
-                // nc.angularVelocity = Util.random(-10, 10);
+                nc.mass = ncs.mass;
 
                 this.world.register(nc);
             }
@@ -166,45 +166,20 @@ export class Game
             this.world.register(this.wallR);
             this.world.register(this.spinner);
         }
-
-        if (Input.isKeyDown("m"))
-        {
-            this.indicateCM = !this.indicateCM;
-        }
-
-        if (Input.isKeyDown("p"))
-        {
-            this.indicateCP = !this.indicateCP;
-        }
-
-        if (Input.isKeyDown("g"))
-        {
-            World.applyGravity = !World.applyGravity;
-        }
-
-        if (Input.isKeyDown("w"))
-        {
-            World.warmStartingEnabled = !World.warmStartingEnabled;
-        }
-
-        if (Input.isKeyDown("b"))
-        {
-            this.showBoundingBox = !this.showBoundingBox;
-        }
+        if (Input.isKeyDown("m")) Settings.indicateCoM = !Settings.indicateCoM;
+        if (Input.isKeyDown("p")) Settings.indicateCP = !Settings.indicateCP;
+        if (Input.isKeyDown("g")) Settings.applyGravity = !Settings.applyGravity;
+        if (Input.isKeyDown("w")) Settings.warmStarting = !Settings.warmStarting;
+        if (Input.isKeyDown("b")) Settings.showBoundingBox = !Settings.showBoundingBox;
+        if (Input.isKeyDown("r")) Settings.positionCorrection = !Settings.positionCorrection;
+        if (Input.isKeyDown("a"))Settings.impulseAccumulation = !Settings.impulseAccumulation;
     }
 
     render(): void
     {
         this.r.setCameraTransform(this.camera.cameraTransform);
 
-        // Draw axis
-        // this.r.drawLine(-10000, 0, 10000, 0);
-        // this.r.drawLine(0, -10000, 0, 10000);
-
-        // this.r.drawVectorP(new Vector2(), this.cursorPos);
-        // this.r.log(this.cursorPos.x + ", " + this.cursorPos.y);
-
-        if (this.indicateCP)
+        if (Settings.indicateCP)
         {
             this.world.manifolds.forEach(m =>
             {
@@ -225,9 +200,9 @@ export class Game
 
         this.world.colliders.forEach((collider) =>
         {
-            this.r.drawCollider(collider, this.indicateCM);
+            this.r.drawCollider(collider, Settings.indicateCoM);
 
-            if (this.showBoundingBox)
+            if (Settings.showBoundingBox)
             {
                 let aabb = createAABB(collider);
                 this.r.drawAABB(aabb);

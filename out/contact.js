@@ -1,6 +1,6 @@
 import { Vector2 } from "./math.js";
+import { Settings } from "./settings.js";
 import * as Util from "./util.js";
-import { World } from "./world.js";
 var ConstraintType;
 (function (ConstraintType) {
     ConstraintType[ConstraintType["Normal"] = 0] = "Normal";
@@ -33,15 +33,16 @@ class ContactConstraintSolver {
             let relativeVelocity = this.b.linearVelocity.addV(Util.cross(this.b.angularVelocity, this.rb))
                 .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal);
-            this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth - ContactConstraintSolver.penetration_slop, 0.0) +
-                this.restitution * Math.min(approachingVelocity + ContactConstraintSolver.restitution_slop, 0.0);
+            if (Settings.positionCorrection)
+                this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth - Settings.penetrationSlop, 0.0);
+            this.bias += this.restitution * Math.min(approachingVelocity + Settings.restitutionSlop, 0.0);
         }
         let k = +this.a.inverseMass
             + this.jacobian.wa * this.a.inverseInertia * this.jacobian.wa
             + this.b.inverseMass
             + this.jacobian.wb * this.b.inverseInertia * this.jacobian.wb;
         this.effectiveMass = 1.0 / k;
-        if (World.warmStartingEnabled) {
+        if (Settings.warmStarting) {
             // Apply the accumulated impulse comes from previous time step
             this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * this.impulseSum));
             this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * this.impulseSum;
@@ -60,17 +61,26 @@ class ContactConstraintSolver {
         switch (this.constraintType) {
             case ConstraintType.Normal:
                 {
-                    this.impulseSum = Math.max(0.0, this.impulseSum + lambda);
+                    if (Settings.impulseAccumulation)
+                        this.impulseSum = Math.max(0.0, this.impulseSum + lambda);
+                    else
+                        this.impulseSum = Math.max(0.0, lambda);
                     break;
                 }
             case ConstraintType.Tangent:
                 {
                     let maxFriction = this.friction * friendNormal.impulseSum;
-                    this.impulseSum = Util.clamp(this.impulseSum + lambda, -maxFriction, maxFriction);
+                    if (Settings.impulseAccumulation)
+                        this.impulseSum = Util.clamp(this.impulseSum + lambda, -maxFriction, maxFriction);
+                    else
+                        this.impulseSum = Util.clamp(lambda, -maxFriction, maxFriction);
                     break;
                 }
         }
-        lambda = this.impulseSum - oldImpulseSum;
+        if (Settings.impulseAccumulation)
+            lambda = this.impulseSum - oldImpulseSum;
+        else
+            lambda = this.impulseSum;
         // Apply impulse
         this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * lambda));
         this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * lambda;
@@ -78,8 +88,6 @@ class ContactConstraintSolver {
         this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * lambda;
     }
 }
-ContactConstraintSolver.penetration_slop = 0.2;
-ContactConstraintSolver.restitution_slop = 1000.0; // This has to be greater than (gravity * delta)
 export class ContactManifold {
     constructor(bodyA, bodyB, contactPoints, penetrationDepth, contactNormal) {
         this.solversN = [];
@@ -107,6 +115,21 @@ export class ContactManifold {
             // Order matters. To clamp friction's lambda range, you should get the normal impulse(lambda) value
             this.solversN[i].solve();
             this.solversT[i].solve(this.solversN[i]);
+        }
+    }
+    tryWarmStart(oldManifold) {
+        for (let n = 0; n < this.numContacts; n++) {
+            let o = 0;
+            for (; o < oldManifold.numContacts; o++) {
+                let dist = Util.squared_distance(this.contactPoints[n], oldManifold.contactPoints[o]);
+                if (dist < Settings.warmStartingThreshold) // If contact points are close enough, warm start.
+                    break;
+            }
+            if (o < oldManifold.numContacts) {
+                this.solversN[n].impulseSum = oldManifold.solversN[o].impulseSum;
+                this.solversT[n].impulseSum = oldManifold.solversT[o].impulseSum;
+                this.persistent = true;
+            }
         }
     }
     get numContacts() {

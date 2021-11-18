@@ -92,7 +92,7 @@ export function checkInside(c, p) {
             throw "Not supported shape";
     }
 }
-// Cantor pairing function
+// Cantor pairing function, ((N, N) -> N) mapping function
 // https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function
 export function make_pair_natural(a, b) {
     return (a + b) * (a + b + 1) / 2 + b;
