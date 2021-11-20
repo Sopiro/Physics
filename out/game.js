@@ -157,6 +157,22 @@ export class Game {
     }
     render() {
         this.r.setCameraTransform(this.camera.cameraTransform);
+        if (Settings.showInfo) {
+            let target;
+            let i = 0;
+            for (; i < this.world.colliders.length; i++) {
+                target = this.world.colliders[i];
+                if (Util.checkInside(target, this.cursorPos))
+                    break;
+            }
+            if (this.world.colliders.length > 0 && i != this.world.colliders.length) {
+                this.r.log("Mass: " + String(target.mass) + "kg");
+                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(2)) + "kg⋅m²", 1);
+                this.r.log("Friction: " + String(target.friction), 2);
+                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(2)) + ", " + String((target.linearVelocity.y / 100).toFixed(2)) + "]m/s", 3);
+                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(2)) + "rad/s", 4);
+            }
+        }
         if (Settings.indicateCP) {
             this.world.manifolds.forEach(m => {
                 let i = 0;

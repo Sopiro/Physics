@@ -35,7 +35,8 @@ export const Settings = {
     restitutionSlop: 1000,
     warmStartingThreshold: 0.2,
     deadBottom: -1000,
-    grabCenter: false
+    grabCenter: false,
+    showInfo: false
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -97,11 +98,11 @@ size.addEventListener("input", () => {
 const friction = document.querySelector("#friction");
 friction.value = String(Util.map(Settings.newColliderSettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
 const frictionLabel = document.querySelector("#friction_label");
-frictionLabel.innerHTML = String(Settings.newColliderSettings.friction) + "μ";
+frictionLabel.innerHTML = String(Settings.newColliderSettings.friction);
 friction.addEventListener("input", () => {
     let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
     mappedValue = Number(mappedValue.toPrecision(2));
-    frictionLabel.innerHTML = String(mappedValue) + "μ";
+    frictionLabel.innerHTML = String(mappedValue);
     updateSetting("friction", mappedValue);
 });
 const gravityForce = document.querySelector("#gravityForce");
@@ -126,6 +127,8 @@ beta.addEventListener("input", () => {
 });
 const grabCenter = document.querySelector("#grabCenter");
 grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
+const showInfo = document.querySelector("#showInfo");
+showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 export function updateSetting(id, content = undefined) {
     switch (id) {
         case "pause":

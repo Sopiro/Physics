@@ -39,7 +39,8 @@ export const Settings = {
     restitutionSlop: 1000, // This has to be greater than (gravity * delta)
     warmStartingThreshold: 0.2,
     deadBottom: -1000,
-    grabCenter: false
+    grabCenter: false,
+    showInfo: false
 }
 
 // Remove the default pop-up context menu
@@ -123,12 +124,12 @@ size.addEventListener("input", () =>
 const friction = document.querySelector("#friction")! as HTMLInputElement;
 friction.value = String(Util.map(Settings.newColliderSettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
 const frictionLabel = document.querySelector("#friction_label")! as HTMLLabelElement;
-frictionLabel.innerHTML = String(Settings.newColliderSettings.friction) + "μ";
+frictionLabel.innerHTML = String(Settings.newColliderSettings.friction);
 friction.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
     mappedValue = Number(mappedValue.toPrecision(2))
-    frictionLabel.innerHTML = String(mappedValue) + "μ";
+    frictionLabel.innerHTML = String(mappedValue);
 
     updateSetting("friction", mappedValue);
 });
@@ -161,6 +162,9 @@ beta.addEventListener("input", () =>
 
 const grabCenter = document.querySelector("#grabCenter")! as HTMLInputElement;
 grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
+
+const showInfo = document.querySelector("#showInfo")! as HTMLInputElement;
+showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 
 export function updateSetting(id: string, content: any = undefined)
 {
