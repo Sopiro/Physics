@@ -66,7 +66,7 @@ export class Renderer
         tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
-        this.gfx.rect(tv.x, this.height - 1 - tv.y, width, height);
+        this.gfx.rect(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, width, height);
 
         if (filled)
             this.gfx.fill();
@@ -93,7 +93,7 @@ export class Renderer
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(tv.x, this.height - 1 - tv.y, radius, 0, 2 * Math.PI);
+        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -113,8 +113,8 @@ export class Renderer
 
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
-        this.gfx.moveTo(tv0.x, this.height - 1 - tv0.y);
-        this.gfx.lineTo(tv1.x, this.height - 1 - tv1.y);
+        this.gfx.moveTo(this.width / 2.0 - 1 + tv0.x, this.height / 2.0 - 1 - tv0.y);
+        this.gfx.lineTo(this.width / 2.0 - 1 + tv1.x, this.height / 2.0 - 1 - tv1.y);
         this.gfx.stroke();
     }
 

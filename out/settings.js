@@ -31,9 +31,11 @@ export const Settings = {
     },
     gravity: -10,
     positionCorrectionBeta: 0.2,
-    penetrationSlop: 0.2,
+    penetrationSlop: 0.1,
     restitutionSlop: 1000,
     warmStartingThreshold: 0.2,
+    deadBottom: -1000,
+    grabCenter: false
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -122,6 +124,8 @@ beta.addEventListener("input", () => {
     betaLabel.innerHTML = String(mappedValue);
     updateSetting("beta", mappedValue);
 });
+const grabCenter = document.querySelector("#grabCenter");
+grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
 export function updateSetting(id, content = undefined) {
     switch (id) {
         case "pause":

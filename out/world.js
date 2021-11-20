@@ -58,7 +58,7 @@ export class World {
             c.position.x += c.linearVelocity.x * delta;
             c.position.y += c.linearVelocity.y * delta;
             c.rotation += c.angularVelocity * delta;
-            if (c.position.y < -500)
+            if (c.position.y < Settings.deadBottom)
                 this.colliders.splice(index, 1);
             c.force.clear();
             c.torque = 0;

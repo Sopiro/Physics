@@ -12,12 +12,15 @@ export class Game {
     constructor(renderer, width, height) {
         this.time = 0;
         this.cursorPos = new Vector2(0, 0);
-        this.mouseBound = false;
+        this.cameraMove = false;
+        this.grabCollider = false;
         this.r = renderer;
         this.width = width;
         this.height = height;
         this.camera = new Camera();
-        this.camera.position = new Vector2(-this.width / 2.0, -10);
+        this.camera.position = new Vector2(0, this.height / 2.0);
+        // this.camera.position = new Vector2(-this.width / 2.0, -10);
+        this.camera.scale = new Vector2(2, 2);
         this.world = new World(true);
         // Register colliders to the physics world
         {
@@ -41,15 +44,35 @@ export class Game {
         this.world.update(delta);
     }
     handleInput(delta) {
-        const speed = delta * 500;
         const mx = Input.isKeyPressed("ArrowLeft") ? -1 : Input.isKeyPressed("ArrowRight") ? 1 : 0;
         const my = Input.isKeyPressed("ArrowDown") ? -1 : Input.isKeyPressed("ArrowUp") ? 1 : 0;
         let mr = Input.isKeyPressed("e") ? -1 : Input.isKeyPressed("q") ? 1 : 0;
-        this.camera.translate(new Vector2(mx * speed, my * speed));
+        this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
-        this.cursorPos = new Vector2(Input.mousePosition.x, this.height - Input.mousePosition.y - 1);
+        this.cursorPos = new Vector2(-this.width / 2.0 + Input.mousePosition.x, this.height / 2.0 - Input.mousePosition.y - 1);
         this.cursorPos = this.camera.transform.mulVector(this.cursorPos, 1);
-        if (this.mouseBound) {
+        let zoom = (1 + Input.mouseScroll.y * 0.1);
+        if (zoom <= 0) {
+            zoom = 0.1;
+            Input.mouseScroll.y = -9;
+        }
+        this.camera.scale = new Vector2(zoom, zoom);
+        let spaceDown = Input.isKeyPressed(" ");
+        if (!this.cameraMove && spaceDown && Input.isMouseDown()) {
+            this.cameraMove = true;
+            this.cursorStart = Input.mousePosition.copy();
+            this.cameraPosStart = this.camera.position.copy();
+        }
+        else if (!spaceDown || Input.isMouseUp()) {
+            this.cameraMove = false;
+        }
+        if (this.cameraMove) {
+            let dist = Input.mousePosition.subV(this.cursorStart);
+            dist.x *= -1;
+            dist = dist.mulS(this.camera.scale.x);
+            this.camera.position = this.cameraPosStart.addV(dist);
+        }
+        if (this.grabCollider && !this.cameraMove) {
             if (Input.isMouseUp()) {
                 let bindInGlobal = this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1);
                 let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetCollider.mass).mulS(300);
@@ -57,7 +80,7 @@ export class Game {
                     mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
                 this.targetCollider.addForce(force);
                 this.targetCollider.addTorque(torque);
-                this.mouseBound = false;
+                this.grabCollider = false;
             }
         }
         if (Input.isMouseDown()) {
@@ -65,14 +88,17 @@ export class Game {
             for (let i = 0; i < this.world.colliders.length; i++) {
                 let c = this.world.colliders[i];
                 if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos)) {
-                    this.mouseBound = true;
-                    this.bindPosition = c.globalToLocal.mulVector(this.cursorPos, 1);
+                    this.grabCollider = true;
+                    if (Settings.grabCenter)
+                        this.bindPosition = c.centerOfMass;
+                    else
+                        this.bindPosition = c.globalToLocal.mulVector(this.cursorPos, 1);
                     this.targetCollider = c;
                     skipGeneration = true;
                     break;
                 }
             }
-            if (!skipGeneration) {
+            if (!skipGeneration && !this.cameraMove) {
                 let nc;
                 let ncs = Settings.newColliderSettings;
                 switch (ncs.shape) {
@@ -143,7 +169,7 @@ export class Game {
                 this.r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5);
             });
         }
-        if (this.mouseBound)
+        if (this.grabCollider)
             this.r.drawVectorP(this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
         this.world.colliders.forEach((collider) => {
             this.r.drawCollider(collider, Settings.indicateCoM);

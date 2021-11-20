@@ -21,6 +21,7 @@ const maxMouseButtons = 5;
 export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
 export const mouseAcceleration = new Vector2(0, 0);
+export const mouseScroll = new Vector2(0, 0);
 
 export function init(engine: Engine)
 {
@@ -52,6 +53,12 @@ export function init(engine: Engine)
 
         mousePosition.x = e.clientX - rect.left;
         mousePosition.y = e.clientY - rect.top;
+    });
+
+    engine.cvs.addEventListener("wheel", (e)=>
+    {
+        mouseScroll.x += e.deltaX / 100; 
+        mouseScroll.y += e.deltaY / 100; 
     });
 
     for (let i = 0; i < maxMouseButtons; i++)

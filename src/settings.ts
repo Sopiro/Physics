@@ -35,9 +35,11 @@ export const Settings = {
     },
     gravity: -10,
     positionCorrectionBeta: 0.2,
-    penetrationSlop: 0.2,
+    penetrationSlop: 0.1,
     restitutionSlop: 1000, // This has to be greater than (gravity * delta)
     warmStartingThreshold: 0.2,
+    deadBottom: -1000,
+    grabCenter: false
 }
 
 // Remove the default pop-up context menu
@@ -156,6 +158,9 @@ beta.addEventListener("input", () =>
 
     updateSetting("beta", mappedValue);
 });
+
+const grabCenter = document.querySelector("#grabCenter")! as HTMLInputElement;
+grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
 
 export function updateSetting(id: string, content: any = undefined)
 {
