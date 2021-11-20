@@ -1,4 +1,5 @@
 import { Vector2 } from "./math.js";
+import { updateSetting } from "./settings.js";
 const last_keys = {};
 const curr_keys = {};
 const mouses = [];
@@ -20,7 +21,7 @@ export function init(engine) {
     }, false);
     window.addEventListener("keydown", (e) => {
         if (e.key == "Escape")
-            engine.paused = !engine.paused;
+            updateSetting("pause");
         curr_keys[e.key] = true;
     });
     window.addEventListener("keyup", (e) => {

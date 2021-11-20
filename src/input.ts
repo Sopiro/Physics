@@ -1,5 +1,6 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./math.js";
+import { updateSetting } from "./settings.js";
 
 interface Key
 {
@@ -37,7 +38,7 @@ export function init(engine: Engine)
     }, false);
     window.addEventListener("keydown", (e) =>
     {
-        if (e.key == "Escape") engine.paused = !engine.paused;
+        if (e.key == "Escape") updateSetting("pause");
 
         curr_keys[e.key] = true;
     });

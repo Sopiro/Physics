@@ -7,7 +7,7 @@ import { World } from "./world.js";
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
-import { GenerationShape, Settings } from "./settings.js";
+import { GenerationShape, Settings, updateSetting } from "./settings.js";
 export class Game {
     constructor(renderer, width, height) {
         this.time = 0;
@@ -27,7 +27,7 @@ export class Game {
             this.wallR.translate(new Vector2(500, height / 3.0));
             this.spinner = new Box(new Vector2(0, 0), new Vector2(width / 4, 15), Type.Ground);
             this.spinner.translate(new Vector2(-width / 3, height / 10));
-            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 1);
+            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 10);
             this.world.register(this.ground);
             this.world.register(this.wallR);
             for (let i = 0; i < 10; i++) {
@@ -53,7 +53,7 @@ export class Game {
         if (this.mouseBound) {
             if (Input.isMouseUp()) {
                 let bindInGlobal = this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(500);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetCollider.mass).mulS(300);
                 let torque = bindInGlobal.subV(this.targetCollider.localToGlobal.
                     mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
                 this.targetCollider.addForce(force);
@@ -114,19 +114,19 @@ export class Game {
             this.world.register(this.spinner);
         }
         if (Input.isKeyDown("m"))
-            Settings.indicateCoM = !Settings.indicateCoM;
+            updateSetting("m");
         if (Input.isKeyDown("p"))
-            Settings.indicateCP = !Settings.indicateCP;
+            updateSetting("p");
         if (Input.isKeyDown("g"))
-            Settings.applyGravity = !Settings.applyGravity;
+            updateSetting("g");
         if (Input.isKeyDown("w"))
-            Settings.warmStarting = !Settings.warmStarting;
+            updateSetting("w");
         if (Input.isKeyDown("b"))
-            Settings.showBoundingBox = !Settings.showBoundingBox;
+            updateSetting("b");
         if (Input.isKeyDown("r"))
-            Settings.positionCorrection = !Settings.positionCorrection;
+            updateSetting("r");
         if (Input.isKeyDown("a"))
-            Settings.impulseAccumulation = !Settings.impulseAccumulation;
+            updateSetting("a");
     }
     render() {
         this.r.setCameraTransform(this.camera.cameraTransform);

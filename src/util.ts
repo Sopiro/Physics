@@ -158,3 +158,14 @@ export function squared_distance(a: Vector2, b: Vector2): number
 {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
+
+export function map(v: number, left: number, right: number, min: number, max: number)
+{
+    const per = v / (right - left);
+    return lerp(min, max, per);
+}
+
+export function lerp(left: number, right: number, per: number)
+{
+    return left + (right - left) * per;
+}

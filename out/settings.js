@@ -1,11 +1,16 @@
+import * as Util from "./util.js";
 export var GenerationShape;
 (function (GenerationShape) {
     GenerationShape[GenerationShape["Box"] = 0] = "Box";
     GenerationShape[GenerationShape["Circle"] = 1] = "Circle";
     GenerationShape[GenerationShape["Random"] = 2] = "Random";
 })(GenerationShape || (GenerationShape = {}));
+let iterationRange = { p1: 0, p2: 50 };
+let massRange = { p1: 1, p2: 100 };
+let sizeRange = { p1: 10, p2: 300 };
 // Simulation settings
 export const Settings = {
+    paused: false,
     fixedDeltaTime: 1 / 144.0,
     applyGravity: true,
     positionCorrection: true,
@@ -18,10 +23,114 @@ export const Settings = {
     newColliderSettings: {
         shape: GenerationShape.Box,
         mass: 2,
-        size: 50
+        size: 50 // (10 ~ 300)
     },
     gravity: -10,
     penetrationSlop: 0.2,
     restitutionSlop: 1000,
     warmStartingThreshold: 0.2,
 };
+// Remove the default pop-up context menu
+let cvs = document.querySelector("#canvas");
+cvs.oncontextmenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+};
+const pause = document.querySelector("#pause");
+pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
+const gravity = document.querySelector("#gravity");
+gravity.addEventListener("click", () => { Settings.applyGravity = gravity.checked; });
+const correction = document.querySelector("#correction");
+correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });
+const accumulation = document.querySelector("#accumulation");
+accumulation.addEventListener("click", () => { Settings.impulseAccumulation = accumulation.checked; });
+const warmStarting = document.querySelector("#warmstarting");
+warmStarting.addEventListener("click", () => { Settings.warmStarting = warmStarting.checked; });
+const indicateCoM = document.querySelector("#indicateCoM");
+indicateCoM.addEventListener("click", () => { Settings.indicateCoM = indicateCoM.checked; });
+const indicateContact = document.querySelector("#indicateContact");
+indicateContact.addEventListener("click", () => { Settings.indicateCP = indicateContact.checked; });
+const showBB = document.querySelector("#showBB");
+showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
+const iteration = document.querySelector("#iteration");
+iteration.value = String(Util.map(Settings.numIterations, iterationRange.p1, iterationRange.p2, 0, 100));
+const iterationLabel = document.querySelector("#iteration_label");
+iterationLabel.innerHTML = String(Settings.numIterations);
+iteration.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(iteration.value), 0, 100, iterationRange.p1, iterationRange.p2);
+    mappedValue = Math.trunc(mappedValue);
+    iterationLabel.innerHTML = String(mappedValue);
+    updateSetting("iteration", mappedValue);
+});
+let rad = document.querySelectorAll('input[name="shapeRadios"]');
+for (var i = 0; i < 3; i++) {
+    let me = rad[i];
+    me.addEventListener('change', () => { Settings.newColliderSettings.shape = Number(me.value); });
+}
+const mass = document.querySelector("#mass");
+mass.value = String(Util.map(Settings.newColliderSettings.mass, massRange.p1, massRange.p2, 0, 100));
+const massLabel = document.querySelector("#mass_label");
+massLabel.innerHTML = String(Settings.newColliderSettings.mass) + "kg";
+mass.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(mass.value), 0, 100, massRange.p1, massRange.p2);
+    mappedValue = Math.trunc(mappedValue);
+    massLabel.innerHTML = String(mappedValue) + "kg";
+    updateSetting("mass", mappedValue);
+});
+const size = document.querySelector("#size");
+size.value = String(Util.map(Settings.newColliderSettings.size, sizeRange.p1, sizeRange.p2, 0, 100));
+const sizeLabel = document.querySelector("#size_label");
+sizeLabel.innerHTML = String(Settings.newColliderSettings.size) + "cm";
+size.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(size.value), 0, 100, sizeRange.p1, sizeRange.p2);
+    mappedValue = Math.trunc(mappedValue);
+    sizeLabel.innerHTML = String(mappedValue) + "cm";
+    updateSetting("size", mappedValue);
+});
+export function updateSetting(id, content = undefined) {
+    switch (id) {
+        case "pause":
+            Settings.paused = !Settings.paused;
+            pause.checked = Settings.paused;
+            break;
+        case "g":
+            Settings.applyGravity = !Settings.applyGravity;
+            gravity.checked = Settings.applyGravity;
+            break;
+        case "r":
+            Settings.positionCorrection = !Settings.positionCorrection;
+            correction.checked = Settings.positionCorrection;
+            break;
+        case "a":
+            Settings.impulseAccumulation = !Settings.impulseAccumulation;
+            accumulation.checked = Settings.impulseAccumulation;
+            break;
+        case "w":
+            Settings.warmStarting = !Settings.warmStarting;
+            warmStarting.checked = Settings.warmStarting;
+            break;
+        case "m":
+            Settings.indicateCoM = !Settings.indicateCoM;
+            indicateCoM.checked = Settings.indicateCoM;
+            break;
+        case "p":
+            Settings.indicateCP = !Settings.indicateCP;
+            indicateContact.checked = Settings.indicateCP;
+            break;
+        case "b":
+            Settings.showBoundingBox = !Settings.showBoundingBox;
+            showBB.checked = Settings.showBoundingBox;
+            break;
+        case "iteration":
+            Settings.numIterations = content;
+            break;
+        case "mass":
+            Settings.newColliderSettings.mass = content;
+            break;
+        case "size":
+            Settings.newColliderSettings.size = content;
+            break;
+        default:
+            break;
+    }
+}

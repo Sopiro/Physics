@@ -1,9 +1,10 @@
-'use strict';
 import { Game } from "./game.js";
 import { Renderer } from "./renderer.js";
 import * as Input from "./input.js";
+import { Settings } from "./settings.js";
 export class Engine {
     constructor(width, height) {
+        this.time = 0;
         this.width = width;
         this.height = height;
         this.cvs = document.querySelector("#canvas");
@@ -11,13 +12,6 @@ export class Engine {
         this.cvs.setAttribute("height", this.height.toString());
         this.gfx = this.cvs.getContext("2d");
         this.frameCounterElement = document.querySelector(".frame_counter");
-        // Remove the default pop-up context menu
-        this.cvs.oncontextmenu = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        };
-        this.paused = false;
-        this.time = 0;
         this.renderer = new Renderer(this.gfx, this.width, this.height);
         this.game = new Game(this.renderer, this.width, this.height);
         Input.init(this);
@@ -32,7 +26,7 @@ export class Engine {
         this.time = t;
         const fps = Math.round(1000 / delta);
         this.frameCounterElement.innerHTML = fps + "fps";
-        if (!this.paused) {
+        if (!Settings.paused) {
             this.update(delta / 1000.0);
             this.render();
         }

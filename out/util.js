@@ -100,3 +100,10 @@ export function make_pair_natural(a, b) {
 export function squared_distance(a, b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
+export function map(v, left, right, min, max) {
+    const per = v / (right - left);
+    return lerp(min, max, per);
+}
+export function lerp(left, right, per) {
+    return left + (right - left) * per;
+}

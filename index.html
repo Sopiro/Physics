@@ -42,7 +42,7 @@
                 <div class="row">
                     <div class="form-check form-switch">
                         <label class="form-check-label" for="pause">Pause</label>
-                        <input class="form-check-input " type="checkbox" role="switch" id="pause">
+                        <input class="form-check-input" type="checkbox" role="switch" id="pause">
                     </div>
                 </div>
 
@@ -96,9 +96,9 @@
                 </div>
 
                 <div class="row">
-                    <label for="iterations" class="form-label col-10 p-0 m-0">Iterations</label>
-                    <div class="col text-end p-0 m-0">0</div>
-                    <input type="range" class="form-range " id="iterations">
+                    <label for="iteration" class="form-label col-10 p-0 m-0">Iterations</label>
+                    <div class="col text-end p-0 m-0" id="iteration_label">0</div>
+                    <input type="range" class="form-range " id="iteration">
                 </div>
 
                 <p class="row mb-2">
@@ -162,32 +162,32 @@
                         <div class="row">
                             <p class="m-0 p-0">Shape</p>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
+                                <input class="form-check-input" type="radio" name="shapeRadios" id="shapeRadios1" value="0" checked>
+                                <label class="form-check-label" for="shapeRadios1">
                                     Box
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
-                                <label class="form-check-label" for="exampleRadios1">
+                                <input class="form-check-input" type="radio" name="shapeRadios" id="shapeRadios2" value="1">
+                                <label class="form-check-label" for="shapeRadios2">
                                     Circle
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
+                                <input class="form-check-input" type="radio" name="shapeRadios" id="shapeRadios3" value="2">
+                                <label class="form-check-label" for="shapeRadios3">
                                     Random
                                 </label>
                             </div>
 
                             <div class="row m-0 p-0">
                                 <label for="mass" class="form-label col-10 p-0 m-0">Mass</label>
-                                <div class="col text-end p-0 m-0">0</div>
+                                <div class="col text-end p-0 m-0" id="mass_label">0</div>
                                 <input type="range" class="form-range " id="mass">
                             </div>
                             <div class="row m-0 p-0">
                                 <label for="size" class="form-label col-10 p-0 m-0">Size</label>
-                                <div class="col text-end p-0 m-0">0</div>
+                                <div class="col text-end p-0 m-0" id="size_label">0</div>
                                 <input type="range" class="form-range " id="size">
                             </div>
                         </div>
