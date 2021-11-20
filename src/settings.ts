@@ -7,9 +7,13 @@ export enum GenerationShape
     Random
 }
 
-let iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
-let massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
-let sizeRange: Util.Pair<number, number> = { p1: 10, p2: 300 };
+const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
+const massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
+const sizeRange: Util.Pair<number, number> = { p1: 10, p2: 300 };
+const gravityForceRange: Util.Pair<number, number> = { p1: -10, p2: 10 };
+const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
+const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
+
 
 // Simulation settings
 export const Settings = {
@@ -22,13 +26,15 @@ export const Settings = {
     indicateCP: false,
     indicateCoM: false,
     showBoundingBox: false,
-    numIterations: 15, // Number of resolution iterations (0 ~ 50)
+    numIterations: 15, // Number of resolution iterations
     newColliderSettings: {
         shape: GenerationShape.Box,
-        mass: 2, // (0 ~ 100)
-        size: 50 // (10 ~ 300)
+        mass: 2,
+        size: 50,
+        friction: 0.7
     },
     gravity: -10,
+    positionCorrectionBeta: 0.2,
     penetrationSlop: 0.2,
     restitutionSlop: 1000, // This has to be greater than (gravity * delta)
     warmStartingThreshold: 0.2,
@@ -45,8 +51,8 @@ cvs.oncontextmenu = (e) =>
 const pause = document.querySelector("#pause")! as HTMLInputElement;
 pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
 
-const gravity = document.querySelector("#gravity")! as HTMLInputElement;
-gravity.addEventListener("click", () => { Settings.applyGravity = gravity.checked; });
+const applyGravity = document.querySelector("#gravity")! as HTMLInputElement;
+applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
 
 const correction = document.querySelector("#correction")! as HTMLInputElement;
 correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });
@@ -112,6 +118,45 @@ size.addEventListener("input", () =>
     updateSetting("size", mappedValue);
 });
 
+const friction = document.querySelector("#friction")! as HTMLInputElement;
+friction.value = String(Util.map(Settings.newColliderSettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
+const frictionLabel = document.querySelector("#friction_label")! as HTMLLabelElement;
+frictionLabel.innerHTML = String(Settings.newColliderSettings.friction) + "μ";
+friction.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2))
+    frictionLabel.innerHTML = String(mappedValue) + "μ";
+
+    updateSetting("friction", mappedValue);
+});
+
+const gravityForce = document.querySelector("#gravityForce")! as HTMLInputElement;
+gravityForce.value = String(Util.map(Settings.gravity, gravityForceRange.p1, gravityForceRange.p2, 0, 100));
+const gravityForceLabel = document.querySelector("#gravityForce_label")! as HTMLLabelElement;
+gravityForceLabel.innerHTML = String(Settings.gravity) + "N";
+gravityForce.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(gravityForce.value), 0, 100, gravityForceRange.p1, gravityForceRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2))
+    gravityForceLabel.innerHTML = String(mappedValue) + "N";
+
+    updateSetting("gravity", mappedValue);
+});
+
+const beta = document.querySelector("#beta")! as HTMLInputElement;
+beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
+const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
+betaLabel.innerHTML = String(Settings.positionCorrectionBeta);
+beta.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(beta.value), 0, 100, betaRange.p1, betaRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2))
+    betaLabel.innerHTML = String(mappedValue);
+
+    updateSetting("beta", mappedValue);
+});
+
 export function updateSetting(id: string, content: any = undefined)
 {
     switch (id)
@@ -122,7 +167,7 @@ export function updateSetting(id: string, content: any = undefined)
             break
         case "g":
             Settings.applyGravity = !Settings.applyGravity;
-            gravity.checked = Settings.applyGravity;
+            applyGravity.checked = Settings.applyGravity;
             break;
         case "r":
             Settings.positionCorrection = !Settings.positionCorrection;
@@ -151,12 +196,20 @@ export function updateSetting(id: string, content: any = undefined)
         case "iteration":
             Settings.numIterations = content!;
             break;
-
         case "mass":
             Settings.newColliderSettings.mass = content!;
             break;
         case "size":
             Settings.newColliderSettings.size = content!;
+            break;
+        case "friction":
+            Settings.newColliderSettings.friction = content!;
+            break;
+        case "gravity":
+            Settings.gravity = content!;
+            break;
+        case "beta":
+            Settings.positionCorrectionBeta = content!;
             break;
         default:
             break;

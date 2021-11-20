@@ -19,7 +19,7 @@ class ContactConstraintSolver {
     }
     init(dir, constraintType, delta) {
         this.constraintType = constraintType;
-        this.beta = this.a.contactBeta * this.b.contactBeta;
+        this.beta = Settings.positionCorrectionBeta;
         this.restitution = this.a.restitution * this.b.restitution;
         this.friction = this.a.friction * this.b.friction;
         this.jacobian = {

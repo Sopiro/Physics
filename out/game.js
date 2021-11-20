@@ -29,7 +29,6 @@ export class Game {
             this.spinner.translate(new Vector2(-width / 3, height / 10));
             this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 10);
             this.world.register(this.ground);
-            this.world.register(this.wallR);
             for (let i = 0; i < 10; i++) {
                 this.world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
                 // this.world.register(new Circle(new Vector2(0, 71 + i * 100), 50));
@@ -95,6 +94,8 @@ export class Game {
                 }
                 nc.position = this.cursorPos;
                 nc.mass = ncs.mass;
+                nc.inertia = Util.calculateBoxInertia(ncs.size, ncs.size, nc.mass);
+                nc.friction = ncs.friction;
                 this.world.register(nc);
             }
         }

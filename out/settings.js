@@ -5,9 +5,12 @@ export var GenerationShape;
     GenerationShape[GenerationShape["Circle"] = 1] = "Circle";
     GenerationShape[GenerationShape["Random"] = 2] = "Random";
 })(GenerationShape || (GenerationShape = {}));
-let iterationRange = { p1: 0, p2: 50 };
-let massRange = { p1: 1, p2: 100 };
-let sizeRange = { p1: 10, p2: 300 };
+const iterationRange = { p1: 0, p2: 50 };
+const massRange = { p1: 1, p2: 100 };
+const sizeRange = { p1: 10, p2: 300 };
+const gravityForceRange = { p1: -10, p2: 10 };
+const betaRange = { p1: 0, p2: 1 };
+const frictionRange = { p1: 0, p2: 1 };
 // Simulation settings
 export const Settings = {
     paused: false,
@@ -23,9 +26,11 @@ export const Settings = {
     newColliderSettings: {
         shape: GenerationShape.Box,
         mass: 2,
-        size: 50 // (10 ~ 300)
+        size: 50,
+        friction: 0.7
     },
     gravity: -10,
+    positionCorrectionBeta: 0.2,
     penetrationSlop: 0.2,
     restitutionSlop: 1000,
     warmStartingThreshold: 0.2,
@@ -38,8 +43,8 @@ cvs.oncontextmenu = (e) => {
 };
 const pause = document.querySelector("#pause");
 pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
-const gravity = document.querySelector("#gravity");
-gravity.addEventListener("click", () => { Settings.applyGravity = gravity.checked; });
+const applyGravity = document.querySelector("#gravity");
+applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
 const correction = document.querySelector("#correction");
 correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });
 const accumulation = document.querySelector("#accumulation");
@@ -87,6 +92,36 @@ size.addEventListener("input", () => {
     sizeLabel.innerHTML = String(mappedValue) + "cm";
     updateSetting("size", mappedValue);
 });
+const friction = document.querySelector("#friction");
+friction.value = String(Util.map(Settings.newColliderSettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
+const frictionLabel = document.querySelector("#friction_label");
+frictionLabel.innerHTML = String(Settings.newColliderSettings.friction) + "μ";
+friction.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2));
+    frictionLabel.innerHTML = String(mappedValue) + "μ";
+    updateSetting("friction", mappedValue);
+});
+const gravityForce = document.querySelector("#gravityForce");
+gravityForce.value = String(Util.map(Settings.gravity, gravityForceRange.p1, gravityForceRange.p2, 0, 100));
+const gravityForceLabel = document.querySelector("#gravityForce_label");
+gravityForceLabel.innerHTML = String(Settings.gravity) + "N";
+gravityForce.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(gravityForce.value), 0, 100, gravityForceRange.p1, gravityForceRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2));
+    gravityForceLabel.innerHTML = String(mappedValue) + "N";
+    updateSetting("gravity", mappedValue);
+});
+const beta = document.querySelector("#beta");
+beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
+const betaLabel = document.querySelector("#beta_label");
+betaLabel.innerHTML = String(Settings.positionCorrectionBeta);
+beta.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(beta.value), 0, 100, betaRange.p1, betaRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2));
+    betaLabel.innerHTML = String(mappedValue);
+    updateSetting("beta", mappedValue);
+});
 export function updateSetting(id, content = undefined) {
     switch (id) {
         case "pause":
@@ -95,7 +130,7 @@ export function updateSetting(id, content = undefined) {
             break;
         case "g":
             Settings.applyGravity = !Settings.applyGravity;
-            gravity.checked = Settings.applyGravity;
+            applyGravity.checked = Settings.applyGravity;
             break;
         case "r":
             Settings.positionCorrection = !Settings.positionCorrection;
@@ -129,6 +164,15 @@ export function updateSetting(id, content = undefined) {
             break;
         case "size":
             Settings.newColliderSettings.size = content;
+            break;
+        case "friction":
+            Settings.newColliderSettings.friction = content;
+            break;
+        case "gravity":
+            Settings.gravity = content;
+            break;
+        case "beta":
+            Settings.positionCorrectionBeta = content;
             break;
         default:
             break;
