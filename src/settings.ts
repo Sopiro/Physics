@@ -8,6 +8,7 @@ export enum GenerationShape
     Random
 }
 
+const frequencyRange: Util.Pair<number, number> = { p1: 10, p2: 240 };
 const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
 const massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
 const sizeRange: Util.Pair<number, number> = { p1: 10, p2: 300 };
@@ -21,7 +22,8 @@ export const Settings = {
     width: 1280,
     height: 720,
     paused: false,
-    fixedDeltaTime: 1 / 144.0,
+    frequency: 60,
+    fixedDeltaTime: 1 / 60.0,
     applyGravity: true,
     positionCorrection: true,
     impulseAccumulation: true,
@@ -86,6 +88,19 @@ indicateContact.addEventListener("click", () => { Settings.indicateCP = indicate
 const showBB = document.querySelector("#showBB")! as HTMLInputElement;
 showBB.checked = Settings.showBoundingBox;
 showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
+
+const frequency = document.querySelector("#frequency")! as HTMLInputElement;
+frequency.value = String(Util.map(Settings.frequency, frequencyRange.p1, frequencyRange.p2, 0, 100));
+const frequencyLabel = document.querySelector("#frequency_label")! as HTMLLabelElement;
+frequencyLabel.innerHTML = String(Settings.frequency);
+frequency.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(frequency.value), 0, 100, frequencyRange.p1, frequencyRange.p2);
+    mappedValue = Math.trunc(mappedValue);
+    frequencyLabel.innerHTML = String(mappedValue);
+
+    updateSetting("frequency", mappedValue);
+});
 
 const iteration = document.querySelector("#iteration")! as HTMLInputElement;
 iteration.value = String(Util.map(Settings.numIterations, iterationRange.p1, iterationRange.p2, 0, 100));
@@ -231,6 +246,10 @@ export function updateSetting(id: string, content: any = undefined)
         case "b":
             Settings.showBoundingBox = !Settings.showBoundingBox;
             showBB.checked = Settings.showBoundingBox;
+            break;
+        case "frequency":
+            Settings.frequency = content!;
+            Settings.fixedDeltaTime = 1 / content!;
             break;
         case "iteration":
             Settings.numIterations = content!;

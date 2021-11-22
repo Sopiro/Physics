@@ -16,8 +16,11 @@ Reflect.set(demo1, "SimulationName", "Single box");
 function demo2(world) {
     updateSetting("g", true);
     world.register(ground);
-    for (let i = 0; i < 10; i++)
-        world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
+    let start = 50;
+    let size = 30;
+    let gap = 5;
+    for (let i = 0; i < 12; i++)
+        world.register(new Box(new Vector2(0, start + i * (size + gap)), new Vector2(size, size)));
 }
 Reflect.set(demo2, "SimulationName", "Box stacking");
 function demo3(world) {
@@ -57,6 +60,35 @@ function demo4(world) {
 Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo5(world) {
     updateSetting("g", false);
+    let lstart = -400;
+    let rstart = 250;
+    let c = new Circle(new Vector2(lstart, Settings.height / 2.0), 20);
+    c.linearVelocity.x = 300;
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart, Settings.height / 2.0), 20);
+    c.angularVelocity = 5;
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart + 60, Settings.height / 2.0 + 30), 20);
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart + 50, Settings.height / 2.0 - 50), 20);
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart + 160, Settings.height / 2.0 + 90), 20);
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart + 130, Settings.height / 2.0 + 10), 20);
+    c.restitution = 1;
+    world.register(c);
+    c = new Circle(new Vector2(rstart + 150, Settings.height / 2.0 - 80), 20);
+    c.restitution = 1;
+    world.register(c);
+}
+Reflect.set(demo5, "SimulationName", "Billiard");
+function demo6(world) {
+    updateSetting("g", false);
     world.register(ground);
     const center = new Vector2(300, Settings.height / 2.0);
     for (let i = 0; i < 70; i++) {
@@ -73,8 +105,8 @@ function demo5(world) {
     b.mass = 30;
     b.inertia = Util.calculateBoxInertia(10, 200, 30);
     b.linearVelocity.x = 300;
-    b.angularVelocity = 20;
+    b.angularVelocity = 15;
     world.register(b);
 }
-Reflect.set(demo5, "SimulationName", "Throwing spinning stick");
-export const demos = [demo1, demo2, demo3, demo4, demo5];
+Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6];

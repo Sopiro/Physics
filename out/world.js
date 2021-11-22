@@ -4,22 +4,20 @@ import { detectCollision } from "./detection.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 export class World {
-    constructor(useFixedDelta) {
+    constructor() {
         this.cmap = new Map();
         this.colliders = [];
         this.manifolds = [];
-        this.useFixedDelta = useFixedDelta;
     }
     update(delta) {
-        if (this.useFixedDelta)
-            delta = Settings.fixedDeltaTime;
+        delta = Settings.fixedDeltaTime;
         // Integrate forces, yield tentative velocities that possibly violate the constraint
         this.colliders.forEach(c => {
             c.addVelocity(c.force.mulS(c.inverseMass * delta));
             c.addAngularVelocity(c.torque * c.inverseInertia * delta);
             // Apply gravity 
             if (c.type != Type.Ground && Settings.applyGravity)
-                c.addVelocity(new Vector2(0, Settings.gravity * 144 * delta));
+                c.addVelocity(new Vector2(0, Settings.gravity * 25 * delta));
         });
         let newManifolds = [];
         // Detect collisions, generate contact manifolds, try warm starting

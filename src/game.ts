@@ -34,7 +34,7 @@ export class Game
         this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.camera.scale = new Vector2(2, 2);
 
-        this.world = new World(false);
+        this.world = new World();
 
         const demoSelect = document.querySelector("#demo_select") as HTMLSelectElement;
         demos.forEach((demo) =>
@@ -111,7 +111,7 @@ export class Game
             if (Input.isMouseUp())
             {
                 let bindInGlobal = this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetCollider.mass).mulS(300);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetCollider.mass).mulS(3200 * Settings.fixedDeltaTime);
                 let torque = bindInGlobal.subV(this.targetCollider.localToGlobal.
                     mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
                 this.targetCollider.addForce(force);

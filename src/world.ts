@@ -13,16 +13,9 @@ export class World
     public colliders: Collider[] = [];
     public manifolds: ContactManifold[] = [];
 
-    private useFixedDelta: boolean;
-
-    constructor(useFixedDelta: boolean)
-    {
-        this.useFixedDelta = useFixedDelta;
-    }
-
     update(delta: number): void
     {
-        if (this.useFixedDelta) delta = Settings.fixedDeltaTime;
+        delta = Settings.fixedDeltaTime;
 
         // Integrate forces, yield tentative velocities that possibly violate the constraint
         this.colliders.forEach(c =>
@@ -32,7 +25,7 @@ export class World
 
             // Apply gravity 
             if (c.type != Type.Ground && Settings.applyGravity)
-                c.addVelocity(new Vector2(0, Settings.gravity * 144 * delta));
+                c.addVelocity(new Vector2(0, Settings.gravity * 25 * delta));
         });
 
         let newManifolds: ContactManifold[] = [];

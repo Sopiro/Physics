@@ -334,13 +334,29 @@ export function detectCollision(a: Collider, b: Collider): ContactManifold | nul
     // Narrow Phase
     const gjkResult = gjk(a, b);
 
-    // EPA needs a full n-simplex to start
-    if (gjkResult.simplex.count != 3)
+    if (!gjkResult.collide)
     {
         return null;
     }
     else
     {
+        // If the gjk termination simplex has vertices less than 3, expand to full simplex
+        // Because EPA needs a full n-simplex to start
+        let simplex = gjkResult.simplex;
+        switch (simplex.count)
+        {
+            case 1:
+                let v = simplex.vertices[0];
+                simplex.addVertex(csoSupport(a, b, v.normalized().inverted()).support);
+            case 2:
+                let e = new Edge(simplex.vertices[0], simplex.vertices[1]);
+                let newVertex = csoSupport(a, b, e.normal).support;
+                if (simplex.containsVertex(newVertex))
+                    simplex.addVertex(csoSupport(a, b, e.normal.inverted()).support);
+                else
+                    simplex.addVertex(newVertex);
+        }
+
         const epaResult: EPAResult = epa(a, b, gjkResult.simplex);
 
         // Apply axis weight to improve coherence
