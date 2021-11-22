@@ -19,7 +19,7 @@ export class Game {
         this.camera = new Camera();
         this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.camera.scale = new Vector2(2, 2);
-        this.world = new World(true);
+        this.world = new World(false);
         const demoSelect = document.querySelector("#demo_select");
         demos.forEach((demo) => {
             let option = document.createElement("option");
@@ -163,11 +163,11 @@ export class Game {
                 let line = 0;
                 this.r.log("Type: " + String(Type[target.type]), line++);
                 this.r.log("Mass: " + String(target.mass) + "kg", line++);
-                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(2)) + "kg⋅m²", line++);
+                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(4)) + "kg⋅m²", line++);
                 this.r.log("Friction: " + String(target.friction), line++);
                 this.r.log("Restitution: " + String(target.restitution), line++);
-                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(2)) + ", " + String((target.linearVelocity.y / 100).toFixed(2)) + "]m/s", line++);
-                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(2)) + "rad/s", line++);
+                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
+                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(4)) + "rad/s", line++);
             }
         }
         if (Settings.indicateCP) {

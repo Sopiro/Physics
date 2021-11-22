@@ -202,7 +202,10 @@ export function updateSetting(id: string, content: any = undefined)
             pause.checked = Settings.paused;
             break
         case "g":
-            Settings.applyGravity = !Settings.applyGravity;
+            if (content == undefined)
+                Settings.applyGravity = !Settings.applyGravity;
+            else
+                Settings.applyGravity = content;
             applyGravity.checked = Settings.applyGravity;
             break;
         case "c":

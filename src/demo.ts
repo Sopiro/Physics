@@ -1,7 +1,7 @@
 import { Box } from "./box.js";
 import { Collider, Type } from "./collider.js";
 import { Vector2 } from "./math.js";
-import { Settings } from "./settings.js";
+import { Settings, updateSetting } from "./settings.js";
 import { World } from "./world.js";
 import * as Util from "./util.js";
 import { Circle } from "./circle.js";
@@ -10,6 +10,7 @@ const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), T
 
 function demo1(world: World): void
 {
+    updateSetting("g", true);
     world.register(ground);
     let b = new Box(new Vector2(0, 500), new Vector2(40, 40));
     b.angularVelocity = Util.random(-10, 10);
@@ -19,6 +20,7 @@ Reflect.set(demo1, "SimulationName", "Single box");
 
 function demo2(world: World): void
 {
+    updateSetting("g", true);
     world.register(ground);
     for (let i = 0; i < 10; i++)
         world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
@@ -27,6 +29,7 @@ Reflect.set(demo2, "SimulationName", "Box stacking");
 
 function demo3(world: World): void
 {
+    updateSetting("g", true);
     world.register(ground);
 
     const rows = 12;
@@ -50,6 +53,7 @@ Reflect.set(demo3, "SimulationName", "Pyramid");
 
 function demo4(world: World): void
 {
+    updateSetting("g", true);
     world.register(ground);
 
     let seesaw = new Box(new Vector2(0, 45), new Vector2(600, 10), Type.Ground);
@@ -69,4 +73,34 @@ function demo4(world: World): void
 }
 Reflect.set(demo4, "SimulationName", "Seesaw");
 
-export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4];
+function demo5(world: World): void
+{
+    updateSetting("g", false);
+    world.register(ground);
+
+    const center = new Vector2(300, Settings.height / 2.0);
+
+    for (let i = 0; i < 70; i++)
+    {
+        let r = Util.random(30, 280);
+        let a = Util.random(0, Math.PI * 2);
+        let p = new Vector2(Math.cos(a), Math.sin(a)).mulS(r);
+        let c = Util.createRandomConvexCollider(9);
+        c.position = center.addV(p);
+        c.mass = 1;
+        c.inertia = Util.calculateCircleInertia(9, 1);
+        world.register(c);
+    }
+
+    let b = new Box(new Vector2(-500, Settings.height / 2.0), new Vector2(10, 200));
+    b.mass = 30;
+    b.inertia = Util.calculateBoxInertia(10, 200, 30);
+
+    b.linearVelocity.x = 300;
+    b.angularVelocity = 20;
+
+    world.register(b);
+}
+Reflect.set(demo5, "SimulationName", "Throwing spinning stick");
+
+export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5];
