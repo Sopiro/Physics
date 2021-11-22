@@ -28,23 +28,21 @@ export class Collider extends Entity
     private _linearVelocity: Vector2;
     private _angularVelocity: number;
     private _friction: number;
-    private _beta: number;
     private _restitution: number;
 
     public readonly type: Type;
 
     public id!: number;
 
-    constructor(shape: Shape, type: Type)
+    constructor(shape: Shape, type: Type, friction = 0.7, restitution = 0.001)
     {
         super();
         this.shape = shape;
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._friction = 0.7;
-        this._beta = 0.45;
-        this._restitution = 0.5;
+        this._friction = friction;
+        this._restitution = restitution;
         this.type = type;
 
         if (this.type == Type.Ground)
@@ -104,16 +102,6 @@ export class Collider extends Entity
     set friction(f: number)
     {
         this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
-    }
-
-    get contactBeta(): number
-    {
-        return this._beta;
-    }
-
-    set contactBeta(b: number)
-    {
-        this._beta = Util.clamp(b, 0, 1);
     }
 
     get restitution(): number

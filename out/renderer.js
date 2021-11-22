@@ -13,11 +13,9 @@ export class Renderer {
         let y = 80 + line * 20;
         this.drawText(30, y, content);
     }
-    setCameraTransform(cameraTransfrom) {
-        this.cameraTransform = cameraTransfrom;
-    }
-    resetCameraTransform() {
-        this.cameraTransform.loadIdentity();
+    setCamera(camera) {
+        this.camera = camera;
+        this.cameraTransform = this.camera.globalToLocal;
     }
     setModelTransform(modelTransform) {
         this.modelTransform = modelTransform;
@@ -54,7 +52,7 @@ export class Renderer {
         tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius, 0, 2 * Math.PI);
+        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
         if (filled)
             this.gfx.fill();
         else

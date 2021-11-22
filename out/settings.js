@@ -11,6 +11,7 @@ const sizeRange = { p1: 10, p2: 300 };
 const gravityForceRange = { p1: -10, p2: 10 };
 const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
+const restitutionRange = { p1: 0, p2: 1 };
 // Simulation settings
 export const Settings = {
     paused: false,
@@ -27,13 +28,14 @@ export const Settings = {
         shape: GenerationShape.Box,
         mass: 2,
         size: 50,
-        friction: 0.7
+        friction: 0.7,
+        restitution: 0.001,
     },
     gravity: -10,
+    penetrationSlop: 0.2,
+    restitutionSlop: 50,
     positionCorrectionBeta: 0.2,
-    penetrationSlop: 0.1,
-    restitutionSlop: 1000,
-    warmStartingThreshold: 0.2,
+    warmStartingThreshold: 0.08,
     deadBottom: -1000,
     grabCenter: false,
     showInfo: false
@@ -45,20 +47,28 @@ cvs.oncontextmenu = (e) => {
     e.stopPropagation();
 };
 const pause = document.querySelector("#pause");
+pause.checked = Settings.paused;
 pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
 const applyGravity = document.querySelector("#gravity");
+applyGravity.checked = Settings.applyGravity;
 applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
 const correction = document.querySelector("#correction");
+correction.checked = Settings.positionCorrection;
 correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });
 const accumulation = document.querySelector("#accumulation");
+accumulation.checked = Settings.impulseAccumulation;
 accumulation.addEventListener("click", () => { Settings.impulseAccumulation = accumulation.checked; });
 const warmStarting = document.querySelector("#warmstarting");
+warmStarting.checked = Settings.warmStarting;
 warmStarting.addEventListener("click", () => { Settings.warmStarting = warmStarting.checked; });
 const indicateCoM = document.querySelector("#indicateCoM");
+indicateCoM.checked = Settings.indicateCoM;
 indicateCoM.addEventListener("click", () => { Settings.indicateCoM = indicateCoM.checked; });
 const indicateContact = document.querySelector("#indicateContact");
+indicateContact.checked = Settings.indicateCP;
 indicateContact.addEventListener("click", () => { Settings.indicateCP = indicateContact.checked; });
 const showBB = document.querySelector("#showBB");
+showBB.checked = Settings.showBoundingBox;
 showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
 const iteration = document.querySelector("#iteration");
 iteration.value = String(Util.map(Settings.numIterations, iterationRange.p1, iterationRange.p2, 0, 100));
@@ -105,6 +115,16 @@ friction.addEventListener("input", () => {
     frictionLabel.innerHTML = String(mappedValue);
     updateSetting("friction", mappedValue);
 });
+const restitution = document.querySelector("#restitution");
+restitution.value = String(Util.map(Settings.newColliderSettings.restitution, restitutionRange.p1, restitutionRange.p2, 0, 100));
+const restitutionLabel = document.querySelector("#restitution_label");
+restitutionLabel.innerHTML = String(Settings.newColliderSettings.restitution);
+restitution.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(restitution.value), 0, 100, restitutionRange.p1, restitutionRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2));
+    restitutionLabel.innerHTML = String(mappedValue);
+    updateSetting("restitution", mappedValue);
+});
 const gravityForce = document.querySelector("#gravityForce");
 gravityForce.value = String(Util.map(Settings.gravity, gravityForceRange.p1, gravityForceRange.p2, 0, 100));
 const gravityForceLabel = document.querySelector("#gravityForce_label");
@@ -115,6 +135,12 @@ gravityForce.addEventListener("input", () => {
     gravityForceLabel.innerHTML = String(mappedValue) + "N";
     updateSetting("gravity", mappedValue);
 });
+const grabCenter = document.querySelector("#grabCenter");
+grabCenter.checked = Settings.grabCenter;
+grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
+const showInfo = document.querySelector("#showInfo");
+showInfo.checked = Settings.showInfo;
+showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 const beta = document.querySelector("#beta");
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
 const betaLabel = document.querySelector("#beta_label");
@@ -125,10 +151,6 @@ beta.addEventListener("input", () => {
     betaLabel.innerHTML = String(mappedValue);
     updateSetting("beta", mappedValue);
 });
-const grabCenter = document.querySelector("#grabCenter");
-grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
-const showInfo = document.querySelector("#showInfo");
-showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 export function updateSetting(id, content = undefined) {
     switch (id) {
         case "pause":
@@ -174,6 +196,9 @@ export function updateSetting(id, content = undefined) {
             break;
         case "friction":
             Settings.newColliderSettings.friction = content;
+            break;
+        case "restitution":
+            Settings.newColliderSettings.restitution = content;
             break;
         case "gravity":
             Settings.gravity = content;

@@ -4,12 +4,14 @@ import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 import { AABB } from "./detection.js";
+import { Camera } from "./camera.js";
 
 export class Renderer
 {
     private gfx: CanvasRenderingContext2D;
     private width: number;
     private height: number;
+    private camera!: Camera;
     private cameraTransform: Matrix3;
     private modelTransform: Matrix3;
 
@@ -28,14 +30,10 @@ export class Renderer
         this.drawText(30, y, content);
     }
 
-    setCameraTransform(cameraTransfrom: Matrix3): void
+    setCamera(camera: Camera)
     {
-        this.cameraTransform = cameraTransfrom;
-    }
-
-    resetCameraTransform(): void
-    {
-        this.cameraTransform.loadIdentity();
+        this.camera = camera;
+        this.cameraTransform = this.camera.globalToLocal;
     }
 
     setModelTransform(modelTransform: Matrix3): void
@@ -93,7 +91,7 @@ export class Renderer
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius, 0, 2 * Math.PI);
+        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -129,7 +127,6 @@ export class Renderer
     {
         this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
         let n = new Vector2(-v.y, v.x).normalized().mulS(3 * arrowSize);
-
         const nv = v.normalized();
         arrowSize *= 4;
 

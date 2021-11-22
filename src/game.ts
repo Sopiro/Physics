@@ -179,6 +179,7 @@ export class Game
                 nc.mass = ncs.mass;
                 nc.inertia = Util.calculateBoxInertia(ncs.size, ncs.size, nc.mass);
                 nc.friction = ncs.friction;
+                nc.restitution = ncs.restitution;
 
                 this.world.register(nc);
             }
@@ -215,7 +216,7 @@ export class Game
 
     render(): void
     {
-        this.r.setCameraTransform(this.camera.cameraTransform);
+        this.r.setCamera(this.camera);
 
         if (Settings.showInfo)
         {
@@ -230,11 +231,14 @@ export class Game
 
             if (this.world.colliders.length > 0 && i != this.world.colliders.length)
             {
-                this.r.log("Mass: " + String(target.mass) + "kg");
-                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(2)) + "kg⋅m²", 1);
-                this.r.log("Friction: " + String(target.friction), 2);
-                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(2)) + ", " + String((target.linearVelocity.y / 100).toFixed(2)) + "]m/s", 3);
-                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(2)) + "rad/s", 4);
+                let line = 0;
+                this.r.log("Type: " + String(Type[target.type]), line++);
+                this.r.log("Mass: " + String(target.mass) + "kg", line++);
+                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(2)) + "kg⋅m²", line++);
+                this.r.log("Friction: " + String(target.friction), line++);
+                this.r.log("Restitution: " + String(target.restitution), line++);
+                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(2)) + ", " + String((target.linearVelocity.y / 100).toFixed(2)) + "]m/s", line++);
+                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(2)) + "rad/s", line++);
             }
         }
 

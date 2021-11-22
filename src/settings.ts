@@ -13,6 +13,7 @@ const sizeRange: Util.Pair<number, number> = { p1: 10, p2: 300 };
 const gravityForceRange: Util.Pair<number, number> = { p1: -10, p2: 10 };
 const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
+const restitutionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 
 
 // Simulation settings
@@ -31,13 +32,14 @@ export const Settings = {
         shape: GenerationShape.Box,
         mass: 2,
         size: 50,
-        friction: 0.7
+        friction: 0.7,
+        restitution: 0.001,
     },
     gravity: -10,
+    penetrationSlop: 0.2,
+    restitutionSlop: 50, // This has to be greater than (gravity * delta)
     positionCorrectionBeta: 0.2,
-    penetrationSlop: 0.1,
-    restitutionSlop: 1000, // This has to be greater than (gravity * delta)
-    warmStartingThreshold: 0.2,
+    warmStartingThreshold: 0.08,
     deadBottom: -1000,
     grabCenter: false,
     showInfo: false
@@ -52,27 +54,35 @@ cvs.oncontextmenu = (e) =>
 }
 
 const pause = document.querySelector("#pause")! as HTMLInputElement;
+pause.checked = Settings.paused;
 pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
 
 const applyGravity = document.querySelector("#gravity")! as HTMLInputElement;
+applyGravity.checked = Settings.applyGravity;
 applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
 
 const correction = document.querySelector("#correction")! as HTMLInputElement;
+correction.checked = Settings.positionCorrection;
 correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });
 
 const accumulation = document.querySelector("#accumulation")! as HTMLInputElement;
+accumulation.checked = Settings.impulseAccumulation;
 accumulation.addEventListener("click", () => { Settings.impulseAccumulation = accumulation.checked; });
 
 const warmStarting = document.querySelector("#warmstarting")! as HTMLInputElement;
+warmStarting.checked = Settings.warmStarting;
 warmStarting.addEventListener("click", () => { Settings.warmStarting = warmStarting.checked; });
 
 const indicateCoM = document.querySelector("#indicateCoM")! as HTMLInputElement;
+indicateCoM.checked = Settings.indicateCoM;
 indicateCoM.addEventListener("click", () => { Settings.indicateCoM = indicateCoM.checked; });
 
 const indicateContact = document.querySelector("#indicateContact")! as HTMLInputElement;
+indicateContact.checked = Settings.indicateCP;
 indicateContact.addEventListener("click", () => { Settings.indicateCP = indicateContact.checked; });
 
 const showBB = document.querySelector("#showBB")! as HTMLInputElement;
+showBB.checked = Settings.showBoundingBox;
 showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
 
 const iteration = document.querySelector("#iteration")! as HTMLInputElement;
@@ -134,6 +144,19 @@ friction.addEventListener("input", () =>
     updateSetting("friction", mappedValue);
 });
 
+const restitution = document.querySelector("#restitution")! as HTMLInputElement;
+restitution.value = String(Util.map(Settings.newColliderSettings.restitution, restitutionRange.p1, restitutionRange.p2, 0, 100));
+const restitutionLabel = document.querySelector("#restitution_label")! as HTMLLabelElement;
+restitutionLabel.innerHTML = String(Settings.newColliderSettings.restitution);
+restitution.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(restitution.value), 0, 100, restitutionRange.p1, restitutionRange.p2);
+    mappedValue = Number(mappedValue.toPrecision(2))
+    restitutionLabel.innerHTML = String(mappedValue);
+
+    updateSetting("restitution", mappedValue);
+});
+
 const gravityForce = document.querySelector("#gravityForce")! as HTMLInputElement;
 gravityForce.value = String(Util.map(Settings.gravity, gravityForceRange.p1, gravityForceRange.p2, 0, 100));
 const gravityForceLabel = document.querySelector("#gravityForce_label")! as HTMLLabelElement;
@@ -147,6 +170,14 @@ gravityForce.addEventListener("input", () =>
     updateSetting("gravity", mappedValue);
 });
 
+const grabCenter = document.querySelector("#grabCenter")! as HTMLInputElement;
+grabCenter.checked = Settings.grabCenter;
+grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
+
+const showInfo = document.querySelector("#showInfo")! as HTMLInputElement;
+showInfo.checked = Settings.showInfo;
+showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
+
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
 const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
@@ -159,12 +190,6 @@ beta.addEventListener("input", () =>
 
     updateSetting("beta", mappedValue);
 });
-
-const grabCenter = document.querySelector("#grabCenter")! as HTMLInputElement;
-grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
-
-const showInfo = document.querySelector("#showInfo")! as HTMLInputElement;
-showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 
 export function updateSetting(id: string, content: any = undefined)
 {
@@ -213,6 +238,9 @@ export function updateSetting(id: string, content: any = undefined)
             break;
         case "friction":
             Settings.newColliderSettings.friction = content!;
+            break;
+        case "restitution":
+            Settings.newColliderSettings.restitution = content!;
             break;
         case "gravity":
             Settings.gravity = content!;

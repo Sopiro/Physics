@@ -74,6 +74,8 @@ class ContactConstraintSolver
                 this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - Settings.penetrationSlop, 0.0);
 
             this.bias += this.restitution * Math.min(approachingVelocity + Settings.restitutionSlop, 0.0);
+            // if (approachingVelocity + Settings.restitutionSlop < 0)
+            //     this.bias += this.restitution * approachingVelocity;
         }
 
         let k: number =

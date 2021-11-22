@@ -13,16 +13,15 @@ export var Type;
 })(Type || (Type = {}));
 // Rigid body collider
 export class Collider extends Entity {
-    constructor(shape, type) {
+    constructor(shape, type, friction = 0.7, restitution = 0.001) {
         super();
         this._force = new Vector2();
         this._torque = 0;
         this.shape = shape;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._friction = 0.7;
-        this._beta = 0.45;
-        this._restitution = 0.5;
+        this._friction = friction;
+        this._restitution = restitution;
         this.type = type;
         if (this.type == Type.Ground) {
             this.mass = Number.MAX_VALUE;
@@ -60,12 +59,6 @@ export class Collider extends Entity {
     }
     set friction(f) {
         this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
-    }
-    get contactBeta() {
-        return this._beta;
-    }
-    set contactBeta(b) {
-        this._beta = Util.clamp(b, 0, 1);
     }
     get restitution() {
         return this._restitution;
