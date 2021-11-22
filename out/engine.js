@@ -3,17 +3,15 @@ import { Renderer } from "./renderer.js";
 import * as Input from "./input.js";
 import { Settings } from "./settings.js";
 export class Engine {
-    constructor(width, height) {
+    constructor() {
         this.time = 0;
-        this.width = width;
-        this.height = height;
         this.cvs = document.querySelector("#canvas");
-        this.cvs.setAttribute("width", this.width.toString());
-        this.cvs.setAttribute("height", this.height.toString());
+        this.cvs.setAttribute("width", Settings.width.toString());
+        this.cvs.setAttribute("height", Settings.height.toString());
         this.gfx = this.cvs.getContext("2d");
         this.frameCounterElement = document.querySelector(".frame_counter");
-        this.renderer = new Renderer(this.gfx, this.width, this.height);
-        this.game = new Game(this.renderer, this.width, this.height);
+        this.renderer = new Renderer(this.gfx);
+        this.game = new Game(this.renderer);
         Input.init(this);
     }
     start() {
@@ -41,7 +39,7 @@ export class Engine {
         Input.update();
     }
     render() {
-        this.gfx.clearRect(0, 0, this.width, this.height);
+        this.gfx.clearRect(0, 0, Settings.width, Settings.height);
         this.game.render();
     }
 }

@@ -9,20 +9,14 @@ import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
 import { GenerationShape, Settings, updateSetting } from "./settings.js";
+import { demos } from "./demo.js";
 
 export class Game
 {
     private r: Renderer;
-    private width: number;
-    private height: number;
-    private time: number = 0;
     private cursorPos: Vector2 = new Vector2(0, 0);
     private camera: Camera;
     private world: World;
-
-    private ground: Collider;
-    private wallR: Collider;
-    private spinner: Collider;
 
     private cameraPosStart!: Vector2;
     private cursorStart!: Vector2;
@@ -31,44 +25,41 @@ export class Game
     private bindPosition!: Vector2;
     private targetCollider!: Collider;
 
-    constructor(renderer: Renderer, width: number, height: number)
+    private currentDemo = 0;
+
+    constructor(renderer: Renderer)
     {
         this.r = renderer;
-        this.width = width;
-        this.height = height;
         this.camera = new Camera();
-        this.camera.position = new Vector2(0, this.height / 2.0);
-        // this.camera.position = new Vector2(-this.width / 2.0, -10);
+        this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.camera.scale = new Vector2(2, 2);
 
         this.world = new World(true);
 
-        // Register colliders to the physics world
+        const demoSelect = document.querySelector("#demo_select") as HTMLSelectElement;
+        demos.forEach((demo) =>
         {
-            this.ground = new Box(new Vector2(0, 0), new Vector2(width * 5, 40), Type.Ground);
-
-            this.wallR = new Box(new Vector2(0, 0), new Vector2(400, 20), Type.Ground);
-            this.wallR.rotate(Math.PI / 7);
-            this.wallR.translate(new Vector2(500, height / 3.0));
-
-            this.spinner = new Box(new Vector2(0, 0), new Vector2(width / 4, 15), Type.Ground);
-            this.spinner.translate(new Vector2(-width / 3, height / 10));
-            this.spinner.inertia = Util.calculateBoxInertia(width / 4, 15, 10);
-
-            this.world.register(this.ground);
-
-            for (let i = 0; i < 10; i++)
-            {
-                this.world.register(new Box(new Vector2(0, 50 + i * 35), new Vector2(30, 30)));
-                // this.world.register(new Circle(new Vector2(0, 71 + i * 100), 50));
-            }
-        }
+            let option = document.createElement("option");
+            option.innerHTML = Reflect.get(demo, "SimulationName");
+            demoSelect.appendChild(option);
+        });
+        demoSelect.addEventListener("input", () =>
+        {
+            this.currentDemo = demoSelect.selectedIndex;
+            this.initDemo();
+        });
+        demoSelect.selectedIndex = this.currentDemo;
+        this.initDemo();
+    }
+    
+    initDemo()
+    {
+        this.world.clear();
+        demos[this.currentDemo](this.world);
     }
 
     update(delta: number): void
     {
-        this.time += delta;
-
         this.handleInput(delta);
         this.world.update(delta);
     }
@@ -77,12 +68,11 @@ export class Game
     {
         const mx = Input.isKeyPressed("ArrowLeft") ? -1 : Input.isKeyPressed("ArrowRight") ? 1 : 0;
         const my = Input.isKeyPressed("ArrowDown") ? -1 : Input.isKeyPressed("ArrowUp") ? 1 : 0;
-        let mr = Input.isKeyPressed("e") ? -1 : Input.isKeyPressed("q") ? 1 : 0;
 
         this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
 
-        this.cursorPos = new Vector2(-this.width / 2.0 + Input.mousePosition.x, this.height / 2.0 - Input.mousePosition.y - 1);
+        this.cursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
         this.cursorPos = this.camera.transform.mulVector(this.cursorPos, 1);
 
         let zoom = (1 + Input.mouseScroll.y * 0.1);
@@ -198,19 +188,13 @@ export class Game
             }
         }
 
-        if (Input.isKeyDown("c"))
-        {
-            this.world.clear();
-            this.world.register(this.ground);
-            this.world.register(this.wallR);
-            this.world.register(this.spinner);
-        }
+        if (Input.isKeyDown("r")) this.initDemo();
         if (Input.isKeyDown("m")) updateSetting("m");
         if (Input.isKeyDown("p")) updateSetting("p");
         if (Input.isKeyDown("g")) updateSetting("g");
         if (Input.isKeyDown("w")) updateSetting("w");
         if (Input.isKeyDown("b")) updateSetting("b");
-        if (Input.isKeyDown("r")) updateSetting("r");
+        if (Input.isKeyDown("c")) updateSetting("c");
         if (Input.isKeyDown("a")) updateSetting("a");
     }
 

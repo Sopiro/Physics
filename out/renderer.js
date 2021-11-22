@@ -1,11 +1,10 @@
 import { Circle } from "./circle.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
+import { Settings } from "./settings.js";
 export class Renderer {
-    constructor(gfx, width, height) {
+    constructor(gfx) {
         this.gfx = gfx;
-        this.width = width;
-        this.height = height;
         this.cameraTransform = new Matrix3();
         this.modelTransform = new Matrix3();
     }
@@ -34,7 +33,7 @@ export class Renderer {
         }
         tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
         this.gfx.lineWidth = 1;
-        this.gfx.rect(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, width, height);
+        this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
         if (filled)
             this.gfx.fill();
         else
@@ -52,7 +51,7 @@ export class Renderer {
         tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
+        this.gfx.arc(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
         if (filled)
             this.gfx.fill();
         else
@@ -66,8 +65,8 @@ export class Renderer {
         let tv1 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v1, 1), 1);
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
-        this.gfx.moveTo(this.width / 2.0 - 1 + tv0.x, this.height / 2.0 - 1 - tv0.y);
-        this.gfx.lineTo(this.width / 2.0 - 1 + tv1.x, this.height / 2.0 - 1 - tv1.y);
+        this.gfx.moveTo(Settings.width / 2.0 - 1 + tv0.x, Settings.height / 2.0 - 1 - tv0.y);
+        this.gfx.lineTo(Settings.width / 2.0 - 1 + tv1.x, Settings.height / 2.0 - 1 - tv1.y);
         this.gfx.stroke();
     }
     drawText(x, y, content, fontSize = 20) {

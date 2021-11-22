@@ -73,6 +73,9 @@ export class World {
     }
     clear() {
         this.colliders = [];
+        this.manifolds = [];
+        this.cmap.clear();
+        World.cid = 0;
     }
     get numColliders() {
         return this.colliders.length;

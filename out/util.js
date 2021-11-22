@@ -72,6 +72,9 @@ export function cross(scalar, vector) {
 export function calculateBoxInertia(w, h, mass) {
     return (w * w + h * h) * mass / 12;
 }
+export function calculateCircleInertia(r, mass) {
+    return mass * r * r / 2.0;
+}
 export function checkInside(c, p) {
     let localP = c.globalToLocal.mulVector(p, 1);
     switch (c.shape) {

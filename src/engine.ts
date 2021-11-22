@@ -5,8 +5,6 @@ import { Settings } from "./settings.js";
 
 export class Engine
 {
-    public width: number;
-    public height: number;
     public cvs: HTMLCanvasElement;
     public gfx: CanvasRenderingContext2D;
     public frameCounterElement: any;
@@ -14,20 +12,17 @@ export class Engine
     public game: Game;
     public time: number = 0;
 
-    constructor(width: number, height: number)
+    constructor()
     {
-        this.width = width;
-        this.height = height;
-
         this.cvs = document.querySelector("#canvas") as HTMLCanvasElement;
-        this.cvs.setAttribute("width", this.width.toString());
-        this.cvs.setAttribute("height", this.height.toString());
+        this.cvs.setAttribute("width", Settings.width.toString());
+        this.cvs.setAttribute("height", Settings.height.toString());
 
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
         this.frameCounterElement = document.querySelector(".frame_counter");
 
-        this.renderer = new Renderer(this.gfx, this.width, this.height);
-        this.game = new Game(this.renderer, this.width, this.height);
+        this.renderer = new Renderer(this.gfx);
+        this.game = new Game(this.renderer);
 
         Input.init(this);
     }
@@ -69,7 +64,7 @@ export class Engine
 
     render(): void
     {
-        this.gfx.clearRect(0, 0, this.width, this.height);
+        this.gfx.clearRect(0, 0, Settings.width, Settings.height);
         this.game.render();
     }
 }

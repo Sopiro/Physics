@@ -1,3 +1,4 @@
+import { demos } from "./demo.js";
 import * as Util from "./util.js";
 
 export enum GenerationShape
@@ -15,9 +16,10 @@ const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const restitutionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 
-
 // Simulation settings
 export const Settings = {
+    width: 1280,
+    height: 720,
     paused: false,
     fixedDeltaTime: 1 / 144.0,
     applyGravity: true,
@@ -203,7 +205,7 @@ export function updateSetting(id: string, content: any = undefined)
             Settings.applyGravity = !Settings.applyGravity;
             applyGravity.checked = Settings.applyGravity;
             break;
-        case "r":
+        case "c":
             Settings.positionCorrection = !Settings.positionCorrection;
             correction.checked = Settings.positionCorrection;
             break;

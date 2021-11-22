@@ -31,12 +31,7 @@
 
             <div class="col fw-normal" style="margin: 4rem 1rem 1rem 1rem">
                 <div class="row">
-                    <select class="form-select form-select-sm mb-2" aria-label=".form-select-sm example">
-                        <option value="1" selected>Demo1</option>
-                        <option value="2">Demo2</option>
-                        <option value="3">Demo3</option>
-                        <option value="4">Demo4</option>
-                    </select>
+                    <select class="form-select form-select-sm mb-2" aria-label=".form-select-sm example" id="demo_select"></select>
                 </div>
 
                 <div class="row">
@@ -83,7 +78,7 @@
 
                 <div class="row">
                     <div class="form-check form-switch">
-                        <label class="form-check-label" for="indicateContact">Indicate contact points</label>
+                        <label class="form-check-label" for="indicateContact">Indicate contact information</label>
                         <input class="form-check-input " type="checkbox" role="switch" id="indicateContact">
                     </div>
                 </div>
@@ -102,12 +97,12 @@
                 </div>
 
                 <p class="row mb-2">
-                    <button class="btn btn-primary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShorcut" aria-expanded="false" aria-controls="collapseExample">
-                        Shorcuts
+                    <button class="btn btn-primary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShortcut" aria-expanded="false" aria-controls="collapseExample">
+                        Shortcuts
                     </button>
                 </p>
 
-                <div class="row collapse mb-2" id="collapseShorcut">
+                <div class="row collapse mb-2" id="collapseShortcut">
                     <div class="card card-body py-2 px-4">
                         <div class="row">
                             - ESC to pause simulation
@@ -131,13 +126,13 @@
                             - Arrow keys to move around
                         </div>
                         <div class="row">
-                            - C to remove all bodies
+                            - R to restart simulation
                         </div>
                         <div class="row">
                             - M to indicate the center of mass
                         </div>
                         <div class="row">
-                            - P to indicate contact points
+                            - P to indicate contact information
                         </div>
                         <div class="row">
                             - G to toggle gravity force
@@ -149,7 +144,7 @@
                             - B to show bounding box
                         </div>
                         <div class="row">
-                            - R to toggle position correction
+                            - C to toggle position correction
                         </div>
                         <div class="row">
                             - A to toggle impulse accumulation

@@ -120,6 +120,11 @@ export function calculateBoxInertia(w: number, h: number, mass: number): number
     return (w * w + h * h) * mass / 12;
 }
 
+export function calculateCircleInertia(r: number, mass: number): number
+{
+    return mass * r * r / 2.0;
+}
+
 export function checkInside(c: Collider, p: Vector2): boolean
 {
     let localP = c.globalToLocal.mulVector(p, 1);

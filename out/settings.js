@@ -14,6 +14,8 @@ const frictionRange = { p1: 0, p2: 1 };
 const restitutionRange = { p1: 0, p2: 1 };
 // Simulation settings
 export const Settings = {
+    width: 1280,
+    height: 720,
     paused: false,
     fixedDeltaTime: 1 / 144.0,
     applyGravity: true,
@@ -161,7 +163,7 @@ export function updateSetting(id, content = undefined) {
             Settings.applyGravity = !Settings.applyGravity;
             applyGravity.checked = Settings.applyGravity;
             break;
-        case "r":
+        case "c":
             Settings.positionCorrection = !Settings.positionCorrection;
             correction.checked = Settings.positionCorrection;
             break;

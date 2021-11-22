@@ -5,21 +5,18 @@ import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 import { AABB } from "./detection.js";
 import { Camera } from "./camera.js";
+import { Settings } from "./settings.js";
 
 export class Renderer
 {
     private gfx: CanvasRenderingContext2D;
-    private width: number;
-    private height: number;
     private camera!: Camera;
     private cameraTransform: Matrix3;
     private modelTransform: Matrix3;
 
-    constructor(gfx: CanvasRenderingContext2D, width: number, height: number)
+    constructor(gfx: CanvasRenderingContext2D)
     {
         this.gfx = gfx;
-        this.width = width;
-        this.height = height;
         this.cameraTransform = new Matrix3();
         this.modelTransform = new Matrix3();
     }
@@ -64,7 +61,7 @@ export class Renderer
         tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
-        this.gfx.rect(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, width, height);
+        this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
 
         if (filled)
             this.gfx.fill();
@@ -91,7 +88,7 @@ export class Renderer
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(this.width / 2.0 - 1 + tv.x, this.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
+        this.gfx.arc(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -111,8 +108,8 @@ export class Renderer
 
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
-        this.gfx.moveTo(this.width / 2.0 - 1 + tv0.x, this.height / 2.0 - 1 - tv0.y);
-        this.gfx.lineTo(this.width / 2.0 - 1 + tv1.x, this.height / 2.0 - 1 - tv1.y);
+        this.gfx.moveTo(Settings.width / 2.0 - 1 + tv0.x, Settings.height / 2.0 - 1 - tv0.y);
+        this.gfx.lineTo(Settings.width / 2.0 - 1 + tv1.x, Settings.height / 2.0 - 1 - tv1.y);
         this.gfx.stroke();
     }
 

@@ -113,6 +113,9 @@ export class World
     clear(): void
     {
         this.colliders = [];
+        this.manifolds = [];
+        this.cmap.clear();
+        World.cid = 0;
     }
 
     get numColliders(): number
