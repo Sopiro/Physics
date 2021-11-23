@@ -36,6 +36,12 @@ export class Game
 
         this.world = new World();
 
+        const restartBtn = document.querySelector("#restart") as HTMLButtonElement;
+        restartBtn.addEventListener("click", () =>
+        {
+            this.initDemo();
+        });
+
         const demoSelect = document.querySelector("#demo_select") as HTMLSelectElement;
         demos.forEach((demo) =>
         {

@@ -1,4 +1,3 @@
-import { demos } from "./demo.js";
 import * as Util from "./util.js";
 
 export enum GenerationShape

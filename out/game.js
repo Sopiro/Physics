@@ -20,6 +20,10 @@ export class Game {
         this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.camera.scale = new Vector2(2, 2);
         this.world = new World();
+        const restartBtn = document.querySelector("#restart");
+        restartBtn.addEventListener("click", () => {
+            this.initDemo();
+        });
         const demoSelect = document.querySelector("#demo_select");
         demos.forEach((demo) => {
             let option = document.createElement("option");
