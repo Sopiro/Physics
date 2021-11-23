@@ -5,10 +5,12 @@ import { Settings, updateSetting } from "./settings.js";
 import * as Util from "./util.js";
 import { Circle } from "./circle.js";
 const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), Type.Ground);
+ground.restitution = 0.45;
 function demo1(world) {
     updateSetting("g", true);
     world.register(ground);
     let b = new Box(new Vector2(0, 500), new Vector2(40, 40));
+    b.restitution = 0.7;
     b.angularVelocity = Util.random(-10, 10);
     world.register(b);
 }
