@@ -1,5 +1,6 @@
 import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
+import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export var Shape;
 (function (Shape) {
@@ -11,21 +12,31 @@ export var Type;
     Type[Type["Ground"] = 0] = "Ground";
     Type[Type["Normal"] = 1] = "Normal";
 })(Type || (Type = {}));
-// Rigid body collider
-export class Collider extends Entity {
+export class RigidBody extends Entity {
     constructor(shape, type, friction = 0.7, restitution = 0.001) {
         super();
-        this._force = new Vector2();
+        this._force = new Vector2(0, 0);
         this._torque = 0;
         this.shape = shape;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
+        this._cm = new Vector2(0, 0);
         this._friction = friction;
         this._restitution = restitution;
         this.type = type;
-        if (this.type == Type.Ground) {
-            this.mass = Number.MAX_VALUE;
-            this.inertia = Number.MAX_VALUE;
+        switch (this.type) {
+            case Type.Ground:
+                this._mass = Number.MAX_VALUE;
+                this._invMass = 0;
+                this._inertia = Number.MAX_VALUE;
+                this._invInertia = 0;
+                break;
+            case Type.Normal:
+                this._mass = Settings.newBodySettings.mass;
+                this._invMass = 1 / this._mass;
+                this._inertia = Util.calculateCircleInertia(Settings.newBodySettings.size, this.mass);
+                this._invInertia = 1 / this._inertia;
+                break;
         }
     }
     get mass() {
@@ -43,7 +54,7 @@ export class Collider extends Entity {
     }
     set inertia(i) {
         this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
-        this._invInertia = this._inertia == 0 ? 0 : 1.0 / i;
+        this._invInertia = this._inertia == Number.MAX_VALUE ? 0 : 1.0 / this._inertia;
     }
     get inverseInertia() {
         return this._invInertia;

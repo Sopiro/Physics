@@ -1,5 +1,5 @@
 import { Box } from "./box.js";
-import { Collider, Type } from "./collider.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Settings, updateSetting } from "./settings.js";
 import { World } from "./world.js";
@@ -9,6 +9,7 @@ import { Circle } from "./circle.js";
 const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), Type.Ground);
 ground.restitution = 0.45;
 
+Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(world: World): void
 {
     updateSetting("g", true);
@@ -18,8 +19,8 @@ function demo1(world: World): void
     b.angularVelocity = Util.random(-10, 10);
     world.register(b);
 }
-Reflect.set(demo1, "SimulationName", "Single box");
 
+Reflect.set(demo2, "SimulationName", "Box stacking");
 function demo2(world: World): void
 {
     updateSetting("g", true);
@@ -32,8 +33,8 @@ function demo2(world: World): void
     for (let i = 0; i < 12; i++)
         world.register(new Box(new Vector2(0, start + i * (size + gap)), new Vector2(size, size)));
 }
-Reflect.set(demo2, "SimulationName", "Box stacking");
 
+Reflect.set(demo3, "SimulationName", "Pyramid");
 function demo3(world: World): void
 {
     updateSetting("g", true);
@@ -56,8 +57,8 @@ function demo3(world: World): void
         }
     }
 }
-Reflect.set(demo3, "SimulationName", "Pyramid");
 
+Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo4(world: World): void
 {
     updateSetting("g", true);
@@ -67,7 +68,7 @@ function demo4(world: World): void
     seesaw.inertia = Util.calculateBoxInertia(600, 10, 10);
     world.register(seesaw);
 
-    let b: Collider = new Circle(new Vector2(-250, 100), 20);
+    let b: RigidBody = new Circle(new Vector2(-250, 100), 20);
     world.register(b);
     b = new Box(new Vector2(-280, 100), new Vector2(20, 20));
     b.mass = 1;
@@ -78,8 +79,8 @@ function demo4(world: World): void
     b.inertia = Util.calculateBoxInertia(30, 30, 30);
     world.register(b);
 }
-Reflect.set(demo4, "SimulationName", "Seesaw");
 
+Reflect.set(demo5, "SimulationName", "Billiard");
 function demo5(world: World): void
 {
     updateSetting("g", false);
@@ -117,8 +118,8 @@ function demo5(world: World): void
     c.restitution = 1;
     world.register(c);
 }
-Reflect.set(demo5, "SimulationName", "Billiard");
 
+Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
 function demo6(world: World): void
 {
     updateSetting("g", false);
@@ -131,7 +132,7 @@ function demo6(world: World): void
         let r = Util.random(30, 280);
         let a = Util.random(0, Math.PI * 2);
         let p = new Vector2(Math.cos(a), Math.sin(a)).mulS(r);
-        let c = Util.createRandomConvexCollider(9);
+        let c = Util.createRandomConvexBody(9);
         c.position = center.addV(p);
         c.mass = 1;
         c.inertia = Util.calculateCircleInertia(9, 1);
@@ -147,8 +148,8 @@ function demo6(world: World): void
 
     world.register(b);
 }
-Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
 
+Reflect.set(demo7, "SimulationName", "Friction test");
 function demo7(world: World): void
 {
     updateSetting("g", true);
@@ -187,8 +188,8 @@ function demo7(world: World): void
         world.register(b);
     }
 }
-Reflect.set(demo7, "SimulationName", "Friction test");
 
+Reflect.set(demo8, "SimulationName", "Restitution test");
 function demo8(world: World): void
 {
     updateSetting("g", true);
@@ -211,6 +212,5 @@ function demo8(world: World): void
         world.register(b);
     }
 }
-Reflect.set(demo8, "SimulationName", "Restitution test");
 
 export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8];

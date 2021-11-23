@@ -31,7 +31,7 @@ export const Settings = {
     indicateCoM: false,
     showBoundingBox: false,
     numIterations: 15, // Number of resolution iterations
-    newColliderSettings: {
+    newBodySettings: {
         shape: GenerationShape.Box,
         mass: 2,
         size: 50,
@@ -118,13 +118,13 @@ let rad = document.querySelectorAll('input[name="shapeRadios"]');
 for (var i = 0; i < 3; i++)
 {
     let me = rad[i] as HTMLInputElement;
-    me.addEventListener('change', () => { Settings.newColliderSettings.shape = Number(me.value); });
+    me.addEventListener('change', () => { Settings.newBodySettings.shape = Number(me.value); });
 }
 
 const mass = document.querySelector("#mass")! as HTMLInputElement;
-mass.value = String(Util.map(Settings.newColliderSettings.mass, massRange.p1, massRange.p2, 0, 100));
+mass.value = String(Util.map(Settings.newBodySettings.mass, massRange.p1, massRange.p2, 0, 100));
 const massLabel = document.querySelector("#mass_label")! as HTMLLabelElement;
-massLabel.innerHTML = String(Settings.newColliderSettings.mass) + "kg";
+massLabel.innerHTML = String(Settings.newBodySettings.mass) + "kg";
 mass.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(mass.value), 0, 100, massRange.p1, massRange.p2);
@@ -135,9 +135,9 @@ mass.addEventListener("input", () =>
 });
 
 const size = document.querySelector("#size")! as HTMLInputElement;
-size.value = String(Util.map(Settings.newColliderSettings.size, sizeRange.p1, sizeRange.p2, 0, 100));
+size.value = String(Util.map(Settings.newBodySettings.size, sizeRange.p1, sizeRange.p2, 0, 100));
 const sizeLabel = document.querySelector("#size_label")! as HTMLLabelElement;
-sizeLabel.innerHTML = String(Settings.newColliderSettings.size) + "cm";
+sizeLabel.innerHTML = String(Settings.newBodySettings.size) + "cm";
 size.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(size.value), 0, 100, sizeRange.p1, sizeRange.p2);
@@ -148,9 +148,9 @@ size.addEventListener("input", () =>
 });
 
 const friction = document.querySelector("#friction")! as HTMLInputElement;
-friction.value = String(Util.map(Settings.newColliderSettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
+friction.value = String(Util.map(Settings.newBodySettings.friction, frictionRange.p1, frictionRange.p2, 0, 100));
 const frictionLabel = document.querySelector("#friction_label")! as HTMLLabelElement;
-frictionLabel.innerHTML = String(Settings.newColliderSettings.friction);
+frictionLabel.innerHTML = String(Settings.newBodySettings.friction);
 friction.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
@@ -161,9 +161,9 @@ friction.addEventListener("input", () =>
 });
 
 const restitution = document.querySelector("#restitution")! as HTMLInputElement;
-restitution.value = String(Util.map(Settings.newColliderSettings.restitution, restitutionRange.p1, restitutionRange.p2, 0, 100));
+restitution.value = String(Util.map(Settings.newBodySettings.restitution, restitutionRange.p1, restitutionRange.p2, 0, 100));
 const restitutionLabel = document.querySelector("#restitution_label")! as HTMLLabelElement;
-restitutionLabel.innerHTML = String(Settings.newColliderSettings.restitution);
+restitutionLabel.innerHTML = String(Settings.newBodySettings.restitution);
 restitution.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(restitution.value), 0, 100, restitutionRange.p1, restitutionRange.p2);
@@ -254,16 +254,16 @@ export function updateSetting(id: string, content: any = undefined)
             Settings.numIterations = content!;
             break;
         case "mass":
-            Settings.newColliderSettings.mass = content!;
+            Settings.newBodySettings.mass = content!;
             break;
         case "size":
-            Settings.newColliderSettings.size = content!;
+            Settings.newBodySettings.size = content!;
             break;
         case "friction":
-            Settings.newColliderSettings.friction = content!;
+            Settings.newBodySettings.friction = content!;
             break;
         case "restitution":
-            Settings.newColliderSettings.restitution = content!;
+            Settings.newBodySettings.restitution = content!;
             break;
         case "gravity":
             Settings.gravity = content!;

@@ -1,6 +1,6 @@
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
-import { Collider, Shape, Type } from "./collider.js";
+import { RigidBody, Shape, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 
@@ -53,7 +53,7 @@ export function lerpVector(a: Vector2, b: Vector2, uv: UV): Vector2
 
 const maxVertices = 8;
 
-export function createRandomConvexCollider(radius: number = 50, numVertices: number = -1): Collider
+export function createRandomConvexBody(radius: number = 50, numVertices: number = -1): RigidBody
 {
     if (numVertices < 0)
         numVertices = Math.trunc(Math.random() * maxVertices);
@@ -77,9 +77,6 @@ export function createRandomConvexCollider(radius: number = 50, numVertices: num
     {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
-
-    res.mass = 2;
-    res.inertia = res.mass * (radius * radius * 2) / 12.0;
 
     return res;
 }
@@ -125,17 +122,17 @@ export function calculateCircleInertia(r: number, mass: number): number
     return mass * r * r / 2.0;
 }
 
-export function checkInside(c: Collider, p: Vector2): boolean
+export function checkInside(b: RigidBody, p: Vector2): boolean
 {
-    let localP = c.globalToLocal.mulVector(p, 1);
+    let localP = b.globalToLocal.mulVector(p, 1);
 
-    switch (c.shape)
+    switch (b.shape)
     {
         case Shape.Circle:
-            return localP.length <= (c as Circle).radius;
+            return localP.length <= (b as Circle).radius;
         case Shape.Polygon:
             {
-                let poly = c as Polygon;
+                let poly = b as Polygon;
 
                 let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
 
@@ -164,13 +161,13 @@ export function squared_distance(a: Vector2, b: Vector2): number
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
 
-export function map(v: number, left: number, right: number, min: number, max: number)
+export function map(v: number, left: number, right: number, min: number, max: number): number
 {
     const per = (v - left) / (right - left);
     return lerp(min, max, per);
 }
 
-export function lerp(left: number, right: number, per: number)
+export function lerp(left: number, right: number, per: number): number
 {
     return left + (right - left) * per;
 }

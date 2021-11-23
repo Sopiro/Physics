@@ -1,5 +1,6 @@
 import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
+import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 
 export enum Shape
@@ -7,26 +8,26 @@ export enum Shape
     Circle = 0,
     Polygon
 }
+
 export enum Type
 {
     Ground = 0,
     Normal
 }
 
-// Rigid body collider
-export class Collider extends Entity
+export class RigidBody extends Entity
 {
     public readonly shape: Shape;
 
-    private _force: Vector2 = new Vector2();
+    private _force: Vector2 = new Vector2(0, 0);
     private _torque: number = 0;
-    private _mass!: number; // kg
-    private _invMass!: number;
-    private _inertia!: number;
-    private _invInertia!: number;
-    private _cm!: Vector2;
-    private _linearVelocity: Vector2;
-    private _angularVelocity: number;
+    private _mass: number; // kg
+    private _invMass: number;
+    private _inertia: number; // kg⋅cm²
+    private _invInertia: number;
+    private _cm: Vector2;
+    private _linearVelocity: Vector2; // cm/s
+    private _angularVelocity: number; // rad/s
     private _friction: number;
     private _restitution: number;
 
@@ -41,14 +42,25 @@ export class Collider extends Entity
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
+        this._cm = new Vector2(0, 0);
         this._friction = friction;
         this._restitution = restitution;
         this.type = type;
 
-        if (this.type == Type.Ground)
+        switch (this.type)
         {
-            this.mass = Number.MAX_VALUE;
-            this.inertia = Number.MAX_VALUE;
+            case Type.Ground:
+                this._mass = Number.MAX_VALUE;
+                this._invMass = 0;
+                this._inertia = Number.MAX_VALUE;
+                this._invInertia = 0;
+                break;
+            case Type.Normal:
+                this._mass = Settings.newBodySettings.mass;
+                this._invMass = 1 / this._mass;
+                this._inertia = Util.calculateCircleInertia(Settings.newBodySettings.size, this.mass);
+                this._invInertia = 1 / this._inertia;
+                break;
         }
     }
 
@@ -76,7 +88,7 @@ export class Collider extends Entity
     set inertia(i: number)
     {
         this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
-        this._invInertia = this._inertia == 0 ? 0 : 1.0 / i;
+        this._invInertia = this._inertia == Number.MAX_VALUE ? 0 : 1.0 / this._inertia;
     }
 
     get inverseInertia(): number

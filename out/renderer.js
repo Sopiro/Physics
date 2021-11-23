@@ -103,29 +103,29 @@ export class Renderer {
                 break;
         }
     }
-    drawCollider(c, drawCenterOfMass = false, drawVerticesOnly = false, lineWidth = 1) {
-        this.setModelTransform(c.localToGlobal);
-        if (c instanceof Polygon) {
-            for (let i = 0; i < c.count; i++) {
+    drawBody(b, drawCenterOfMass = false, drawVerticesOnly = false, lineWidth = 1) {
+        this.setModelTransform(b.localToGlobal);
+        if (b instanceof Polygon) {
+            for (let i = 0; i < b.count; i++) {
                 if (drawVerticesOnly) {
-                    this.drawCircleV(c.vertices[i], 5, true);
+                    this.drawCircleV(b.vertices[i], 5, true);
                 }
                 else {
-                    let curr = c.vertices[i];
-                    let next = c.vertices[(i + 1) % c.count];
+                    let curr = b.vertices[i];
+                    let next = b.vertices[(i + 1) % b.count];
                     this.drawLineV(curr, next, lineWidth);
                 }
             }
         }
-        else if (c instanceof Circle) {
-            this.drawCircleV(c.centerOfMass, c.radius);
-            this.drawLineV(c.centerOfMass, c.centerOfMass.addV(new Vector2(c.radius, 0)));
+        else if (b instanceof Circle) {
+            this.drawCircleV(b.centerOfMass, b.radius);
+            this.drawLineV(b.centerOfMass, b.centerOfMass.addV(new Vector2(b.radius, 0)));
         }
         else {
             throw "Not supported shape";
         }
         if (drawCenterOfMass)
-            this.drawCircleV(c.centerOfMass, 1, true);
+            this.drawCircleV(b.centerOfMass, 1, true);
         this.resetModelTransform();
     }
     drawAABB(aabb, lineWidth = 1) {

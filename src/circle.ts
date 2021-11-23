@@ -1,8 +1,8 @@
-import { Collider, Shape, Type } from "./collider.js";
+import { RigidBody, Shape, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
 
-export class Circle extends Collider
+export class Circle extends RigidBody
 {
     public readonly radius: number;
 
@@ -10,12 +10,9 @@ export class Circle extends Collider
     {
         super(Shape.Circle, type);
 
-        this.mass = 2;
-        this.inertia = Util.calculateCircleInertia(radius, this.mass);
-        this.centerOfMass = new Vector2(0, 0);
-
-        this.translate(center);
-
         this.radius = radius;
+        this.inertia = Util.calculateCircleInertia(radius, this.mass);
+
+        this.position = center.copy();
     }
 }

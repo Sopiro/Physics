@@ -1,42 +1,42 @@
 import { Vector2 } from "./math.js";
-import { Type } from "./collider.js";
+import { Type } from "./rigidbody.js";
 import { detectCollision } from "./detection.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 export class World {
     constructor() {
-        this.cmap = new Map();
-        this.colliders = [];
+        this.bmap = new Map();
+        this.bodies = [];
         this.manifolds = [];
     }
     update(delta) {
         delta = Settings.fixedDeltaTime;
         // Integrate forces, yield tentative velocities that possibly violate the constraint
-        this.colliders.forEach(c => {
-            c.addVelocity(c.force.mulS(c.inverseMass * delta));
-            c.addAngularVelocity(c.torque * c.inverseInertia * delta);
+        this.bodies.forEach(b => {
+            b.addVelocity(b.force.mulS(b.inverseMass * delta));
+            b.addAngularVelocity(b.torque * b.inverseInertia * delta);
             // Apply gravity 
-            if (c.type != Type.Ground && Settings.applyGravity)
-                c.addVelocity(new Vector2(0, Settings.gravity * 25 * delta));
+            if (b.type != Type.Ground && Settings.applyGravity)
+                b.addVelocity(new Vector2(0, Settings.gravity * 25 * delta));
         });
         let newManifolds = [];
         // Detect collisions, generate contact manifolds, try warm starting
-        for (let i = 0; i < this.colliders.length; i++) {
-            let a = this.colliders[i];
-            for (let j = i + 1; j < this.colliders.length; j++) {
-                let b = this.colliders[j];
+        for (let i = 0; i < this.bodies.length; i++) {
+            let a = this.bodies[i];
+            for (let j = i + 1; j < this.bodies.length; j++) {
+                let b = this.bodies[j];
                 let key = Util.make_pair_natural(a.id, b.id);
                 let newManifold = detectCollision(a, b);
                 if (newManifold != null) {
-                    if (Settings.warmStarting && this.cmap.has(key)) {
-                        let oldManifold = this.cmap.get(key);
+                    if (Settings.warmStarting && this.bmap.has(key)) {
+                        let oldManifold = this.bmap.get(key);
                         newManifold.tryWarmStart(oldManifold);
                     }
-                    this.cmap.set(key, newManifold);
+                    this.bmap.set(key, newManifold);
                     newManifolds.push(newManifold);
                 }
                 else {
-                    this.cmap.delete(key);
+                    this.bmap.delete(key);
                 }
             }
         }
@@ -52,31 +52,31 @@ export class World {
             });
         }
         // Update the positions using the new velocities
-        this.colliders.forEach((c, index) => {
+        this.bodies.forEach((c, index) => {
             c.position.x += c.linearVelocity.x * delta;
             c.position.y += c.linearVelocity.y * delta;
             c.rotation += c.angularVelocity * delta;
             if (c.position.y < Settings.deadBottom)
-                this.colliders.splice(index, 1);
+                this.bodies.splice(index, 1);
             c.force.clear();
             c.torque = 0;
         });
     }
-    register(collider) {
-        collider.id = World.cid++;
-        this.colliders.push(collider);
+    register(body) {
+        body.id = World.bid++;
+        this.bodies.push(body);
     }
     unregister(index) {
-        this.colliders.splice(index, 1);
+        this.bodies.splice(index, 1);
     }
     clear() {
-        this.colliders = [];
+        this.bodies = [];
         this.manifolds = [];
-        this.cmap.clear();
-        World.cid = 0;
+        this.bmap.clear();
+        World.bid = 0;
     }
-    get numColliders() {
-        return this.colliders.length;
+    get numBodies() {
+        return this.bodies.length;
     }
 }
-World.cid = 0;
+World.bid = 0;

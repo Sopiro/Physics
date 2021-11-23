@@ -1,4 +1,4 @@
-import { Collider } from "./collider.js";
+import { RigidBody } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
@@ -21,8 +21,8 @@ class ContactConstraintSolver
 {
     private readonly manifold: ContactManifold;
 
-    private readonly a: Collider;
-    private readonly b: Collider;
+    private readonly a: RigidBody;
+    private readonly b: RigidBody;
     private readonly contactPoint: Vector2;
     private readonly ra: Vector2;
     private readonly rb: Vector2;
@@ -144,8 +144,8 @@ class ContactConstraintSolver
 
 export class ContactManifold
 {
-    public readonly bodyA: Collider;
-    public readonly bodyB: Collider;
+    public readonly bodyA: RigidBody;
+    public readonly bodyB: RigidBody;
 
     // Contact informations
     public readonly penetrationDepth: number;
@@ -158,7 +158,7 @@ export class ContactManifold
 
     public persistent = false;
 
-    constructor(bodyA: Collider, bodyB: Collider, contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2)
+    constructor(bodyA: RigidBody, bodyB: RigidBody, contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2)
     {
         this.bodyA = bodyA;
         this.bodyB = bodyB;

@@ -5,8 +5,6 @@ export class Entity {
         this._rotation = 0;
         this._scale = new Vector2(1, 1);
     }
-    update(delta) {
-    }
     get position() {
         return this._position;
     }

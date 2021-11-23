@@ -1,6 +1,6 @@
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
-import { Shape, Type } from "./collider.js";
+import { Shape, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
@@ -30,7 +30,7 @@ export function lerpVector(a, b, uv) {
     return a.mulS(uv.u).addV(b.mulS(uv.v));
 }
 const maxVertices = 8;
-export function createRandomConvexCollider(radius = 50, numVertices = -1) {
+export function createRandomConvexBody(radius = 50, numVertices = -1) {
     if (numVertices < 0)
         numVertices = Math.trunc(Math.random() * maxVertices);
     if (numVertices == 0)
@@ -45,8 +45,6 @@ export function createRandomConvexCollider(radius = 50, numVertices = -1) {
     let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
     }));
-    res.mass = 2;
-    res.inertia = res.mass * (radius * radius * 2) / 12.0;
     return res;
 }
 export function random(left = -1, right = 1) {
@@ -75,14 +73,14 @@ export function calculateBoxInertia(w, h, mass) {
 export function calculateCircleInertia(r, mass) {
     return mass * r * r / 2.0;
 }
-export function checkInside(c, p) {
-    let localP = c.globalToLocal.mulVector(p, 1);
-    switch (c.shape) {
+export function checkInside(b, p) {
+    let localP = b.globalToLocal.mulVector(p, 1);
+    switch (b.shape) {
         case Shape.Circle:
-            return localP.length <= c.radius;
+            return localP.length <= b.radius;
         case Shape.Polygon:
             {
-                let poly = c;
+                let poly = b;
                 let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
                 for (let i = 1; i < poly.vertices.length; i++) {
                     let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));

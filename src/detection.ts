@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Collider, Shape } from "./collider.js";
+import { RigidBody, Shape } from "./rigidbody.js";
 import { ContactManifold } from "./contact.js";
 import { Edge } from "./edge.js";
 import { Vector2 } from "./math.js";
@@ -14,20 +14,20 @@ export interface AABB
     max: Vector2;
 }
 
-export function createAABB(c: Collider): AABB
+export function createAABB(b: RigidBody): AABB
 {
-    switch (c.shape)
+    switch (b.shape)
     {
         case Shape.Circle:
-            let circle = c as Circle;
-            let cmInGlobal = c.localToGlobal.mulVector(c.centerOfMass, 1);
+            let circle = b as Circle;
+            let cmInGlobal = b.localToGlobal.mulVector(b.centerOfMass, 1);
 
             return {
                 min: new Vector2(cmInGlobal.x - circle.radius, cmInGlobal.y - circle.radius),
                 max: new Vector2(cmInGlobal.x + circle.radius, cmInGlobal.y + circle.radius)
             };
         case Shape.Polygon:
-            let poly = c as Polygon;
+            let poly = b as Polygon;
 
             const lTg = poly.localToGlobal;
 
@@ -63,16 +63,16 @@ interface SupportResult
 }
 
 // Returns the fardest vertex in the 'dir' direction
-function support(collider: Collider, dir: Vector2): SupportResult
+function support(b: RigidBody, dir: Vector2): SupportResult
 {
-    if (collider.shape == Shape.Polygon && collider instanceof Polygon)
+    if (b.shape == Shape.Polygon && b instanceof Polygon)
     {
         let idx = 0;
-        let maxValue = dir.dot(collider.vertices[idx]);
+        let maxValue = dir.dot(b.vertices[idx]);
 
-        for (let i = 1; i < collider.vertices.length; i++)
+        for (let i = 1; i < b.vertices.length; i++)
         {
-            let value = dir.dot(collider.vertices[i]);
+            let value = dir.dot(b.vertices[i]);
             if (value > maxValue)
             {
                 idx = i;
@@ -80,11 +80,11 @@ function support(collider: Collider, dir: Vector2): SupportResult
             }
         }
 
-        return { vertex: collider.vertices[idx], index: idx };
+        return { vertex: b.vertices[idx], index: idx };
     }
-    else if (collider.shape == Shape.Circle && collider instanceof Circle)
+    else if (b.shape == Shape.Circle && b instanceof Circle)
     {
-        return { vertex: dir.normalized().mulS(collider.radius), index: -1 };
+        return { vertex: dir.normalized().mulS(b.radius), index: -1 };
     }
     else
     {
@@ -99,7 +99,7 @@ interface CSOSupportResult
     supportB: Vector2;
 }
 
-function csoSupport(c1: Collider, c2: Collider, dir: Vector2): CSOSupportResult
+function csoSupport(c1: RigidBody, c2: RigidBody, dir: Vector2): CSOSupportResult
 {
     const localDirP1 = c1.globalToLocal.mulVector(dir, 0);
     const localDirP2 = c2.globalToLocal.mulVector(dir.mulS(-1), 0);
@@ -125,7 +125,7 @@ interface GJKResult
     simplex: Simplex;
 }
 
-function gjk(c1: Collider, c2: Collider): GJKResult
+function gjk(c1: RigidBody, c2: RigidBody): GJKResult
 {
     const origin = new Vector2(0, 0);
     let simplex: Simplex = new Simplex();
@@ -191,7 +191,7 @@ interface EPAResult
 
 const TOLERANCE = 0.001;
 
-function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
+function epa(c1: RigidBody, c2: RigidBody, gjkResult: Simplex): EPAResult
 {
     let polytope: Polytope = new Polytope(gjkResult);
 
@@ -210,7 +210,7 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
         }
         else
         {
-            // If you didn't expand edge, you reached the most outer edge
+            // If you didn't expand edge, it means you reached the closest outer edge
             break;
         }
     }
@@ -221,16 +221,16 @@ function epa(c1: Collider, c2: Collider, gjkResult: Simplex): EPAResult
     };
 }
 
-function findFarthestEdge(c: Collider, dir: Vector2): Edge
+function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
 {
-    let localDir = c.globalToLocal.mulVector(dir, 0)
-    let farthest = support(c, localDir);
+    let localDir = b.globalToLocal.mulVector(dir, 0)
+    let farthest = support(b, localDir);
     let curr = farthest.vertex;
     let idx = farthest.index;
 
-    let localToGlobal = c.localToGlobal;
+    let localToGlobal = b.localToGlobal;
 
-    switch (c.shape)
+    switch (b.shape)
     {
         case Shape.Circle:
             {
@@ -243,7 +243,7 @@ function findFarthestEdge(c: Collider, dir: Vector2): Edge
             }
         case Shape.Polygon:
             {
-                let p = c as Polygon;
+                let p = b as Polygon;
 
                 let prev = p.vertices[(idx - 1 + p.count) % p.count];
                 let next = p.vertices[(idx + 1) % p.count];
@@ -286,10 +286,10 @@ function clipEdge(edge: Edge, p: Vector2, dir: Vector2, remove: boolean = false)
 }
 
 // Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
-// merging threshold should be sqrt(2) * minimum edge length
+// merging threshold should be greater than sqrt(2) * minimum edge length
 const CONTACT_MERGE_THRESHOLD = 1.4143;
 
-function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
+function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
 {
     // collision normal in the world space
     let edgeA = findFarthestEdge(a, n);
@@ -322,7 +322,7 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
 }
 
 // Returns contact data if collide, otherwise returns null
-export function detectCollision(a: Collider, b: Collider): ContactManifold | null
+export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | null
 {
     // Broad Phase
     let boundingBoxA = createAABB(a);

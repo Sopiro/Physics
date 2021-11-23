@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Collider } from "./collider.js";
+import { RigidBody } from "./rigidbody.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
@@ -157,30 +157,30 @@ export class Renderer
         }
     }
 
-    drawCollider(c: Collider, drawCenterOfMass: boolean = false, drawVerticesOnly: boolean = false, lineWidth: number = 1): void
+    drawBody(b: RigidBody, drawCenterOfMass: boolean = false, drawVerticesOnly: boolean = false, lineWidth: number = 1): void
     {
-        this.setModelTransform(c.localToGlobal);
+        this.setModelTransform(b.localToGlobal);
 
-        if (c instanceof Polygon)
+        if (b instanceof Polygon)
         {
-            for (let i = 0; i < c.count; i++)
+            for (let i = 0; i < b.count; i++)
             {
                 if (drawVerticesOnly)
                 {
-                    this.drawCircleV(c.vertices[i], 5, true);
+                    this.drawCircleV(b.vertices[i], 5, true);
                 }
                 else
                 {
-                    let curr = c.vertices[i];
-                    let next = c.vertices[(i + 1) % c.count];
+                    let curr = b.vertices[i];
+                    let next = b.vertices[(i + 1) % b.count];
                     this.drawLineV(curr, next, lineWidth);
                 }
             }
         }
-        else if (c instanceof Circle)
+        else if (b instanceof Circle)
         {
-            this.drawCircleV(c.centerOfMass, c.radius);
-            this.drawLineV(c.centerOfMass, c.centerOfMass.addV(new Vector2(c.radius, 0)));
+            this.drawCircleV(b.centerOfMass, b.radius);
+            this.drawLineV(b.centerOfMass, b.centerOfMass.addV(new Vector2(b.radius, 0)));
         }
         else
         {
@@ -188,7 +188,7 @@ export class Renderer
         }
 
         if (drawCenterOfMass)
-            this.drawCircleV(c.centerOfMass, 1, true);
+            this.drawCircleV(b.centerOfMass, 1, true);
 
         this.resetModelTransform();
     }

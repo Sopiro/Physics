@@ -2,7 +2,7 @@ import { Vector2 } from "./math.js";
 import * as Input from "./input.js";
 import * as Util from "./util.js";
 import { Camera } from "./camera.js";
-import { Type } from "./collider.js";
+import { Type } from "./rigidbody.js";
 import { World } from "./world.js";
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
@@ -13,7 +13,7 @@ export class Game {
     constructor(renderer) {
         this.cursorPos = new Vector2(0, 0);
         this.cameraMove = false;
-        this.grabCollider = false;
+        this.grabBody = false;
         this.currentDemo = 0;
         this.r = renderer;
         this.camera = new Camera();
@@ -73,64 +73,62 @@ export class Game {
             dist = dist.mulS(this.camera.scale.x);
             this.camera.position = this.cameraPosStart.addV(dist);
         }
-        if (this.grabCollider && !this.cameraMove) {
+        if (this.grabBody && !this.cameraMove) {
             if (Input.isMouseUp()) {
-                let bindInGlobal = this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetCollider.mass).mulS(3200 * Settings.fixedDeltaTime);
-                let torque = bindInGlobal.subV(this.targetCollider.localToGlobal.
-                    mulVector(this.targetCollider.centerOfMass, 1)).cross(force);
-                this.targetCollider.addForce(force);
-                this.targetCollider.addTorque(torque);
-                this.grabCollider = false;
+                let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(3200 * Settings.fixedDeltaTime);
+                let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
+                    mulVector(this.targetBody.centerOfMass, 1)).cross(force);
+                this.targetBody.addForce(force);
+                this.targetBody.addTorque(torque);
+                this.grabBody = false;
             }
         }
         if (Input.isMouseDown()) {
             let skipGeneration = false;
-            for (let i = 0; i < this.world.colliders.length; i++) {
-                let c = this.world.colliders[i];
-                if (c.type != Type.Ground && Util.checkInside(c, this.cursorPos)) {
-                    this.grabCollider = true;
+            for (let i = 0; i < this.world.bodies.length; i++) {
+                let b = this.world.bodies[i];
+                if (b.type != Type.Ground && Util.checkInside(b, this.cursorPos)) {
+                    this.grabBody = true;
                     if (Settings.grabCenter)
-                        this.bindPosition = c.centerOfMass;
+                        this.bindPosition = b.centerOfMass;
                     else
-                        this.bindPosition = c.globalToLocal.mulVector(this.cursorPos, 1);
-                    this.targetCollider = c;
+                        this.bindPosition = b.globalToLocal.mulVector(this.cursorPos, 1);
+                    this.targetBody = b;
                     skipGeneration = true;
                     break;
                 }
             }
             if (!skipGeneration && !this.cameraMove) {
-                let nc;
-                let ncs = Settings.newColliderSettings;
-                switch (ncs.shape) {
+                let nb;
+                let nbs = Settings.newBodySettings;
+                switch (nbs.shape) {
                     case GenerationShape.Box:
                         {
-                            nc = new Box(new Vector2(), new Vector2(ncs.size, ncs.size));
+                            nb = new Box(new Vector2(), new Vector2(nbs.size, nbs.size));
                             break;
                         }
                     case GenerationShape.Circle:
                         {
-                            nc = new Circle(new Vector2(), ncs.size / 2);
+                            nb = new Circle(new Vector2(), nbs.size / 2);
                             break;
                         }
                     case GenerationShape.Random:
                         {
-                            nc = Util.createRandomConvexCollider(Math.random() * ncs.size / 3 + ncs.size / 2);
+                            nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2);
                             break;
                         }
                 }
-                nc.position = this.cursorPos;
-                nc.mass = ncs.mass;
-                nc.inertia = Util.calculateBoxInertia(ncs.size, ncs.size, nc.mass);
-                nc.friction = ncs.friction;
-                nc.restitution = ncs.restitution;
-                this.world.register(nc);
+                nb.position = this.cursorPos;
+                nb.friction = nbs.friction;
+                nb.restitution = nbs.restitution;
+                this.world.register(nb);
             }
         }
         if (Input.isMouseDown(2)) {
-            for (let i = 0; i < this.world.colliders.length; i++) {
-                let c = this.world.colliders[i];
-                if (Util.checkInside(c, this.cursorPos)) {
+            for (let i = 0; i < this.world.bodies.length; i++) {
+                let b = this.world.bodies[i];
+                if (Util.checkInside(b, this.cursorPos)) {
                     this.world.unregister(i);
                     break;
                 }
@@ -158,12 +156,12 @@ export class Game {
         if (Settings.showInfo) {
             let target;
             let i = 0;
-            for (; i < this.world.colliders.length; i++) {
-                target = this.world.colliders[i];
+            for (; i < this.world.bodies.length; i++) {
+                target = this.world.bodies[i];
                 if (Util.checkInside(target, this.cursorPos))
                     break;
             }
-            if (this.world.colliders.length > 0 && i != this.world.colliders.length) {
+            if (this.world.bodies.length > 0 && i != this.world.bodies.length) {
                 let line = 0;
                 this.r.log("Type: " + String(Type[target.type]), line++);
                 this.r.log("Mass: " + String(target.mass) + "kg", line++);
@@ -186,12 +184,12 @@ export class Game {
                 this.r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5);
             });
         }
-        if (this.grabCollider)
-            this.r.drawVectorP(this.targetCollider.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
-        this.world.colliders.forEach((collider) => {
-            this.r.drawCollider(collider, Settings.indicateCoM);
+        if (this.grabBody)
+            this.r.drawVectorP(this.targetBody.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
+        this.world.bodies.forEach((b) => {
+            this.r.drawBody(b, Settings.indicateCoM);
             if (Settings.showBoundingBox) {
-                let aabb = createAABB(collider);
+                let aabb = createAABB(b);
                 this.r.drawAABB(aabb);
             }
         });

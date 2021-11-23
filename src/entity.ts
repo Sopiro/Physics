@@ -13,11 +13,6 @@ export class Entity
         this._scale = new Vector2(1, 1);
     }
 
-    update(delta: number): void
-    {
-
-    }
-
     get position(): Vector2
     {
         return this._position;

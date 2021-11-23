@@ -1,5 +1,5 @@
 import { Circle } from "./circle.js";
-import { Shape } from "./collider.js";
+import { Shape } from "./rigidbody.js";
 import { ContactManifold } from "./contact.js";
 import { Edge } from "./edge.js";
 import { Vector2 } from "./math.js";
@@ -7,17 +7,17 @@ import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
 import * as Util from "./util.js";
-export function createAABB(c) {
-    switch (c.shape) {
+export function createAABB(b) {
+    switch (b.shape) {
         case Shape.Circle:
-            let circle = c;
-            let cmInGlobal = c.localToGlobal.mulVector(c.centerOfMass, 1);
+            let circle = b;
+            let cmInGlobal = b.localToGlobal.mulVector(b.centerOfMass, 1);
             return {
                 min: new Vector2(cmInGlobal.x - circle.radius, cmInGlobal.y - circle.radius),
                 max: new Vector2(cmInGlobal.x + circle.radius, cmInGlobal.y + circle.radius)
             };
         case Shape.Polygon:
-            let poly = c;
+            let poly = b;
             const lTg = poly.localToGlobal;
             let res = { min: lTg.mulVector(poly.vertices[0], 1), max: lTg.mulVector(poly.vertices[0], 1) };
             for (let i = 1; i < poly.count; i++) {
@@ -44,21 +44,21 @@ export function testCollideAABB(a, b) {
     return true;
 }
 // Returns the fardest vertex in the 'dir' direction
-function support(collider, dir) {
-    if (collider.shape == Shape.Polygon && collider instanceof Polygon) {
+function support(b, dir) {
+    if (b.shape == Shape.Polygon && b instanceof Polygon) {
         let idx = 0;
-        let maxValue = dir.dot(collider.vertices[idx]);
-        for (let i = 1; i < collider.vertices.length; i++) {
-            let value = dir.dot(collider.vertices[i]);
+        let maxValue = dir.dot(b.vertices[idx]);
+        for (let i = 1; i < b.vertices.length; i++) {
+            let value = dir.dot(b.vertices[i]);
             if (value > maxValue) {
                 idx = i;
                 maxValue = value;
             }
         }
-        return { vertex: collider.vertices[idx], index: idx };
+        return { vertex: b.vertices[idx], index: idx };
     }
-    else if (collider.shape == Shape.Circle && collider instanceof Circle) {
-        return { vertex: dir.normalized().mulS(collider.radius), index: -1 };
+    else if (b.shape == Shape.Circle && b instanceof Circle) {
+        return { vertex: dir.normalized().mulS(b.radius), index: -1 };
     }
     else {
         throw "Not supported shape";
@@ -130,7 +130,7 @@ function epa(c1, c2, gjkResult) {
             polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint.support);
         }
         else {
-            // If you didn't expand edge, you reached the most outer edge
+            // If you didn't expand edge, it means you reached the closest outer edge
             break;
         }
     }
@@ -139,13 +139,13 @@ function epa(c1, c2, gjkResult) {
         contactNormal: closestEdge.normal,
     };
 }
-function findFarthestEdge(c, dir) {
-    let localDir = c.globalToLocal.mulVector(dir, 0);
-    let farthest = support(c, localDir);
+function findFarthestEdge(b, dir) {
+    let localDir = b.globalToLocal.mulVector(dir, 0);
+    let farthest = support(b, localDir);
     let curr = farthest.vertex;
     let idx = farthest.index;
-    let localToGlobal = c.localToGlobal;
-    switch (c.shape) {
+    let localToGlobal = b.localToGlobal;
+    switch (b.shape) {
         case Shape.Circle:
             {
                 curr = localToGlobal.mulVector(curr, 1);
@@ -155,7 +155,7 @@ function findFarthestEdge(c, dir) {
             }
         case Shape.Polygon:
             {
-                let p = c;
+                let p = b;
                 let prev = p.vertices[(idx - 1 + p.count) % p.count];
                 let next = p.vertices[(idx + 1) % p.count];
                 let e1 = curr.subV(prev).normalized();
@@ -186,7 +186,7 @@ function clipEdge(edge, p, dir, remove = false) {
     }
 }
 // Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
-// merging threshold should be sqrt(2) * minimum edge length
+// merging threshold should be greater than sqrt(2) * minimum edge length
 const CONTACT_MERGE_THRESHOLD = 1.4143;
 function findContactPoints(n, a, b) {
     // collision normal in the world space
