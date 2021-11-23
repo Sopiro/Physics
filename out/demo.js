@@ -146,12 +146,12 @@ Reflect.set(demo7, "SimulationName", "Friction test");
 function demo8(world) {
     updateSetting("g", true);
     let g = new Box(new Vector2(), new Vector2(Settings.width * 2, 20), Type.Ground);
-    g.restitution = 0.8;
+    g.restitution = 0.7;
     world.register(g);
     let count = 7;
     let gap = 100;
     let xStart = -(count - 1) / 2 * gap;
-    let yStart = 600;
+    let yStart = 620;
     let size = 30;
     for (let i = 0; i < count; i++) {
         let b = new Box(new Vector2(xStart + gap * i, yStart), new Vector2(size, size));

@@ -37,7 +37,7 @@ export const Settings = {
     },
     gravity: -10,
     penetrationSlop: 0.2,
-    restitutionSlop: 50,
+    restitutionSlop: 25,
     positionCorrectionBeta: 0.2,
     warmStartingThreshold: 0.08,
     deadBottom: -1000,
