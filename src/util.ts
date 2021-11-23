@@ -166,7 +166,7 @@ export function squared_distance(a: Vector2, b: Vector2): number
 
 export function map(v: number, left: number, right: number, min: number, max: number)
 {
-    const per = v / (right - left);
+    const per = (v - left) / (right - left);
     return lerp(min, max, per);
 }
 
