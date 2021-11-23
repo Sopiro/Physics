@@ -4,9 +4,9 @@ import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
-        let p1v = p1.localToGlobal().mulVector(p1.vertices[i], 1);
+        let p1v = p1.localToGlobal.mulVector(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++) {
-            let p2v = p2.localToGlobal().mulVector(p2.vertices[j], 1);
+            let p2v = p2.localToGlobal.mulVector(p2.vertices[j], 1);
             res.push(p1v.subV(p2v));
         }
     }

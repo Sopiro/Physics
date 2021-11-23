@@ -107,7 +107,7 @@ export class Renderer {
         }
     }
     drawCollider(c, drawVerticesOnly = false) {
-        this.setModelTransform(c.localToGlobal());
+        this.setModelTransform(c.localToGlobal);
         if (c instanceof Polygon) {
             for (let i = 0; i < c.count; i++) {
                 if (drawVerticesOnly) {

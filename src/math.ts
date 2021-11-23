@@ -37,6 +37,11 @@ export class Vector2
         this.y *= -1;
     }
 
+    inverted(): Vector2
+    {
+        return new Vector2(-this.x, -this.y);
+    }
+
     normalize(): void
     {
         const len = this.getLength();
@@ -169,6 +174,11 @@ export class Vector3
         this.x *= -1;
         this.y *= -1;
         this.z *= -1;
+    }
+
+    inverted(): Vector3
+    {
+        return new Vector3(-this.x, -this.y, -this.z);
     }
 
     getLength(): number

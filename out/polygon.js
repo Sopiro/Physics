@@ -24,7 +24,7 @@ export class Polygon extends Collider {
         return this.vertices.length;
     }
     getGlobalVertices() {
-        const transform = this.localToGlobal();
+        const transform = this.localToGlobal;
         let res = [];
         for (let i = 0; i < this.count; i++)
             res.push(transform.mulVector(this.vertices[i], 1));

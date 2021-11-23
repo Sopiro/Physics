@@ -11,4 +11,7 @@ export class Edge {
     get length() {
         return this.p2.subV(this.p1).getLength();
     }
+    get normal() {
+        return new Vector2(-this.dir.y, this.dir.x);
+    }
 }

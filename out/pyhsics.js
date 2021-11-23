@@ -5,7 +5,43 @@ import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
-import { toFixed } from "./util.js";
+import * as Util from "./util.js";
+export function createAABB(c) {
+    switch (c.shape) {
+        case Shape.Circle:
+            let circle = c;
+            let cmInGlobal = c.localToGlobal.mulVector(circle.center, 1);
+            return {
+                min: new Vector2(cmInGlobal.x - circle.radius, cmInGlobal.y - circle.radius),
+                max: new Vector2(cmInGlobal.x + circle.radius, cmInGlobal.y + circle.radius)
+            };
+        case Shape.Polygon:
+            let poly = c;
+            const lTg = poly.localToGlobal;
+            let res = { min: lTg.mulVector(poly.vertices[0], 1), max: lTg.mulVector(poly.vertices[0], 1) };
+            for (let i = 1; i < poly.count; i++) {
+                let gv = lTg.mulVector(poly.vertices[i], 1);
+                if (gv.x < res.min.x)
+                    res.min.x = gv.x;
+                else if (gv.x > res.max.x)
+                    res.max.x = gv.x;
+                if (gv.y < res.min.y)
+                    res.min.y = gv.y;
+                else if (gv.y > res.max.y)
+                    res.max.y = gv.y;
+            }
+            return res;
+        default:
+            throw "Not supported shape";
+    }
+}
+export function testCollideAABB(a, b) {
+    if (a.min.x > b.max.x || a.max.x < b.min.x)
+        return false;
+    if (a.min.y > b.max.y || a.max.y < b.min.y)
+        return false;
+    return true;
+}
 // Returns the fardest vertex in the 'dir' direction
 function support(collider, dir) {
     if (collider.shape == Shape.Polygon && collider instanceof Polygon) {
@@ -28,12 +64,12 @@ function support(collider, dir) {
     }
 }
 function csoSupport(c1, c2, dir) {
-    const localDirP1 = c1.globalToLocal().mulVector(dir, 0);
-    const localDirP2 = c2.globalToLocal().mulVector(dir.mulS(-1), 0);
+    const localDirP1 = c1.globalToLocal.mulVector(dir, 0);
+    const localDirP2 = c2.globalToLocal.mulVector(dir.mulS(-1), 0);
     let supportP1 = support(c1, localDirP1).vertex;
     let supportP2 = support(c2, localDirP2).vertex;
-    supportP1 = c1.localToGlobal().mulVector(supportP1, 1);
-    supportP2 = c2.localToGlobal().mulVector(supportP2, 1);
+    supportP1 = c1.localToGlobal.mulVector(supportP1, 1);
+    supportP2 = c2.localToGlobal.mulVector(supportP2, 1);
     return {
         support: supportP1.subV(supportP2),
         supportA: supportP1,
@@ -65,7 +101,7 @@ function gjk(c1, c2) {
         supportPoint = csoSupport(c1, c2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
-        if (toFixed(dir.getLength() - dir.normalized().dot(supportPoint.support.subV(closest.result))) > 0) {
+        if (Util.toFixed(dir.getLength() - dir.normalized().dot(supportPoint.support.subV(closest.result))) > 0) {
             result.collide = false;
             break;
         }
@@ -81,11 +117,11 @@ function gjk(c1, c2) {
     return result;
 }
 function findFarthestEdge(c, dir) {
-    let localDir = c.globalToLocal().mulVector(dir, 0);
+    let localDir = c.globalToLocal.mulVector(dir, 0);
     let farthest = support(c, localDir);
     let curr = farthest.vertex;
     let idx = farthest.index;
-    let localToGlobal = c.localToGlobal();
+    let localToGlobal = c.localToGlobal;
     switch (c.shape) {
         case Shape.Circle:
             {
@@ -159,10 +195,6 @@ function findContactPoints(n, a, b) {
         inc = edgeA;
         flip = true;
     }
-    // r.drawCircleV(ref.p1, 15);
-    // r.drawCircleV(ref.p2, 15);
-    // r.drawCircleV(inc.p1, 10);
-    // r.drawCircleV(inc.p2, 10);
     clipEdge(inc, ref.p1, ref.dir);
     clipEdge(inc, ref.p2, ref.dir.mulS(-1));
     clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
@@ -174,12 +206,33 @@ function findContactPoints(n, a, b) {
     return contactPoints;
 }
 export function detectCollision(a, b) {
+    // Broad Phase
+    let boundingBoxA = createAABB(a);
+    let boundingBoxB = createAABB(b);
+    if (!testCollideAABB(boundingBoxA, boundingBoxB))
+        return { collide: false };
+    // Narrow Phase
     const gjkResult = gjk(a, b);
-    if (gjkResult.simplex.count != 3) {
+    if (!gjkResult.collide) {
         return { collide: false };
     }
     else {
-        const epaResult = epa(a, b, gjkResult.simplex);
+        // If the gjk termination simplex has vertices less than 3, expand to full simplex
+        // Because EPA needs a full n-simplex to start
+        let simplex = gjkResult.simplex;
+        switch (simplex.count) {
+            case 1:
+                let v = simplex.vertices[0];
+                simplex.addVertex(csoSupport(a, b, v.normalized().inverted()).support);
+            case 2:
+                let e = new Edge(simplex.vertices[0], simplex.vertices[1]);
+                let newVertex = csoSupport(a, b, e.normal).support;
+                if (simplex.containsVertex(newVertex))
+                    simplex.addVertex(csoSupport(a, b, e.normal.inverted()).support);
+                else
+                    simplex.addVertex(newVertex);
+        }
+        const epaResult = epa(a, b, simplex);
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
         return {
             collide: true,

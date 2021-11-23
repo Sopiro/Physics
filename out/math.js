@@ -21,6 +21,9 @@ export class Vector2 {
         this.x *= -1;
         this.y *= -1;
     }
+    inverted() {
+        return new Vector2(-this.x, -this.y);
+    }
     normalize() {
         const len = this.getLength();
         if (len != 0) {
@@ -105,6 +108,9 @@ export class Vector3 {
         this.x *= -1;
         this.y *= -1;
         this.z *= -1;
+    }
+    inverted() {
+        return new Vector3(-this.x, -this.y, -this.z);
     }
     getLength() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);

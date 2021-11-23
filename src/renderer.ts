@@ -164,7 +164,7 @@ export class Renderer
 
     drawCollider(c: Collider, drawVerticesOnly: boolean = false): void
     {
-        this.setModelTransform(c.localToGlobal());
+        this.setModelTransform(c.localToGlobal);
 
         if (c instanceof Polygon)
         {

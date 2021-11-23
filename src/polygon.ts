@@ -43,7 +43,7 @@ export class Polygon extends Collider
 
     getGlobalVertices(): Vector2[]
     {
-        const transform = this.localToGlobal();
+        const transform = this.localToGlobal;
 
         let res: Vector2[] = [];
 

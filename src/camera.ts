@@ -10,11 +10,11 @@ export class Camera extends Entity
 
     getTransform(): Matrix3
     {
-        return super.localToGlobal();
+        return super.localToGlobal;
     }
 
     getCameraTransform(): Matrix3
     {
-        return super.globalToLocal();
+        return super.globalToLocal;
     }
 }

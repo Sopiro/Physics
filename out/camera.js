@@ -4,9 +4,9 @@ export class Camera extends Entity {
         super();
     }
     getTransform() {
-        return super.localToGlobal();
+        return super.localToGlobal;
     }
     getCameraTransform() {
-        return super.globalToLocal();
+        return super.globalToLocal;
     }
 }

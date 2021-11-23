@@ -37,9 +37,9 @@ export class Game
         this.p = new Polygon([new Vector2(100, 100), new Vector2(100, 200), new Vector2(200, 200), new Vector2(200, 100)], true);
         // this.p = new Circle(new Vector2(), 100);
         // this.p.rotate(0.6);
-        this.p.translate(new Vector2(55, -10))
-        this.p2 = new Polygon([new Vector2(100, 100), new Vector2(100, 300), new Vector2(300, 300), new Vector2(300, 100)], false);
-        this.p2 = new Circle(new Vector2(100, 100), 100);
+        this.p2 = new Polygon([new Vector2(100, 100), new Vector2(100, 300), new Vector2(300, 300), new Vector2(300, 100)], true);
+        this.p2.translate(new Vector2(150, 150));
+        // this.p2 = new Circle(new Vector2(100, 100), 100);
         this.colliders.push(this.p2);
 
         this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
