@@ -76,7 +76,7 @@ export class Game {
         if (this.grabBody && !this.cameraMove) {
             if (Input.isMouseUp()) {
                 let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(3200 * Settings.fixedDeltaTime);
+                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
                 let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
                     mulVector(this.targetBody.centerOfMass, 1)).cross(force);
                 this.targetBody.addForce(force);

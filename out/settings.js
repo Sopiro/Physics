@@ -36,6 +36,7 @@ export const Settings = {
         restitution: 0.001,
     },
     gravity: -10,
+    gravityScale: 25,
     penetrationSlop: 0.2,
     restitutionSlop: 8,
     positionCorrectionBeta: 0.2,

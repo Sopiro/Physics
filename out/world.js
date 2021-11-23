@@ -17,7 +17,7 @@ export class World {
             b.addAngularVelocity(b.torque * b.inverseInertia * delta);
             // Apply gravity 
             if (b.type != Type.Ground && Settings.applyGravity)
-                b.addVelocity(new Vector2(0, Settings.gravity * 25 * delta));
+                b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * delta));
         });
         let newManifolds = [];
         // Detect collisions, generate contact manifolds, try warm starting
