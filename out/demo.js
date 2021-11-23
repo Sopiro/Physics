@@ -111,4 +111,54 @@ function demo6(world) {
     world.register(b);
 }
 Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6];
+function demo7(world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let b = new Box(new Vector2(-60, 500), new Vector2(600, 10), Type.Ground);
+    b.rotation = -0.15;
+    b.friction = 1.0;
+    world.register(b);
+    b = new Box(new Vector2(0, 300), new Vector2(600, 10), Type.Ground);
+    b.rotation = 0.15;
+    b.friction = 1.0;
+    world.register(b);
+    b = new Box(new Vector2(-60, 100), new Vector2(600, 10), Type.Ground);
+    b.rotation = -0.15;
+    b.friction = 1.0;
+    world.register(b);
+    b = new Box(new Vector2(310, 430), new Vector2(10, 110), Type.Ground);
+    world.register(b);
+    b = new Box(new Vector2(-370, 230), new Vector2(10, 110), Type.Ground);
+    world.register(b);
+    let xStart = -450;
+    let yStart = 700;
+    let gap = 10;
+    let size = 30;
+    let frictions = [0.5, 0.2, 0.12, 0.0];
+    for (let i = 0; i < frictions.length; i++) {
+        b = new Box(new Vector2(xStart + (size + gap) * i, yStart), new Vector2(size, size));
+        b.friction = frictions[i];
+        b.linearVelocity.x = 120;
+        world.register(b);
+    }
+}
+Reflect.set(demo7, "SimulationName", "Friction test");
+function demo8(world) {
+    updateSetting("g", true);
+    let g = new Box(new Vector2(), new Vector2(Settings.width * 2, 20), Type.Ground);
+    g.restitution = 0.8;
+    world.register(g);
+    let count = 7;
+    let gap = 100;
+    let xStart = -(count - 1) / 2 * gap;
+    let yStart = 600;
+    let size = 30;
+    for (let i = 0; i < count; i++) {
+        let b = new Box(new Vector2(xStart + gap * i, yStart), new Vector2(size, size));
+        let attenuation = (count - i) / count;
+        b.restitution = 1.0 - attenuation * attenuation;
+        world.register(b);
+    }
+}
+Reflect.set(demo8, "SimulationName", "Restitution test");
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8];
