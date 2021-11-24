@@ -6,7 +6,7 @@ Live demo: https://sopiro.github.io/Physics/
 Video: https://youtu.be/mHnHj9HHSBg
 
 ## Preview
-![img](.github/gjk%2Bepa%20demo.gif)
+![img](.github/rigidbody.gif)
 
 ## Features
 - Basic input, rendering system(Game engine-like)
