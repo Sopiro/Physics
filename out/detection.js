@@ -230,14 +230,17 @@ export function detectCollision(a, b) {
         switch (simplex.count) {
             case 1:
                 let v = simplex.vertices[0];
-                simplex.addVertex(csoSupport(a, b, v.normalized().inverted()).support);
+                let randomSupport = csoSupport(a, b, new Vector2(1, 0)).support;
+                if (randomSupport.equals(v))
+                    randomSupport = csoSupport(a, b, new Vector2(-1, 0)).support;
+                simplex.addVertex(randomSupport);
             case 2:
                 let e = new Edge(simplex.vertices[0], simplex.vertices[1]);
-                let newVertex = csoSupport(a, b, e.normal).support;
-                if (simplex.containsVertex(newVertex))
+                let normalSupport = csoSupport(a, b, e.normal).support;
+                if (simplex.containsVertex(normalSupport))
                     simplex.addVertex(csoSupport(a, b, e.normal.inverted()).support);
                 else
-                    simplex.addVertex(newVertex);
+                    simplex.addVertex(normalSupport);
         }
         const epaResult = epa(a, b, gjkResult.simplex);
         // Apply axis weight to improve coherence

@@ -144,7 +144,7 @@ function demo6(world: World): void
     b.inertia = Util.calculateBoxInertia(10, 200, 30);
 
     b.linearVelocity.x = 300;
-    b.angularVelocity = 15;
+    b.angularVelocity = 10;
 
     world.register(b);
 }

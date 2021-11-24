@@ -108,7 +108,7 @@ function demo6(world) {
     b.mass = 30;
     b.inertia = Util.calculateBoxInertia(10, 200, 30);
     b.linearVelocity.x = 300;
-    b.angularVelocity = 15;
+    b.angularVelocity = 10;
     world.register(b);
 }
 Reflect.set(demo7, "SimulationName", "Friction test");
