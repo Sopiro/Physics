@@ -16,7 +16,7 @@ function demo1(world: World): void
     world.register(ground);
     let b = new Box(new Vector2(0, 500), new Vector2(40, 40));
     b.restitution = 0.7;
-    b.angularVelocity = Util.random(-10, 10);
+    b.angularVelocity = Util.random(-8, 8);
     world.register(b);
 }
 
@@ -31,7 +31,7 @@ function demo2(world: World): void
     let gap = 5;
 
     for (let i = 0; i < 12; i++)
-        world.register(new Box(new Vector2(0, start + i * (size + gap)), new Vector2(size, size)));
+        world.register(new Box(new Vector2(Util.random(-1.5, 1.5), start + i * (size + gap)), new Vector2(size, size)));
 }
 
 Reflect.set(demo3, "SimulationName", "Pyramid");
@@ -43,7 +43,7 @@ function demo3(world: World): void
     const rows = 12;
     const boxSize = 30;
     const xGap = 5;
-    const yGap = 10;
+    const yGap = 30;
     const xStart = - rows * boxSize / 2.0;
     const yStart = 60;
 
@@ -175,10 +175,10 @@ function demo7(world: World): void
 
     let xStart = -450;
     let yStart = 700;
-    let gap = 10;
+    let gap = 30;
     let size = 30;
 
-    let frictions = [0.5, 0.2, 0.12, 0.0];
+    let frictions = [0.5, 0.3, 0.2, 0.12, 0.0];
 
     for (let i = 0; i < frictions.length; i++)
     {
