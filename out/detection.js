@@ -7,6 +7,7 @@ import { Polygon } from "./polygon.js";
 import { Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
 import * as Util from "./util.js";
+import { Settings } from "./settings.js";
 export function createAABB(b) {
     switch (b.shape) {
         case Shape.Circle:
@@ -77,7 +78,6 @@ function csoSupport(c1, c2, dir) {
         supportB: supportP2
     };
 }
-const MAX_ITERATION = 20;
 function gjk(c1, c2) {
     const origin = new Vector2(0, 0);
     let simplex = new Simplex();
@@ -85,7 +85,7 @@ function gjk(c1, c2) {
     let result = { collide: false, simplex: simplex };
     let supportPoint = csoSupport(c1, c2, dir);
     simplex.addVertex(supportPoint.support, { p1: supportPoint.supportA, p2: supportPoint.supportB });
-    for (let k = 0; k < MAX_ITERATION; k++) {
+    for (let k = 0; k < Settings.GJK_MAX_ITERATION; k++) {
         let closest = simplex.getClosest(origin);
         if (closest.result.fixed().equals(origin)) {
             result.collide = true;
@@ -117,15 +117,14 @@ function gjk(c1, c2) {
     result.simplex = simplex;
     return result;
 }
-const TOLERANCE = 0.001;
 function epa(c1, c2, gjkResult) {
     let polytope = new Polytope(gjkResult);
     let closestEdge = { index: 0, distance: Infinity, normal: new Vector2(0, 0) };
-    for (let i = 0; i < MAX_ITERATION; i++) {
+    for (let i = 0; i < Settings.EPA_MAX_ITERATION; i++) {
         closestEdge = polytope.getClosestEdge();
         let supportPoint = csoSupport(c1, c2, closestEdge.normal);
         let newDistance = closestEdge.normal.dot(supportPoint.support);
-        if (Math.abs(closestEdge.distance - newDistance) > TOLERANCE) {
+        if (Math.abs(closestEdge.distance - newDistance) > Settings.EPA_TOLERANCE) {
             // Insert the support vertex so that it expands our polytope
             polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint.support);
         }
