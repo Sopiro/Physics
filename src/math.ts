@@ -385,6 +385,111 @@ export class Vector4
     }
 }
 
+export class Matrix2
+{
+    m00: number; m01: number;
+    m10: number; m11: number;
+
+    constructor()
+    {
+        this.m00 = 1; this.m01 = 0;
+        this.m10 = 0; this.m11 = 1;
+    }
+
+    loadIdentity(): void
+    {
+        this.m00 = 1; this.m01 = 0;
+        this.m10 = 0; this.m11 = 1;
+    }
+
+    copy(): Matrix2
+    {
+        let res = new Matrix2();
+
+        res.m00 = this.m00; res.m01 = this.m01;
+        res.m10 = this.m10; res.m11 = this.m11;
+
+        return res;
+    }
+
+    mulMatrix(right: Matrix2): Matrix2
+    {
+        let res = new Matrix2();
+
+        res.m00 = this.m00 * right.m00 + this.m01 * right.m10;
+        res.m01 = this.m00 * right.m01 + this.m01 * right.m11;
+
+        res.m10 = this.m10 * right.m00 + this.m11 * right.m10;
+        res.m11 = this.m10 * right.m01 + this.m11 * right.m11;
+
+        return res;
+    }
+
+    mulVector(right: Vector2): Vector2
+    {
+        let res = new Vector2(0, 0);
+
+        res.x = this.m00 * right.x + this.m01 * right.y;
+        res.y = this.m10 * right.x + this.m11 * right.y;
+
+        return res;
+    }
+
+    rotate(r: number): Matrix2
+    {
+        const sin = Math.sin(r);
+        const cos = Math.cos(r);
+
+        let res = new Matrix2();
+
+        res.m00 = cos;
+        res.m01 = -sin;
+        res.m10 = sin;
+        res.m11 = cos;
+
+        return this.mulMatrix(res);
+    }
+
+    transpose(): Matrix2
+    {
+        let res = new Matrix2();
+        res.m00 = this.m00;
+        res.m01 = this.m10;
+        res.m10 = this.m01;
+        res.m11 = this.m11;
+
+        return res;
+    }
+
+    invert(): Matrix2
+    {
+        let res = new Matrix2();
+        let det = this.m00 * this.m11 - this.m01 * this.m10;
+
+        if (det == 0) throw "Determinant 0";
+
+        det = 1.0 / det;
+        res.m00 = det * this.m11;
+        res.m01 = -det * this.m01;
+        res.m10 = -det * this.m10;
+        res.m11 = det * this.m00;
+
+        return res;
+    }
+
+    addMatrix(m: Matrix2): Matrix2
+    {
+        let res = new Matrix2();
+
+        res.m00 = this.m00 + m.m00;
+        res.m01 = this.m01 + m.m01;
+        res.m10 = this.m10 + m.m10;
+        res.m11 = this.m11 + m.m11;
+
+        return res;
+    }
+}
+
 export class Matrix3
 {
     m00: number; m01: number; m02: number;
