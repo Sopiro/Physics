@@ -4,13 +4,18 @@ import { detectCollision } from "./detection.js";
 import { ContactManifold } from "./contact.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
+import { RevoluteJoint } from "./revolute.js";
+
+type Registrable = RevoluteJoint | RigidBody;
 
 export class World
 {
     private static bid = 0;
-    public bmap: Map<number, ContactManifold> = new Map();
+    public manifoldMap: Map<number, ContactManifold> = new Map();
+    public passTestSet: Set<number> = new Set();
 
     public bodies: RigidBody[] = [];
+    public joints: RevoluteJoint[] = [];
     public manifolds: ContactManifold[] = [];
 
     update(delta: number): void
@@ -40,22 +45,24 @@ export class World
                 let b = this.bodies[j];
 
                 let key = Util.make_pair_natural(a.id, b.id);
+                if(this.passTestSet.has(key)) continue;
+                
                 let newManifold = detectCollision(a, b);
 
                 if (newManifold != null)
                 {
-                    if (Settings.warmStarting && this.bmap.has(key))
+                    if (Settings.warmStarting && this.manifoldMap.has(key))
                     {
-                        let oldManifold = this.bmap.get(key)!;
+                        let oldManifold = this.manifoldMap.get(key)!;
                         newManifold.tryWarmStart(oldManifold);
                     }
 
-                    this.bmap.set(key, newManifold);
+                    this.manifoldMap.set(key, newManifold);
                     newManifolds.push(newManifold);
                 }
                 else
                 {
-                    this.bmap.delete(key);
+                    this.manifoldMap.delete(key);
                 }
             }
         }
@@ -68,12 +75,22 @@ export class World
             manifold.prepare(delta);
         });
 
+        this.joints.forEach(joint =>
+        {
+            joint.prepare(delta);
+        });
+
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < Settings.numIterations; i++)
         {
             this.manifolds.forEach(manifold =>
             {
                 manifold.solve();
+            });
+
+            this.joints.forEach(joint =>
+            {
+                joint.solve();
             });
         }
 
@@ -92,13 +109,26 @@ export class World
         });
     }
 
-    register(body: RigidBody): void
+    register(r: Registrable, passTest: boolean = false): void
     {
-        body.id = World.bid++;
-        this.bodies.push(body);
+        if (r instanceof RigidBody)
+        {
+            r.id = World.bid++;
+            this.bodies.push(r);
+        } else if (r instanceof RevoluteJoint)
+        {
+            this.joints.push(r);
+            if (passTest)
+            {
+                if (r.a.id == -1 || r.b.id == -1)
+                    throw "You should register the rigid bodies before registering the joint";
+                else
+                    this.passTestSet.add(Util.make_pair_natural(r.a.id, r.b.id));
+            }
+        }
     }
 
-    unregister(index: number): void
+    unregisterBody(index: number): void
     {
         this.bodies.splice(index, 1);
     }
@@ -106,13 +136,20 @@ export class World
     clear(): void
     {
         this.bodies = [];
+        this.joints = [];
         this.manifolds = [];
-        this.bmap.clear();
+        this.passTestSet.clear();
+        this.manifoldMap.clear();
         World.bid = 0;
     }
 
     get numBodies(): number
     {
         return this.bodies.length;
+    }
+
+    get numJoints(): number
+    {
+        return this.joints.length;
     }
 }

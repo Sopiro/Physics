@@ -294,7 +294,7 @@ export class Matrix2 {
         res.m11 = this.m11;
         return res;
     }
-    invert() {
+    inverted() {
         let res = new Matrix2();
         let det = this.m00 * this.m11 - this.m01 * this.m10;
         if (det == 0)

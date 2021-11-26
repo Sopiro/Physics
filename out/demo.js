@@ -4,6 +4,7 @@ import { Vector2 } from "./math.js";
 import { Settings, updateSetting } from "./settings.js";
 import * as Util from "./util.js";
 import { Circle } from "./circle.js";
+import { RevoluteJoint } from "./revolute.js";
 const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -161,4 +162,35 @@ function demo8(world) {
         world.register(b);
     }
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8];
+Reflect.set(demo9, "SimulationName", "Revolute joint test");
+function demo9(world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let b = new Box(new Vector2(-300, 500), new Vector2(30, 30));
+    world.register(b);
+    let j = new RevoluteJoint(ground, b, new Vector2(0, 500));
+    world.register(j);
+    let b1 = new Box(new Vector2(-500, 300), new Vector2(150, 30));
+    world.register(b1);
+    b1.angularVelocity = 1.5;
+    let b2 = new Box(new Vector2(-400, 300), new Vector2(150, 30));
+    world.register(b2);
+    j = new RevoluteJoint(b1, b2, new Vector2(-450, 300));
+    j.drawAnchorOnly = true;
+    world.register(j, true);
+    let c1 = new Circle(new Vector2(300, 50), 25);
+    world.register(c1);
+    let c2 = new Circle(new Vector2(100, 50), 25);
+    world.register(c2);
+    b = new Box(new Vector2(200, 100), new Vector2(300, 100));
+    world.register(b);
+    j = new RevoluteJoint(c1, b, c1.position);
+    j.drawAnchorOnly = true;
+    world.register(j, true);
+    j = new RevoluteJoint(c2, b, c2.position);
+    j.drawAnchorOnly = true;
+    world.register(j, true);
+    b = new Box(new Vector2(75, 350), new Vector2(50, 50));
+    world.register(b);
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9];

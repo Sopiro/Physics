@@ -33,7 +33,7 @@ export class RigidBody extends Entity
 
     public readonly type: Type;
 
-    public id!: number;
+    public id: number = -1;
 
     constructor(shape: Shape, type: Type, friction = 0.7, restitution = 0.001)
     {

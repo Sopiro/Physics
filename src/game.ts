@@ -186,7 +186,7 @@ export class Game
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos))
                 {
-                    this.world.unregister(i);
+                    this.world.unregisterBody(i);
                     break;
                 }
             }
@@ -249,7 +249,7 @@ export class Game
         if (this.grabBody)
             this.r.drawVectorP(this.targetBody.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
 
-        this.world.bodies.forEach((b) =>
+        this.world.bodies.forEach(b =>
         {
             this.r.drawBody(b, Settings.indicateCoM);
 
@@ -258,6 +258,18 @@ export class Game
                 let aabb = createAABB(b);
                 this.r.drawAABB(aabb);
             }
+        });
+
+        this.world.joints.forEach(j =>
+        {
+            let anchor = j.a.localToGlobal.mulVector(j.localAnchorA, 1);
+
+            if(!j.drawAnchorOnly)
+            {
+                this.r.drawLineV(anchor, j.a.position);
+                this.r.drawLineV(anchor, j.b.position);
+            }
+            this.r.drawCircleV(anchor, 3);
         });
     }
 }

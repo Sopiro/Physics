@@ -1,12 +1,15 @@
 import { Vector2 } from "./math.js";
-import { Type } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import { detectCollision } from "./detection.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
+import { RevoluteJoint } from "./revolute.js";
 export class World {
     constructor() {
-        this.bmap = new Map();
+        this.manifoldMap = new Map();
+        this.passTestSet = new Set();
         this.bodies = [];
+        this.joints = [];
         this.manifolds = [];
     }
     update(delta) {
@@ -26,17 +29,19 @@ export class World {
             for (let j = i + 1; j < this.bodies.length; j++) {
                 let b = this.bodies[j];
                 let key = Util.make_pair_natural(a.id, b.id);
+                if (this.passTestSet.has(key))
+                    continue;
                 let newManifold = detectCollision(a, b);
                 if (newManifold != null) {
-                    if (Settings.warmStarting && this.bmap.has(key)) {
-                        let oldManifold = this.bmap.get(key);
+                    if (Settings.warmStarting && this.manifoldMap.has(key)) {
+                        let oldManifold = this.manifoldMap.get(key);
                         newManifold.tryWarmStart(oldManifold);
                     }
-                    this.bmap.set(key, newManifold);
+                    this.manifoldMap.set(key, newManifold);
                     newManifolds.push(newManifold);
                 }
                 else {
-                    this.bmap.delete(key);
+                    this.manifoldMap.delete(key);
                 }
             }
         }
@@ -45,10 +50,16 @@ export class World {
         this.manifolds.forEach(manifold => {
             manifold.prepare(delta);
         });
+        this.joints.forEach(joint => {
+            joint.prepare(delta);
+        });
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < Settings.numIterations; i++) {
             this.manifolds.forEach(manifold => {
                 manifold.solve();
+            });
+            this.joints.forEach(joint => {
+                joint.solve();
             });
         }
         // Update the positions using the new velocities
@@ -62,21 +73,37 @@ export class World {
             c.torque = 0;
         });
     }
-    register(body) {
-        body.id = World.bid++;
-        this.bodies.push(body);
+    register(r, passTest = false) {
+        if (r instanceof RigidBody) {
+            r.id = World.bid++;
+            this.bodies.push(r);
+        }
+        else if (r instanceof RevoluteJoint) {
+            this.joints.push(r);
+            if (passTest) {
+                if (r.a.id == -1 || r.b.id == -1)
+                    throw "You should register the rigid bodies before registering the joint";
+                else
+                    this.passTestSet.add(Util.make_pair_natural(r.a.id, r.b.id));
+            }
+        }
     }
-    unregister(index) {
+    unregisterBody(index) {
         this.bodies.splice(index, 1);
     }
     clear() {
         this.bodies = [];
+        this.joints = [];
         this.manifolds = [];
-        this.bmap.clear();
+        this.passTestSet.clear();
+        this.manifoldMap.clear();
         World.bid = 0;
     }
     get numBodies() {
         return this.bodies.length;
+    }
+    get numJoints() {
+        return this.joints.length;
     }
 }
 World.bid = 0;

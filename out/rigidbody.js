@@ -17,6 +17,7 @@ export class RigidBody extends Entity {
         super();
         this._force = new Vector2(0, 0);
         this._torque = 0;
+        this.id = -1;
         this.shape = shape;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;

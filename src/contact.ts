@@ -2,6 +2,7 @@ import { RigidBody } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
+import { Constraint } from "./constraint.js";
 
 enum ConstraintType
 {
@@ -105,7 +106,7 @@ class ContactConstraintSolver
             + this.jacobian.vb.dot(this.b.linearVelocity)
             + this.jacobian.wb * this.b.angularVelocity;
 
-        let lambda = this.effectiveMass * -(jv + this.bias);
+        let impulse = this.effectiveMass * -(jv + this.bias);
 
         let oldImpulseSum = this.impulseSum;
         switch (this.constraintType)
@@ -113,36 +114,36 @@ class ContactConstraintSolver
             case ConstraintType.Normal:
                 {
                     if (Settings.impulseAccumulation)
-                        this.impulseSum = Math.max(0.0, this.impulseSum + lambda);
+                        this.impulseSum = Math.max(0.0, this.impulseSum + impulse);
                     else
-                        this.impulseSum = Math.max(0.0, lambda);
+                        this.impulseSum = Math.max(0.0, impulse);
                     break;
                 }
             case ConstraintType.Tangent:
                 {
                     let maxFriction = this.friction * friendNormal!.impulseSum;
                     if (Settings.impulseAccumulation)
-                        this.impulseSum = Util.clamp(this.impulseSum + lambda, -maxFriction, maxFriction);
+                        this.impulseSum = Util.clamp(this.impulseSum + impulse, -maxFriction, maxFriction);
                     else
-                        this.impulseSum = Util.clamp(lambda, -maxFriction, maxFriction);
+                        this.impulseSum = Util.clamp(impulse, -maxFriction, maxFriction);
                     break;
                 }
         }
 
         if (Settings.impulseAccumulation)
-            lambda = this.impulseSum - oldImpulseSum;
+            impulse = this.impulseSum - oldImpulseSum;
         else
-            lambda = this.impulseSum;
+            impulse = this.impulseSum;
 
         // Apply impulse
-        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * lambda));
-        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * lambda;
-        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * lambda));
-        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * lambda;
+        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * impulse));
+        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * impulse;
+        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * impulse));
+        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * impulse;
     }
 }
 
-export class ContactManifold
+export class ContactManifold extends Constraint
 {
     public readonly bodyA: RigidBody;
     public readonly bodyB: RigidBody;
@@ -160,6 +161,7 @@ export class ContactManifold
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2)
     {
+        super();
         this.bodyA = bodyA;
         this.bodyB = bodyB;
         this.contactPoints = contactPoints;
@@ -174,7 +176,7 @@ export class ContactManifold
         }
     }
 
-    prepare(delta: number)
+    override prepare(delta: number): void
     {
         for (let i = 0; i < this.numContacts; i++)
         {
@@ -183,7 +185,7 @@ export class ContactManifold
         }
     }
 
-    solve()
+    override solve(): void
     {
         for (let i = 0; i < this.numContacts; i++)
         {
