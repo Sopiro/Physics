@@ -10,12 +10,11 @@ import { createAABB } from "./detection.js";
 import { GenerationShape, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
 export class Game {
-    constructor(renderer) {
+    constructor() {
         this.cursorPos = new Vector2(0, 0);
         this.cameraMove = false;
         this.grabBody = false;
         this.currentDemo = 0;
-        this.r = renderer;
         this.camera = new Camera();
         this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.camera.scale = new Vector2(2, 2);
@@ -150,9 +149,11 @@ export class Game {
             updateSetting("c");
         if (Input.isKeyDown("a"))
             updateSetting("a");
+        if (Input.isKeyDown("i"))
+            updateSetting("i");
     }
-    render() {
-        this.r.setCamera(this.camera);
+    render(r) {
+        r.setCamera(this.camera);
         if (Settings.showInfo) {
             let target;
             let i = 0;
@@ -163,13 +164,13 @@ export class Game {
             }
             if (this.world.bodies.length > 0 && i != this.world.bodies.length) {
                 let line = 0;
-                this.r.log("Type: " + String(Type[target.type]), line++);
-                this.r.log("Mass: " + String(target.mass) + "kg", line++);
-                this.r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(4)) + "kg⋅m²", line++);
-                this.r.log("Friction: " + String(target.friction), line++);
-                this.r.log("Restitution: " + String(target.restitution), line++);
-                this.r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
-                this.r.log("Angular velocity: " + String((target.angularVelocity).toFixed(4)) + "rad/s", line++);
+                r.log("Type: " + String(Type[target.type]), line++);
+                r.log("Mass: " + String(target.mass) + "kg", line++);
+                r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(4)) + "kg⋅m²", line++);
+                r.log("Friction: " + String(target.friction), line++);
+                r.log("Restitution: " + String(target.restitution), line++);
+                r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
+                r.log("Angular velocity: " + String((target.angularVelocity).toFixed(4)) + "rad/s", line++);
             }
         }
         if (Settings.indicateCP) {
@@ -178,28 +179,28 @@ export class Game {
                 let mid = new Vector2();
                 for (; i < m.numContacts; i++) {
                     mid = mid.addV(m.contactPoints[i]);
-                    this.r.drawCircleV(m.contactPoints[i], 4);
+                    r.drawCircleV(m.contactPoints[i], 4);
                 }
                 mid = mid.divS(i);
-                this.r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5);
+                r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5);
             });
         }
         if (this.grabBody)
-            this.r.drawVectorP(this.targetBody.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
+            r.drawVectorP(this.targetBody.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
         this.world.bodies.forEach(b => {
-            this.r.drawBody(b, Settings.indicateCoM);
+            r.drawBody(b, Settings.indicateCoM);
             if (Settings.showBoundingBox) {
                 let aabb = createAABB(b);
-                this.r.drawAABB(aabb);
+                r.drawAABB(aabb);
             }
         });
         this.world.joints.forEach(j => {
             let anchor = j.a.localToGlobal.mulVector(j.localAnchorA, 1);
             if (!j.drawAnchorOnly) {
-                this.r.drawLineV(anchor, j.a.position);
-                this.r.drawLineV(anchor, j.b.position);
+                r.drawLineV(anchor, j.a.position);
+                r.drawLineV(anchor, j.b.position);
             }
-            this.r.drawCircleV(anchor, 3);
+            r.drawCircleV(anchor, 3);
         });
     }
 }

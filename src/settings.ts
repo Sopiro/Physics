@@ -234,6 +234,10 @@ export function updateSetting(id: string, content: any = undefined)
             Settings.impulseAccumulation = !Settings.impulseAccumulation;
             accumulation.checked = Settings.impulseAccumulation;
             break;
+        case "i":
+            Settings.showInfo = !Settings.showInfo;
+            showInfo.checked = Settings.showInfo;
+            break;
         case "w":
             Settings.warmStarting = !Settings.warmStarting;
             warmStarting.checked = Settings.warmStarting;
