@@ -81,6 +81,24 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
     return res;
 }
 
+export function createRegularPolygon(numVertices: number, radius: number = 50): RigidBody
+{
+    if (numVertices < 3) numVertices = random(3, 10);
+
+    let angleStart = Math.PI / 2;
+    let angle = Math.PI * 2 / numVertices;
+
+    let vertices: Vector2[] = [];
+
+    for (let i = 0; i < numVertices; i++)
+    {
+        let currentAngle = angleStart + angle * i;
+        vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mulS(radius));
+    }
+
+    return new Polygon(vertices, Type.Normal);;
+}
+
 export interface Pair<A, B>
 {
     p1: A;

@@ -47,6 +47,19 @@ export function createRandomConvexBody(radius = 50, numVertices = -1) {
     }));
     return res;
 }
+export function createRegularPolygon(numVertices, radius = 50) {
+    if (numVertices < 3)
+        numVertices = random(3, 10);
+    let angleStart = Math.PI / 2;
+    let angle = Math.PI * 2 / numVertices;
+    let vertices = [];
+    for (let i = 0; i < numVertices; i++) {
+        let currentAngle = angleStart + angle * i;
+        vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mulS(radius));
+    }
+    return new Polygon(vertices, Type.Normal);
+    ;
+}
 export function random(left = -1, right = 1) {
     if (left > right) {
         let tmp = right;
