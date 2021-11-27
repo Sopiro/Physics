@@ -120,10 +120,10 @@ export class World
             this.joints.push(r);
             if (passTest)
             {
-                if (r.a.id == -1 || r.b.id == -1)
+                if (r.bodyA.id == -1 || r.bodyB.id == -1)
                     throw "You should register the rigid bodies before registering the joint";
                 else
-                    this.passTestSet.add(Util.make_pair_natural(r.a.id, r.b.id));
+                    this.passTestSet.add(Util.make_pair_natural(r.bodyA.id, r.bodyB.id));
             }
         }
     }

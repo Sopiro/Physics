@@ -214,7 +214,7 @@ function demo8(world: World): void
     }
 }
 
-Reflect.set(demo9, "SimulationName", "Revolute joint test");
+Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(world: World): void
 {
     updateSetting("g", true);
@@ -225,36 +225,37 @@ function demo9(world: World): void
 
     let j = new RevoluteJoint(ground, b, new Vector2(0, 500));
     world.register(j);
-
-    let b1 = new Box(new Vector2(-500, 300), new Vector2(150, 30));
-    world.register(b1);
-    b1.angularVelocity = 1.5;
-
-    let b2 = new Box(new Vector2(-400, 300), new Vector2(150, 30));
-    world.register(b2);
-
-    j = new RevoluteJoint(b1, b2, new Vector2(-450, 300));
-    j.drawAnchorOnly = true;
-    world.register(j, true);
-
-    let c1 = new Circle(new Vector2(300, 50), 25);
-    world.register(c1);
-
-    let c2 = new Circle(new Vector2(100, 50), 25);
-    world.register(c2);
-
-    b = new Box(new Vector2(200, 100), new Vector2(300, 100));
-    world.register(b);
-
-    j = new RevoluteJoint(c1, b, c1.position);
-    j.drawAnchorOnly = true;
-    world.register(j, true);
-    j = new RevoluteJoint(c2, b, c2.position);
-    j.drawAnchorOnly = true;
-    world.register(j, true);
-
-    b = new Box(new Vector2(75, 350), new Vector2(50, 50));
-    world.register(b);
 }
 
-export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9];
+Reflect.set(demo10, "SimulationName", "Multi pendulum");
+function demo10(world: World): void
+{
+    updateSetting("g", true);
+    world.register(ground);
+
+    let xStart = 0;
+    let yStart = 500;
+    let sizeW = 30;
+    let sizeH = 15;
+    let gap = 10;
+
+    let b1: RigidBody = new Box(new Vector2(xStart - (gap + sizeW), yStart), new Vector2(sizeW, sizeH));
+    b1.mass = 1;
+    world.register(b1);
+
+    let j = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
+    world.register(j);
+
+    for (let i = 1; i < 15; i++)
+    {
+        let b2 = new Box(new Vector2(xStart - (gap + sizeW) * (i + 1), yStart), new Vector2(sizeW, sizeH));
+        b2.mass = 1;
+        world.register(b2);
+        j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart));
+        world.register(j);
+        j.drawAnchor = false;
+        b1 = b2;
+    }
+}
+
+export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10];

@@ -261,14 +261,18 @@ export class Game
 
         this.world.joints.forEach(j =>
         {
-            let anchor = j.a.localToGlobal.mulVector(j.localAnchorA, 1);
+            let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
+            let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
 
             if (!j.drawAnchorOnly)
             {
-                r.drawLineV(anchor, j.a.position);
-                r.drawLineV(anchor, j.b.position);
+                r.drawLineV(anchorA, j.bodyA.position);
+                r.drawLineV(anchorB, j.bodyB.position);
             }
-            r.drawCircleV(anchor, 3);
+            if(j.drawAnchor)
+            {
+                r.drawCircleV(anchorA, 3);
+            }
         });
     }
 }
