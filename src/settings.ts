@@ -4,6 +4,7 @@ export enum GenerationShape
 {
     Box = 0,
     Circle,
+    Regular,
     Random
 }
 
@@ -15,6 +16,7 @@ const gravityForceRange: Util.Pair<number, number> = { p1: -20, p2: 20 };
 const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const restitutionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
+const numVerticesRange: Util.Pair<number, number> = { p1: 2.9, p2: 17 };
 
 // Simulation settings
 export const Settings = {
@@ -40,6 +42,7 @@ export const Settings = {
         size: 50,
         friction: 0.7,
         restitution: 0.001,
+        numVertices: 5
     },
     gravity: -10,
     gravityScale: 25,
@@ -118,11 +121,18 @@ iteration.addEventListener("input", () =>
     updateSetting("iteration", mappedValue);
 });
 
+let vertices_div = document.querySelector("#vertices_div")! as HTMLDivElement;
+
 let rad = document.querySelectorAll('input[name="shapeRadios"]');
-for (var i = 0; i < 3; i++)
+for (var i = 0; i < 4; i++)
 {
     let me = rad[i] as HTMLInputElement;
-    me.addEventListener('change', () => { Settings.newBodySettings.shape = Number(me.value); });
+    me.addEventListener('change', () =>
+    {
+        let index = Number(me.value);
+        Settings.newBodySettings.shape = index;
+        vertices_div.hidden = index != 2;
+    });
 }
 
 const mass = document.querySelector("#mass")! as HTMLInputElement;
@@ -158,7 +168,7 @@ frictionLabel.innerHTML = String(Settings.newBodySettings.friction);
 friction.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2))
+    mappedValue = Number(mappedValue.toPrecision(2));
     frictionLabel.innerHTML = String(mappedValue);
 
     updateSetting("friction", mappedValue);
@@ -171,10 +181,26 @@ restitutionLabel.innerHTML = String(Settings.newBodySettings.restitution);
 restitution.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(restitution.value), 0, 100, restitutionRange.p1, restitutionRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2))
+    mappedValue = Number(mappedValue.toPrecision(2));
     restitutionLabel.innerHTML = String(mappedValue);
 
     updateSetting("restitution", mappedValue);
+});
+
+const numVertices = document.querySelector("#vertices")! as HTMLInputElement;
+numVertices.value = String(Util.map(Settings.newBodySettings.numVertices, numVerticesRange.p1, numVerticesRange.p2, 0, 100));
+const numVerticesLabel = document.querySelector("#vertices_label")! as HTMLLabelElement;
+numVerticesLabel.innerHTML = String(Settings.newBodySettings.numVertices);
+numVertices.addEventListener("input", () =>
+{
+    let mappedValue = Util.map(Number(numVertices.value), 0, 100, numVerticesRange.p1, numVerticesRange.p2);
+    mappedValue = Number(Math.trunc(mappedValue));
+    if (mappedValue < 3)
+        numVerticesLabel.innerHTML = "Random";
+    else
+        numVerticesLabel.innerHTML = String(mappedValue);
+
+    updateSetting("vertices", mappedValue);
 });
 
 const gravityForce = document.querySelector("#gravityForce")! as HTMLInputElement;
@@ -184,7 +210,7 @@ gravityForceLabel.innerHTML = String(Settings.gravity) + "N";
 gravityForce.addEventListener("input", () =>
 {
     let mappedValue = Util.map(Number(gravityForce.value), 0, 100, gravityForceRange.p1, gravityForceRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2))
+    mappedValue = Number(mappedValue.toPrecision(2));
     gravityForceLabel.innerHTML = String(mappedValue) + "N";
 
     updateSetting("gravity", mappedValue);
@@ -272,6 +298,9 @@ export function updateSetting(id: string, content: any = undefined)
             break;
         case "restitution":
             Settings.newBodySettings.restitution = content!;
+            break;
+        case "vertices":
+            Settings.newBodySettings.numVertices = content!;
             break;
         case "gravity":
             Settings.gravity = content!;

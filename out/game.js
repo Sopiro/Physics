@@ -112,6 +112,11 @@ export class Game {
                             nb = new Circle(new Vector2(), nbs.size / 2);
                             break;
                         }
+                    case GenerationShape.Regular:
+                        {
+                            nb = Util.createRegularPolygon(nbs.numVertices, nbs.size / 2);
+                            break;
+                        }
                     case GenerationShape.Random:
                         {
                             nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2);

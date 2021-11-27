@@ -3,7 +3,8 @@ export var GenerationShape;
 (function (GenerationShape) {
     GenerationShape[GenerationShape["Box"] = 0] = "Box";
     GenerationShape[GenerationShape["Circle"] = 1] = "Circle";
-    GenerationShape[GenerationShape["Random"] = 2] = "Random";
+    GenerationShape[GenerationShape["Regular"] = 2] = "Regular";
+    GenerationShape[GenerationShape["Random"] = 3] = "Random";
 })(GenerationShape || (GenerationShape = {}));
 const frequencyRange = { p1: 10, p2: 240 };
 const iterationRange = { p1: 0, p2: 50 };
@@ -13,6 +14,7 @@ const gravityForceRange = { p1: -20, p2: 20 };
 const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
 const restitutionRange = { p1: 0, p2: 1 };
+const numVerticesRange = { p1: 2.9, p2: 17 };
 // Simulation settings
 export const Settings = {
     width: 1280,
@@ -37,6 +39,7 @@ export const Settings = {
         size: 50,
         friction: 0.7,
         restitution: 0.001,
+        numVertices: 5
     },
     gravity: -10,
     gravityScale: 25,
@@ -98,10 +101,15 @@ iteration.addEventListener("input", () => {
     iterationLabel.innerHTML = String(mappedValue);
     updateSetting("iteration", mappedValue);
 });
+let vertices_div = document.querySelector("#vertices_div");
 let rad = document.querySelectorAll('input[name="shapeRadios"]');
-for (var i = 0; i < 3; i++) {
+for (var i = 0; i < 4; i++) {
     let me = rad[i];
-    me.addEventListener('change', () => { Settings.newBodySettings.shape = Number(me.value); });
+    me.addEventListener('change', () => {
+        let index = Number(me.value);
+        Settings.newBodySettings.shape = index;
+        vertices_div.hidden = index != 2;
+    });
 }
 const mass = document.querySelector("#mass");
 mass.value = String(Util.map(Settings.newBodySettings.mass, massRange.p1, massRange.p2, 0, 100));
@@ -142,6 +150,19 @@ restitution.addEventListener("input", () => {
     mappedValue = Number(mappedValue.toPrecision(2));
     restitutionLabel.innerHTML = String(mappedValue);
     updateSetting("restitution", mappedValue);
+});
+const numVertices = document.querySelector("#vertices");
+numVertices.value = String(Util.map(Settings.newBodySettings.numVertices, numVerticesRange.p1, numVerticesRange.p2, 0, 100));
+const numVerticesLabel = document.querySelector("#vertices_label");
+numVerticesLabel.innerHTML = String(Settings.newBodySettings.numVertices);
+numVertices.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(numVertices.value), 0, 100, numVerticesRange.p1, numVerticesRange.p2);
+    mappedValue = Number(Math.trunc(mappedValue));
+    if (mappedValue < 3)
+        numVerticesLabel.innerHTML = "Random";
+    else
+        numVerticesLabel.innerHTML = String(mappedValue);
+    updateSetting("vertices", mappedValue);
 });
 const gravityForce = document.querySelector("#gravityForce");
 gravityForce.value = String(Util.map(Settings.gravity, gravityForceRange.p1, gravityForceRange.p2, 0, 100));
@@ -228,6 +249,9 @@ export function updateSetting(id, content = undefined) {
             break;
         case "restitution":
             Settings.newBodySettings.restitution = content;
+            break;
+        case "vertices":
+            Settings.newBodySettings.numVertices = content;
             break;
         case "gravity":
             Settings.gravity = content;
