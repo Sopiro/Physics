@@ -223,24 +223,40 @@ function demo10(world) {
         b1 = b2;
     }
 }
-Reflect.set(demo11, "SimulationName", "Distance joint test");
+Reflect.set(demo11, "SimulationName", "Suspension bridge");
 function demo11(world) {
     updateSetting("g", true);
     world.register(ground);
-    let b1 = new Box(30, 30);
-    b1.position = new Vector2(-60, 500);
+    let groundStart = 20;
+    let xStart = -500;
+    let yStart = 400;
+    let gap = 10;
+    let sizeX = 30;
+    let sizeY = 15;
+    let b1 = new Box(sizeX, sizeY);
+    b1.position = new Vector2(xStart, yStart + groundStart);
     world.register(b1);
-    let b2 = new Box(30, 30);
-    b2.position = new Vector2(60, 500);
-    world.register(b2);
-    let b3 = new Box(30, 30);
-    b3.position = new Vector2(0, 600);
-    world.register(b3);
-    let j = new DistanceJoint(b1, b2, b1.position, b2.position);
+    let pillar = new Box(sizeX, yStart, Type.Ground);
+    pillar.position = new Vector2(xStart - sizeX - gap, yStart / 2 + 20);
+    world.register(pillar);
+    let j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 0)));
+    j.drawAnchor = false;
     world.register(j);
-    j = new DistanceJoint(b2, b3, b2.position, b3.position);
+    for (let i = 1; i < xStart * -2 / (sizeX + gap); i++) {
+        let b2 = new Box(sizeX, sizeY);
+        b2.position = new Vector2(xStart + (gap + sizeX) * i, yStart + groundStart);
+        world.register(b2);
+        j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 0)), b2.position.addV(new Vector2(-sizeX / 2, 0)));
+        // j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2));
+        j.drawAnchor = false;
+        world.register(j);
+        b1 = b2;
+    }
+    pillar = new Box(sizeX, yStart, Type.Ground);
+    pillar.position = new Vector2(-(xStart), yStart / 2 + 20);
+    world.register(pillar);
+    j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 0)));
+    j.drawAnchor = false;
     world.register(j);
-    // j = new DistanceJoint(b3, b1, b3.position, b1.position);
-    // world.register(j);
 }
 export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11];

@@ -44,6 +44,7 @@ export class World
             {
                 let b = this.bodies[j];
 
+                if (a.type == Type.Ground && b.type == Type.Ground) continue;
                 let key = Util.make_pair_natural(a.id, b.id);
                 if (this.passTestSet.has(key)) continue;
 

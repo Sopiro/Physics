@@ -28,6 +28,8 @@ export class World {
             let a = this.bodies[i];
             for (let j = i + 1; j < this.bodies.length; j++) {
                 let b = this.bodies[j];
+                if (a.type == Type.Ground && b.type == Type.Ground)
+                    continue;
                 let key = Util.make_pair_natural(a.id, b.id);
                 if (this.passTestSet.has(key))
                     continue;
