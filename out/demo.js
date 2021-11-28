@@ -5,6 +5,7 @@ import { Settings, updateSetting } from "./settings.js";
 import * as Util from "./util.js";
 import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
+import { DistanceJoint } from "./distance.js";
 const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -195,4 +196,21 @@ function demo10(world) {
         b1 = b2;
     }
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10];
+Reflect.set(demo11, "SimulationName", "Distance joint test");
+function demo11(world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let b1 = new Box(new Vector2(-60, 500), new Vector2(30, 30));
+    world.register(b1);
+    let b2 = new Box(new Vector2(60, 500), new Vector2(30, 30));
+    world.register(b2);
+    let b3 = new Box(new Vector2(0, 600), new Vector2(30, 30));
+    world.register(b3);
+    let j = new DistanceJoint(b1, b2, b1.position, b2.position);
+    world.register(j);
+    j = new DistanceJoint(b2, b3, b2.position, b3.position);
+    world.register(j);
+    // j = new DistanceJoint(b3, b1, b3.position, b1.position);
+    // world.register(j);
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11];

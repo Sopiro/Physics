@@ -3,7 +3,7 @@ import { RigidBody, Type } from "./rigidbody.js";
 import { detectCollision } from "./detection.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
-import { RevoluteJoint } from "./revolute.js";
+import { Joint } from "./joint.js";
 export class World {
     constructor() {
         this.manifoldMap = new Map();
@@ -78,7 +78,7 @@ export class World {
             r.id = World.bid++;
             this.bodies.push(r);
         }
-        else if (r instanceof RevoluteJoint) {
+        else if (r instanceof Joint) {
             this.joints.push(r);
             if (passTest) {
                 if (r.bodyA.id == -1 || r.bodyB.id == -1)

@@ -6,6 +6,8 @@ import { World } from "./world.js";
 import * as Util from "./util.js";
 import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
+import { DistanceJoint } from "./distance.js";
+import { Joint } from "./joint.js";
 
 const ground = new Box(new Vector2(0, 0), new Vector2(Settings.width * 5, 40), Type.Ground);
 ground.restitution = 0.45;
@@ -243,7 +245,7 @@ function demo10(world: World): void
     b1.mass = 1;
     world.register(b1);
 
-    let j = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
+    let j: Joint = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
     world.register(j);
 
     for (let i = 1; i < 15; i++)
@@ -258,4 +260,25 @@ function demo10(world: World): void
     }
 }
 
-export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10];
+Reflect.set(demo11, "SimulationName", "Distance joint test");
+function demo11(world: World): void
+{
+    updateSetting("g", true);
+    world.register(ground);
+
+    let b1 = new Box(new Vector2(-60, 500), new Vector2(30, 30));
+    world.register(b1);
+    let b2 = new Box(new Vector2(60, 500), new Vector2(30, 30));
+    world.register(b2);
+    let b3 = new Box(new Vector2(0, 600), new Vector2(30, 30));
+    world.register(b3);
+
+    let j = new DistanceJoint(b1, b2, b1.position, b2.position);
+    world.register(j);
+    j = new DistanceJoint(b2, b3, b2.position, b3.position);
+    world.register(j);
+    // j = new DistanceJoint(b3, b1, b3.position, b1.position);
+    // world.register(j);
+}
+
+export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11];

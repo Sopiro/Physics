@@ -145,9 +145,6 @@ class ContactConstraintSolver
 
 export class ContactManifold extends Constraint
 {
-    public readonly bodyA: RigidBody;
-    public readonly bodyB: RigidBody;
-
     // Contact informations
     public readonly penetrationDepth: number;
     public readonly contactNormal: Vector2;
@@ -161,9 +158,7 @@ export class ContactManifold extends Constraint
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2)
     {
-        super();
-        this.bodyA = bodyA;
-        this.bodyB = bodyB;
+        super(bodyA, bodyB);
         this.contactPoints = contactPoints;
         this.penetrationDepth = penetrationDepth;
         this.contactNormal = contactNormal;

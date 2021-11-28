@@ -2,32 +2,24 @@ import { Matrix2, Vector2 } from "./math.js";
 import { RigidBody } from "./rigidbody.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
-import { Constraint } from "./constraint.js";
+import { Joint } from "./joint.js";
 
-export class RevoluteJoint extends Constraint
+export class RevoluteJoint extends Joint
 {
-    public readonly bodyA: RigidBody;
-    public readonly bodyB: RigidBody;
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
     private ra!: Vector2;
     private rb!: Vector2;
 
     private m!: Matrix2;
-    private bias: Vector2 = new Vector2();
+    private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2();
-
-    public drawAnchor = true;
-    public drawAnchorOnly = false;
-    public motor = false;
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2)
     {
-        super();
-        this.bodyA = bodyA;
-        this.bodyB = bodyB;
-        this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchor.subV(this.bodyA.position), 0);
-        this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchor.subV(this.bodyB.position), 0);
+        super(bodyA, bodyB);
+        this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchor, 1);
+        this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchor, 1);
     }
 
     override prepare(delta: number)
@@ -55,9 +47,9 @@ export class RevoluteJoint extends Constraint
         let error = pb.subV(pa);
 
         if (Settings.positionCorrection)
-        {
             this.bias = error.mulS(Settings.positionCorrectionBeta / delta);
-        }
+        else
+            this.bias = new Vector2();
 
         if (Settings.warmStarting)
         {
@@ -78,8 +70,6 @@ export class RevoluteJoint extends Constraint
 
         // You don't have to clamp the impulse. It's equality constraint.
         let impulse = this.m.mulVector(jv.addV(this.bias).inverted());
-
-        impulse.mulS(0.7);
 
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(impulse.mulS(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(impulse);

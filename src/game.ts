@@ -10,6 +10,8 @@ import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
 import { GenerationShape, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
+import { RevoluteJoint } from "./revolute.js";
+import { DistanceJoint } from "./distance.js";
 
 export class Game
 {
@@ -56,7 +58,7 @@ export class Game
         this.initDemo();
     }
 
-    initDemo()
+    initDemo(): void
     {
         this.world.clear();
         demos[this.currentDemo](this.world);
@@ -266,17 +268,35 @@ export class Game
 
         this.world.joints.forEach(j =>
         {
-            let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
-            let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
+            if (j instanceof RevoluteJoint)
+            {
+                let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
+                let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
 
-            if (!j.drawAnchorOnly)
-            {
-                r.drawLineV(anchorA, j.bodyA.position);
-                r.drawLineV(anchorB, j.bodyB.position);
+                if (j.drawConnectionLine)
+                {
+                    r.drawLineV(anchorA, j.bodyA.position);
+                    r.drawLineV(anchorB, j.bodyB.position);
+                }
+                if (j.drawAnchor)
+                {
+                    r.drawCircleV(anchorA, 3);
+                }
             }
-            if (j.drawAnchor)
+            else if (j instanceof DistanceJoint)
             {
-                r.drawCircleV(anchorA, 3);
+                let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
+                let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
+
+                if (j.drawConnectionLine)
+                {
+                    r.drawLineV(anchorA, anchorB);
+                }
+                if (j.drawAnchor)
+                {
+                    r.drawCircleV(anchorA, 3);
+                    r.drawCircleV(anchorB, 3);
+                }
             }
         });
     }

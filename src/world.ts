@@ -4,9 +4,9 @@ import { detectCollision } from "./detection.js";
 import { ContactManifold } from "./contact.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
-import { RevoluteJoint } from "./revolute.js";
+import { Joint } from "./joint.js";
 
-type Registrable = RevoluteJoint | RigidBody;
+type Registrable = RigidBody | Joint;
 
 export class World
 {
@@ -15,7 +15,7 @@ export class World
     public passTestSet: Set<number> = new Set();
 
     public bodies: RigidBody[] = [];
-    public joints: RevoluteJoint[] = [];
+    public joints: Joint[] = [];
     public manifolds: ContactManifold[] = [];
 
     update(delta: number): void
@@ -45,8 +45,8 @@ export class World
                 let b = this.bodies[j];
 
                 let key = Util.make_pair_natural(a.id, b.id);
-                if(this.passTestSet.has(key)) continue;
-                
+                if (this.passTestSet.has(key)) continue;
+
                 let newManifold = detectCollision(a, b);
 
                 if (newManifold != null)
@@ -115,7 +115,7 @@ export class World
         {
             r.id = World.bid++;
             this.bodies.push(r);
-        } else if (r instanceof RevoluteJoint)
+        } else if (r instanceof Joint)
         {
             this.joints.push(r);
             if (passTest)

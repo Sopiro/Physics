@@ -93,12 +93,10 @@ class ContactConstraintSolver {
 }
 export class ContactManifold extends Constraint {
     constructor(bodyA, bodyB, contactPoints, penetrationDepth, contactNormal) {
-        super();
+        super(bodyA, bodyB);
         this.solversN = [];
         this.solversT = [];
         this.persistent = false;
-        this.bodyA = bodyA;
-        this.bodyB = bodyB;
         this.contactPoints = contactPoints;
         this.penetrationDepth = penetrationDepth;
         this.contactNormal = contactNormal;
