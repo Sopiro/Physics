@@ -6,13 +6,13 @@ import * as Util from "./util.js";
 import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
-const ground = new Box(new Vector2(Settings.width * 5, 40), Type.Ground);
+const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(world) {
     updateSetting("g", true);
     world.register(ground);
-    let b = new Box(new Vector2(40, 40));
+    let b = new Box(40, 40);
     b.position = new Vector2(0, 500);
     b.restitution = 0.7;
     b.angularVelocity = Util.random(-8, 8);
@@ -26,7 +26,7 @@ function demo2(world) {
     let size = 30;
     let gap = 5;
     for (let i = 0; i < 12; i++) {
-        let b = new Box(new Vector2(size, size));
+        let b = new Box(size, size);
         b.position = new Vector2(Util.random(-1.5, 1.5), start + i * (size + gap));
         world.register(b);
     }
@@ -43,7 +43,7 @@ function demo3(world) {
     const yStart = 60;
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < rows - y; x++) {
-            let b = new Box(new Vector2(boxSize, boxSize));
+            let b = new Box(boxSize, boxSize);
             b.position = new Vector2(xStart + y * (boxSize + xGap) / 2 + x * (boxSize + xGap), yStart + y * (boxSize + yGap));
             world.register(b);
         }
@@ -53,19 +53,19 @@ Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo4(world) {
     updateSetting("g", true);
     world.register(ground);
-    let seesaw = new Box(new Vector2(600, 10), Type.Ground);
+    let seesaw = new Box(600, 10, Type.Ground);
     seesaw.position = new Vector2(0, 45);
     seesaw.inertia = Util.calculateBoxInertia(600, 10, 10);
     world.register(seesaw);
     let b = new Circle(20);
     b.position = new Vector2(-250, 100);
     world.register(b);
-    b = new Box(new Vector2(20, 20));
+    b = new Box(20, 20);
     b.position = new Vector2(-280, 100);
     b.mass = 1;
     b.inertia = Util.calculateBoxInertia(20, 20, 1);
     world.register(b);
-    b = new Box(new Vector2(50, 50));
+    b = new Box(50, 50);
     b.position = new Vector2(260, 500);
     b.mass = 30;
     b.inertia = Util.calculateBoxInertia(30, 30, 30);
@@ -122,7 +122,7 @@ function demo6(world) {
         c.inertia = Util.calculateCircleInertia(9, 1);
         world.register(c);
     }
-    let b = new Box(new Vector2(10, 200));
+    let b = new Box(10, 200);
     b.position = new Vector2(-500, Settings.height / 2.0);
     b.mass = 30;
     b.inertia = Util.calculateBoxInertia(10, 200, 30);
@@ -134,25 +134,25 @@ Reflect.set(demo7, "SimulationName", "Friction test");
 function demo7(world) {
     updateSetting("g", true);
     world.register(ground);
-    let b = new Box(new Vector2(600, 10), Type.Ground);
+    let b = new Box(600, 10, Type.Ground);
     b.position = new Vector2(-60, 500);
     b.rotation = -0.15;
     b.friction = 1.0;
     world.register(b);
-    b = new Box(new Vector2(600, 10), Type.Ground);
+    b = new Box(600, 10, Type.Ground);
     b.position = new Vector2(0, 300);
     b.rotation = 0.15;
     b.friction = 1.0;
     world.register(b);
-    b = new Box(new Vector2(600, 10), Type.Ground);
+    b = new Box(600, 10, Type.Ground);
     b.position = new Vector2(-60, 100);
     b.rotation = -0.15;
     b.friction = 1.0;
     world.register(b);
-    b = new Box(new Vector2(10, 110), Type.Ground);
+    b = new Box(10, 110, Type.Ground);
     b.position = new Vector2(310, 430);
     world.register(b);
-    b = new Box(new Vector2(10, 110), Type.Ground);
+    b = new Box(10, 110, Type.Ground);
     b.position = new Vector2(-370, 230);
     world.register(b);
     let xStart = -450;
@@ -161,7 +161,7 @@ function demo7(world) {
     let size = 30;
     let frictions = [0.5, 0.3, 0.2, 0.12, 0.0];
     for (let i = 0; i < frictions.length; i++) {
-        b = new Box(new Vector2(size, size));
+        b = new Box(size, size);
         b.position = new Vector2(xStart + (size + gap) * i, yStart);
         b.friction = frictions[i];
         b.linearVelocity.x = 120;
@@ -171,7 +171,7 @@ function demo7(world) {
 Reflect.set(demo8, "SimulationName", "Restitution test");
 function demo8(world) {
     updateSetting("g", true);
-    let g = new Box(new Vector2(Settings.width * 2, 20), Type.Ground);
+    let g = new Box(Settings.width * 2, 20, Type.Ground);
     g.restitution = 0.7;
     world.register(g);
     let count = 7;
@@ -180,7 +180,7 @@ function demo8(world) {
     let yStart = 620;
     let size = 30;
     for (let i = 0; i < count; i++) {
-        let b = new Box(new Vector2(size, size));
+        let b = new Box(size, size);
         b.position = new Vector2(xStart + gap * i, yStart);
         let attenuation = (count - i) / count;
         b.restitution = 1.0 - attenuation * attenuation;
@@ -191,7 +191,7 @@ Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(world) {
     updateSetting("g", true);
     world.register(ground);
-    let b = new Box(new Vector2(30, 30));
+    let b = new Box(30, 30);
     b.position = new Vector2(-300, 500);
     world.register(b);
     let j = new RevoluteJoint(ground, b, new Vector2(0, 500));
@@ -206,14 +206,14 @@ function demo10(world) {
     let sizeW = 30;
     let sizeH = 15;
     let gap = 10;
-    let b1 = new Box(new Vector2(sizeW, sizeH));
+    let b1 = new Box(sizeW, sizeH);
     b1.position = new Vector2(xStart - (gap + sizeW), yStart);
     b1.mass = 1;
     world.register(b1);
     let j = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
     world.register(j);
     for (let i = 1; i < 15; i++) {
-        let b2 = new Box(new Vector2(sizeW, sizeH));
+        let b2 = new Box(sizeW, sizeH);
         b2.position = new Vector2(xStart - (gap + sizeW) * (i + 1), yStart);
         b2.mass = 1;
         world.register(b2);
@@ -227,13 +227,13 @@ Reflect.set(demo11, "SimulationName", "Distance joint test");
 function demo11(world) {
     updateSetting("g", true);
     world.register(ground);
-    let b1 = new Box(new Vector2(30, 30));
+    let b1 = new Box(30, 30);
     b1.position = new Vector2(-60, 500);
     world.register(b1);
-    let b2 = new Box(new Vector2(30, 30));
+    let b2 = new Box(30, 30);
     b2.position = new Vector2(60, 500);
     world.register(b2);
-    let b3 = new Box(new Vector2(30, 30));
+    let b3 = new Box(30, 30);
     b3.position = new Vector2(0, 600);
     world.register(b3);
     let j = new DistanceJoint(b1, b2, b1.position, b2.position);

@@ -5,13 +5,13 @@ import * as Util from "./util.js";
 
 export class Box extends Polygon
 {
-    constructor(wh: Vector2, type: Type = Type.Normal, centered: boolean = true)
+    constructor(width: number, height: number, type: Type = Type.Normal, centered: boolean = true)
     {
-        super([new Vector2(0, 0), new Vector2(0, wh.y), wh.copy(), new Vector2(wh.x, 0)], type);
-        
-        this.inertia = Util.calculateBoxInertia(wh.x, wh.y, this.mass);
+        super([new Vector2(0, 0), new Vector2(0, height), new Vector2(width, height), new Vector2(width, 0)], type);
+
+        this.inertia = Util.calculateBoxInertia(width, height, this.mass);
 
         if (!centered)
-            this.translate(wh.divS(2));
+            this.translate(new Vector2(width / 2, height / 2));
     }
 }

@@ -36,7 +36,7 @@ export function createRandomConvexBody(radius = 50, numVertices = -1) {
     if (numVertices == 0)
         return new Circle(radius);
     if (numVertices == maxVertices - 1)
-        return new Box(new Vector2(radius * 2, radius * 2));
+        return new Box(radius * 2, radius * 2);
     numVertices += 2;
     let angles = [];
     for (let i = 0; i < numVertices; i++)

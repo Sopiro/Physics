@@ -106,7 +106,7 @@ export class Game {
                 switch (nbs.shape) {
                     case GenerationShape.Box:
                         {
-                            nb = new Box(new Vector2(nbs.size, nbs.size));
+                            nb = new Box(nbs.size, nbs.size);
                             break;
                         }
                     case GenerationShape.Circle:
