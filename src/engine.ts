@@ -41,7 +41,7 @@ export class Engine
         const fps = Math.round(1000 / delta);
 
         this.frameCounterElement.innerHTML = fps + "fps";
-        
+
         if (!Settings.paused)
         {
             this.update(delta / 1000.0);
@@ -52,7 +52,7 @@ export class Engine
             this.gfx.font = "48px verdana";
             this.gfx.fillText("PAUSE", 4, 40);
         }
-        
+
         window.requestAnimationFrame(this.run.bind(this));
     }
 

@@ -59,10 +59,10 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
         numVertices = Math.trunc(Math.random() * maxVertices);
 
     if (numVertices == 0)
-        return new Circle(new Vector2(), radius);
+        return new Circle(radius);
 
     if (numVertices == maxVertices - 1)
-        return new Box(new Vector2(), new Vector2(radius * 2, radius * 2));
+        return new Box(new Vector2(radius * 2, radius * 2));
 
     numVertices += 2;
 
