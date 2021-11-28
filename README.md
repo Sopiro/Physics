@@ -11,12 +11,18 @@ Video: https://youtu.be/mHnHj9HHSBg
 ## Features
 - Basic input, rendering system(Game engine-like)
 - Collision detection
+  - Convex polygons and circles
   - AABB Broad phase
-  - Compute the closest distance between convex polygons (GJK)
+  - Computing minimum distance between two convex shapes (GJK)
   - Generate contact manifold (EPA)
 - Collision resolution 
-  - Constraint-based simulation
-  - Sequential impulses
+  - Friction and restitution
+  - Iterative solver
+  - Sequential impulses  
+- Constraint-basd simulation
+  - Contact constraint
+  - Joints: Revolute, Distance joint
+
 
 ## References
 - https://box2d.org/publications/
