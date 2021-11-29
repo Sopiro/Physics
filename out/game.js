@@ -17,9 +17,9 @@ export class Game {
         this.cameraMove = false;
         this.grabBody = false;
         this.currentDemo = 0;
+        this.demoCallback = () => { };
         this.camera = new Camera();
         this.camera.position = new Vector2(0, Settings.height / 2.0);
-        this.camera.scale = new Vector2(2, 2);
         this.world = new World();
         const restartBtn = document.querySelector("#restart");
         restartBtn.addEventListener("click", () => {
@@ -40,32 +40,32 @@ export class Game {
     }
     initDemo() {
         this.world.clear();
-        demos[this.currentDemo](this.world);
+        this.demoCallback = () => { };
+        demos[this.currentDemo](this, this.world);
     }
     update(delta) {
         this.handleInput(delta);
+        this.demoCallback();
         this.world.update(delta);
     }
     handleInput(delta) {
-        const mx = Input.isKeyPressed("ArrowLeft") ? -1 : Input.isKeyPressed("ArrowRight") ? 1 : 0;
-        const my = Input.isKeyPressed("ArrowDown") ? -1 : Input.isKeyPressed("ArrowUp") ? 1 : 0;
+        const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
+        const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
         this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         this.cursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
         this.cursorPos = this.camera.transform.mulVector(this.cursorPos, 1);
-        let zoom = (1 + Input.mouseScroll.y * 0.1);
-        if (zoom <= 0) {
-            zoom = 0.1;
-            Input.mouseScroll.y = -9;
+        if (Input.isScrolling()) {
+            this.camera.scale.x += Input.mouseScroll.y * 0.1;
+            this.camera.scale.y += Input.mouseScroll.y * 0.1;
         }
-        this.camera.scale = new Vector2(zoom, zoom);
-        let spaceDown = Input.isKeyPressed(" ");
-        if (!this.cameraMove && spaceDown && Input.isMouseDown()) {
+        let spaceDown = Input.isKeyDown(" ");
+        if (!this.cameraMove && spaceDown && Input.isMousePressed()) {
             this.cameraMove = true;
             this.cursorStart = Input.mousePosition.copy();
             this.cameraPosStart = this.camera.position.copy();
         }
-        else if (!spaceDown || Input.isMouseUp()) {
+        else if (!spaceDown || Input.isMouseReleased()) {
             this.cameraMove = false;
         }
         if (this.cameraMove) {
@@ -75,7 +75,7 @@ export class Game {
             this.camera.position = this.cameraPosStart.addV(dist);
         }
         if (this.grabBody && !this.cameraMove) {
-            if (Input.isMouseUp()) {
+            if (Input.isMouseReleased()) {
                 let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
                 let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
                 let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
@@ -85,7 +85,7 @@ export class Game {
                 this.grabBody = false;
             }
         }
-        if (Input.isMouseDown()) {
+        if (Input.isMousePressed()) {
             let skipGeneration = false;
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
@@ -131,7 +131,7 @@ export class Game {
                 this.world.register(nb);
             }
         }
-        if (Input.isMouseDown(2)) {
+        if (Input.isMousePressed(2)) {
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos)) {
@@ -140,23 +140,23 @@ export class Game {
                 }
             }
         }
-        if (Input.isKeyDown("r"))
+        if (Input.isKeyPressed("r"))
             this.initDemo();
-        if (Input.isKeyDown("m"))
+        if (Input.isKeyPressed("m"))
             updateSetting("m");
-        if (Input.isKeyDown("p"))
+        if (Input.isKeyPressed("p"))
             updateSetting("p");
-        if (Input.isKeyDown("g"))
+        if (Input.isKeyPressed("g"))
             updateSetting("g");
-        if (Input.isKeyDown("w"))
+        if (Input.isKeyPressed("w"))
             updateSetting("w");
-        if (Input.isKeyDown("b"))
+        if (Input.isKeyPressed("b"))
             updateSetting("b");
-        if (Input.isKeyDown("c"))
+        if (Input.isKeyPressed("c"))
             updateSetting("c");
-        if (Input.isKeyDown("a"))
+        if (Input.isKeyPressed("a"))
             updateSetting("a");
-        if (Input.isKeyDown("i"))
+        if (Input.isKeyPressed("i"))
             updateSetting("i");
     }
     render(r) {

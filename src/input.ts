@@ -20,8 +20,10 @@ const maxMouseButtons = 5;
 
 export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
+export let last_scroll: boolean = false;
+export let curr_scroll: boolean = false;
+export let mouseScroll: Vector2 = new Vector2(0, 0); 
 export const mouseAcceleration = new Vector2(0, 0);
-export const mouseScroll = new Vector2(0, 0);
 
 export function init(engine: Engine)
 {
@@ -55,10 +57,12 @@ export function init(engine: Engine)
         mousePosition.y = e.clientY - rect.top;
     });
 
-    engine.cvs.addEventListener("wheel", (e)=>
+    engine.cvs.addEventListener("wheel", (e) =>
     {
-        mouseScroll.x += e.deltaX / 100; 
-        mouseScroll.y += e.deltaY / 100; 
+        mouseScroll.x = e.deltaX / 100;
+        mouseScroll.y = e.deltaY / 100;
+
+        curr_scroll = true;
     });
 
     for (let i = 0; i < maxMouseButtons; i++)
@@ -72,38 +76,57 @@ export function update()
     mouseLastPosition.x = mousePosition.x;
     mouseLastPosition.y = mousePosition.y;
 
+    last_scroll = curr_scroll;
+    curr_scroll = false;
+    mouseScroll.clear();
+
     for (let i = 0; i < mouses.length; i++)
         mouses[i].last_down = mouses[i].curr_down;
 
     Object.assign(last_keys, curr_keys);
 }
 
-export function isMouseDown(button: number = 0): boolean
+export function isScrolling(): boolean
 {
-    return mouses[button].curr_down && !mouses[button].last_down;
+    return curr_scroll;
 }
 
-export function isMouseUp(button: number = 0): boolean
+export function isScrollingStart(): boolean
 {
-    return !mouses[button].curr_down && mouses[button].last_down;
+    return curr_scroll && !last_scroll;
+}
+
+export function isScrollingEnd(): boolean
+{
+    return !curr_scroll && last_scroll;
 }
 
 export function isMousePressed(button: number = 0): boolean
 {
+    return mouses[button].curr_down && !mouses[button].last_down;
+}
+
+export function isMouseReleased(button: number = 0): boolean
+{
+    return !mouses[button].curr_down && mouses[button].last_down;
+}
+
+export function isMouseDown(button: number = 0): boolean
+{
     return mouses[button].curr_down;
 }
 
-export function isKeyDown(key: string): boolean
+export function isKeyPressed(key: string): boolean
 {
     return curr_keys[key] && !last_keys[key];
 }
 
-export function isKeyUp(key: string): boolean
+export function isKeyReleased(key: string): boolean
 {
     return !curr_keys[key] && last_keys[key];
 }
 
-export function isKeyPressed(key: string): boolean
+export function isKeyDown(key: string): boolean
 {
     return curr_keys[key];
 }

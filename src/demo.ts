@@ -8,12 +8,15 @@ import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
 import { Joint } from "./joint.js";
+import { Game } from "./game.js";
+import * as Input from "./input.js";
+import { Polygon } from "./polygon.js";
 
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
 
 Reflect.set(demo1, "SimulationName", "Single box");
-function demo1(world: World): void
+function demo1(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -25,7 +28,7 @@ function demo1(world: World): void
 }
 
 Reflect.set(demo2, "SimulationName", "Box stacking");
-function demo2(world: World): void
+function demo2(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -43,7 +46,7 @@ function demo2(world: World): void
 }
 
 Reflect.set(demo3, "SimulationName", "Pyramid");
-function demo3(world: World): void
+function demo3(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -67,7 +70,7 @@ function demo3(world: World): void
 }
 
 Reflect.set(demo4, "SimulationName", "Seesaw");
-function demo4(world: World): void
+function demo4(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -93,7 +96,7 @@ function demo4(world: World): void
 }
 
 Reflect.set(demo5, "SimulationName", "Billiard");
-function demo5(world: World): void
+function demo5(game: Game, world: World): void
 {
     updateSetting("g", false);
 
@@ -139,7 +142,7 @@ function demo5(world: World): void
 }
 
 Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
-function demo6(world: World): void
+function demo6(game: Game, world: World): void
 {
     updateSetting("g", false);
     world.register(ground);
@@ -170,7 +173,7 @@ function demo6(world: World): void
 }
 
 Reflect.set(demo7, "SimulationName", "Friction test");
-function demo7(world: World): void
+function demo7(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -216,7 +219,7 @@ function demo7(world: World): void
 }
 
 Reflect.set(demo8, "SimulationName", "Restitution test");
-function demo8(world: World): void
+function demo8(game: Game, world: World): void
 {
     updateSetting("g", true);
     let g = new Box(Settings.width * 2, 20, Type.Ground);
@@ -241,7 +244,7 @@ function demo8(world: World): void
 }
 
 Reflect.set(demo9, "SimulationName", "Single pendulum");
-function demo9(world: World): void
+function demo9(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -255,7 +258,7 @@ function demo9(world: World): void
 }
 
 Reflect.set(demo10, "SimulationName", "Multi pendulum");
-function demo10(world: World): void
+function demo10(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -289,7 +292,7 @@ function demo10(world: World): void
 }
 
 Reflect.set(demo11, "SimulationName", "Suspension bridge");
-function demo11(world: World): void
+function demo11(game: Game, world: World): void
 {
     updateSetting("g", true);
     world.register(ground);
@@ -336,4 +339,59 @@ function demo11(world: World): void
     world.register(j);
 }
 
-export const demos: ((world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11];
+Reflect.set(demo12, "SimulationName", "interactive demo");
+function demo12(game: Game, world: World): void
+{
+    updateSetting("g", true);
+    world.register(ground);
+
+    // let pillar = new Box(30, 400, Type.Ground);
+    // pillar.position = new Vector2(-300, 400 / 2 + 20);
+    // world.register(pillar);
+
+    let c1 = new Circle(30);
+    c1.friction = 1.0;
+    c1.position.x = -100;
+    c1.position.y = 200;
+    world.register(c1);
+
+    let c2 = new Circle(30);
+    c2.friction = 1.0;
+    c2.position.x = 100;
+    c2.position.y = 200;
+    world.register(c2);
+
+    let b = new Polygon([new Vector2(-110, 0), new Vector2(-110, 80), new Vector2(20, 80), new Vector2(110, 20), new Vector2(110, 0)]);
+    b.position.y = 250;
+    world.register(b);
+
+    let j1 = new RevoluteJoint(c1, b, c1.position);
+    world.register(j1, true);
+    let j2 = new RevoluteJoint(c2, b, c2.position);
+    world.register(j2, true);
+
+    let start = 50;
+    let size = 50;
+    let gap = 5;
+
+    for (let i = 0; i < 12; i++)
+    {
+        let b = new Box(size, size);
+        b.mass = 0.5;
+        b.position = new Vector2(1600 + Util.random(-1.5, 1.5), start + i * (size + gap));
+        world.register(b);
+    }
+
+    game.camera.position = new Vector2(900, 400);
+    game.camera.scale = new Vector2(2, 2);
+
+    game.demoCallback = () =>
+    {
+        if (Input.isKeyDown("q"))
+            c1.addTorque(c1.inertia * 10);
+        if (Input.isKeyDown("e"))
+            c1.addTorque(c1.inertia * -10);
+    };
+}
+
+export const demos: ((game: Game, world: World) => void)[] = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12];

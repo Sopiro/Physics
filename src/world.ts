@@ -118,14 +118,11 @@ export class World
             this.bodies.push(r);
         } else if (r instanceof Joint)
         {
+            if (r.bodyA.id == -1 || r.bodyB.id == -1)
+                throw "You should register the rigid bodies before registering the joint";
+
+            if (passTest) this.passTestSet.add(Util.make_pair_natural(r.bodyA.id, r.bodyB.id));
             this.joints.push(r);
-            if (passTest)
-            {
-                if (r.bodyA.id == -1 || r.bodyB.id == -1)
-                    throw "You should register the rigid bodies before registering the joint";
-                else
-                    this.passTestSet.add(Util.make_pair_natural(r.bodyA.id, r.bodyB.id));
-            }
         }
     }
 
