@@ -44,7 +44,7 @@ export class DistanceJoint extends Joint
             + this.bodyA.inverseInertia * this.n.cross(this.ra) * this.n.cross(this.ra)
             + this.bodyB.inverseInertia * this.n.cross(this.rb) * this.n.cross(this.rb);
 
-        let error = (u.length - this.length) / 2;
+        let error = (u.length - this.length);
 
         if (Settings.positionCorrection)
             this.bias = error * Settings.positionCorrectionBeta / delta;
@@ -54,10 +54,7 @@ export class DistanceJoint extends Joint
         if (Settings.warmStarting)
         {
             this.impulseSum *= 0.5;
-            this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(this.impulseSum * this.bodyA.inverseMass));
-            this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(this.ra.normal) * this.impulseSum * this.bodyA.inverseInertia;
-            this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(this.impulseSum * this.bodyB.inverseMass));
-            this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(this.rb.normal) * this.impulseSum * this.bodyB.inverseInertia;
+            this.applyImpulse(this.impulseSum);
         }
     }
 
@@ -71,12 +68,17 @@ export class DistanceJoint extends Joint
 
         let impulse = -(jv + this.bias) / this.k;
 
+        this.applyImpulse(impulse);
+
+        if (Settings.warmStarting)
+            this.impulseSum += impulse;
+    }
+
+    protected override applyImpulse(impulse: number): void
+    {
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(impulse * this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(this.ra.normal) * impulse * this.bodyA.inverseInertia;
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(impulse * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(this.rb.normal) * impulse * this.bodyB.inverseInertia;
-
-        if (Settings.warmStarting)
-            this.impulseSum += impulse;
     }
 }

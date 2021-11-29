@@ -87,14 +87,9 @@ class ContactConstraintSolver
 
         this.effectiveMass = 1.0 / k;
 
+        // Apply the old impulse calculated in the previous time step
         if (Settings.warmStarting)
-        {
-            // Apply the accumulated impulse comes from previous time step
-            this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * this.impulseSum));
-            this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * this.impulseSum;
-            this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * this.impulseSum));
-            this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * this.impulseSum;
-        }
+            this.applyImpulse(this.impulseSum);
     }
 
     solve(friendNormal?: ContactConstraintSolver)
@@ -136,6 +131,11 @@ class ContactConstraintSolver
             impulse = this.impulseSum;
 
         // Apply impulse
+        this.applyImpulse(impulse);
+    }
+
+    private applyImpulse(impulse: number)
+    {
         this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * impulse));
         this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * impulse;
         this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * impulse));
@@ -189,6 +189,8 @@ export class ContactManifold extends Constraint
             this.solversT[i].solve(this.solversN[i]);
         }
     }
+
+    protected override applyImpulse(): void { }
 
     tryWarmStart(oldManifold: ContactManifold)
     {
