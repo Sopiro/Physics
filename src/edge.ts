@@ -24,7 +24,7 @@ export class Edge
 
     get normal()
     {
-        return new Vector2(-this.dir.y, this.dir.x);
+        return this.dir.normal;
     }
 
     get midPoint()

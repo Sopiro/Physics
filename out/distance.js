@@ -1,11 +1,10 @@
 import { Joint } from "./joint.js";
-import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class DistanceJoint extends Joint {
     constructor(bodyA, bodyB, anchorA, anchorB, length = -1) {
         super(bodyA, bodyB);
-        this.impulseSum = new Vector2();
+        this.impulseSum = 0;
         this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchorB, 1);
         if (length < 0)
@@ -28,25 +27,25 @@ export class DistanceJoint extends Joint {
             this.bias = error * Settings.positionCorrectionBeta / delta;
         else
             this.bias = 0;
-        // if (Settings.warmStarting)
-        // {
-        //     this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.impulseSum.mulS(this.bodyA.inverseMass));
-        //     this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(this.impulseSum);
-        //     this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.impulseSum.mulS(this.bodyB.inverseMass));
-        //     this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(this.impulseSum);
-        // }
+        if (Settings.warmStarting) {
+            this.impulseSum *= 0.5;
+            this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(this.impulseSum * this.bodyA.inverseMass));
+            this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(this.ra.normal) * this.impulseSum * this.bodyA.inverseInertia;
+            this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(this.impulseSum * this.bodyB.inverseMass));
+            this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(this.rb.normal) * this.impulseSum * this.bodyB.inverseInertia;
+        }
     }
     solve() {
         // Calculate corrective impulse: λ
         // λ = (J * M^-1 * J^t)^-1 * -(Jv+b)
         let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
-        let impulse = this.n.mulS(-(jv + this.bias)).divS(this.k);
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(impulse.mulS(this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(impulse);
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(impulse.mulS(this.bodyB.inverseMass));
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(impulse);
+        let impulse = -(jv + this.bias) / this.k;
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(impulse * this.bodyA.inverseMass));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(this.ra.normal) * impulse * this.bodyA.inverseInertia;
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(impulse * this.bodyB.inverseMass));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(this.rb.normal) * impulse * this.bodyB.inverseInertia;
         if (Settings.warmStarting)
-            this.impulseSum = this.impulseSum.addV(impulse);
+            this.impulseSum += impulse;
     }
 }

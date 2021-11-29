@@ -281,6 +281,7 @@ function demo10(world: World): void
         b2.mass = 1;
         world.register(b2);
         j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart));
+        // j = new DistanceJoint(b1, b2, b1.position.subV(new Vector2(sizeW / 2, 0)), b2.position.addV(new Vector2(sizeW / 2, 0)));
         world.register(j);
         j.drawAnchor = false;
         b1 = b2;
