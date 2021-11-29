@@ -135,7 +135,7 @@ export class Game {
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos)) {
-                    this.world.unregisterBody(i);
+                    this.world.unregister(i);
                     break;
                 }
             }

@@ -90,8 +90,16 @@ export class World {
             }
         }
     }
-    unregisterBody(index) {
-        this.bodies.splice(index, 1);
+    unregister(index) {
+        let b = this.bodies.splice(index, 1)[0];
+        let newJoints = [];
+        for (let i = 0; i < this.joints.length; i++) {
+            let j = this.joints[i];
+            if (b.id == j.bodyA.id || b.id == j.bodyB.id)
+                continue;
+            newJoints.push(j);
+        }
+        this.joints = newJoints;
     }
     clear() {
         this.bodies = [];

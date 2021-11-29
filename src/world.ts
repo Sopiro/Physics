@@ -129,9 +129,23 @@ export class World
         }
     }
 
-    unregisterBody(index: number): void
+    unregister(index: number): void
     {
-        this.bodies.splice(index, 1);
+        let b = this.bodies.splice(index, 1)[0];
+
+        let newJoints: Joint[] = [];
+
+        for (let i = 0; i < this.joints.length; i++)
+        {
+            let j = this.joints[i];
+
+            if (b.id == j.bodyA.id || b.id == j.bodyB.id)
+                continue;
+
+            newJoints.push(j);
+        }
+
+        this.joints = newJoints;
     }
 
     clear(): void

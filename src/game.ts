@@ -191,7 +191,7 @@ export class Game
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos))
                 {
-                    this.world.unregisterBody(i);
+                    this.world.unregister(i);
                     break;
                 }
             }
