@@ -12,7 +12,7 @@ export class DistanceJoint extends Joint
     private ra!: Vector2;
     private rb!: Vector2;
 
-    private k!: number;
+    private m!: number;
     private n!: Vector2;
     private bias!: number;
     private impulseSum: number = 0;
@@ -44,9 +44,11 @@ export class DistanceJoint extends Joint
 
         this.n = u.normalized();
 
-        this.k = this.bodyA.inverseMass + this.bodyB.inverseMass
+        let k = this.bodyA.inverseMass + this.bodyB.inverseMass
             + this.bodyA.inverseInertia * this.n.cross(this.ra) * this.n.cross(this.ra)
             + this.bodyB.inverseInertia * this.n.cross(this.rb) * this.n.cross(this.rb);
+
+        this.m = 1 / k;
 
         let error = (u.length - this.length);
 
@@ -71,22 +73,22 @@ export class DistanceJoint extends Joint
         let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
 
-        let impulse = -(jv + this.bias) / this.k;
+        let lambda = -(jv + this.bias) * this.m;
 
-        this.applyImpulse(impulse);
+        this.applyImpulse(lambda);
 
         if (Settings.warmStarting)
-            this.impulseSum += impulse;
+            this.impulseSum += lambda;
     }
 
-    protected override applyImpulse(impulse: number): void
+    protected override applyImpulse(lambda: number): void
     {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
 
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(impulse * this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(impulse, this.ra)) * this.bodyA.inverseInertia;
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(impulse * this.bodyB.inverseMass));
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(impulse, this.rb)) * this.bodyB.inverseInertia;
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(lambda * this.bodyA.inverseMass));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(lambda, this.ra)) * this.bodyA.inverseInertia;
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(lambda * this.bodyB.inverseMass));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(lambda, this.rb)) * this.bodyB.inverseInertia;
     }
 }

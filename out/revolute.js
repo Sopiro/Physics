@@ -40,17 +40,17 @@ export class RevoluteJoint extends Joint {
         let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra)));
         // You don't have to clamp the impulse. It's equality constraint.
-        let impulse = this.m.mulVector(jv.addV(this.bias).inverted());
-        this.applyImpulse(impulse);
+        let lambda = this.m.mulVector(jv.addV(this.bias).inverted());
+        this.applyImpulse(lambda);
         if (Settings.warmStarting)
-            this.impulseSum = this.impulseSum.addV(impulse);
+            this.impulseSum = this.impulseSum.addV(lambda);
     }
-    applyImpulse(impulse) {
+    applyImpulse(lambda) {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(impulse.mulS(this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(impulse);
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(impulse.mulS(this.bodyB.inverseMass));
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(impulse);
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(lambda.mulS(this.bodyA.inverseMass));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda);
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(lambda.mulS(this.bodyB.inverseMass));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(lambda);
     }
 }

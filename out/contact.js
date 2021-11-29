@@ -61,41 +61,41 @@ class ContactConstraintSolver {
             + this.jacobian.wa * this.a.angularVelocity
             + this.jacobian.vb.dot(this.b.linearVelocity)
             + this.jacobian.wb * this.b.angularVelocity;
-        let impulse = this.effectiveMass * -(jv + this.bias);
+        let lambda = this.effectiveMass * -(jv + this.bias);
         let oldImpulseSum = this.impulseSum;
         switch (this.constraintType) {
             case ConstraintType.Normal:
                 {
                     if (Settings.impulseAccumulation)
-                        this.impulseSum = Math.max(0.0, this.impulseSum + impulse);
+                        this.impulseSum = Math.max(0.0, this.impulseSum + lambda);
                     else
-                        this.impulseSum = Math.max(0.0, impulse);
+                        this.impulseSum = Math.max(0.0, lambda);
                     break;
                 }
             case ConstraintType.Tangent:
                 {
                     let maxFriction = this.friction * friendNormal.impulseSum;
                     if (Settings.impulseAccumulation)
-                        this.impulseSum = Util.clamp(this.impulseSum + impulse, -maxFriction, maxFriction);
+                        this.impulseSum = Util.clamp(this.impulseSum + lambda, -maxFriction, maxFriction);
                     else
-                        this.impulseSum = Util.clamp(impulse, -maxFriction, maxFriction);
+                        this.impulseSum = Util.clamp(lambda, -maxFriction, maxFriction);
                     break;
                 }
         }
         if (Settings.impulseAccumulation)
-            impulse = this.impulseSum - oldImpulseSum;
+            lambda = this.impulseSum - oldImpulseSum;
         else
-            impulse = this.impulseSum;
+            lambda = this.impulseSum;
         // Apply impulse
-        this.applyImpulse(impulse);
+        this.applyImpulse(lambda);
     }
-    applyImpulse(impulse) {
+    applyImpulse(lambda) {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
-        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * impulse));
-        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * impulse;
-        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * impulse));
-        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * impulse;
+        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * lambda));
+        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * lambda;
+        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * lambda));
+        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * lambda;
     }
 }
 export class ContactManifold extends Constraint {
