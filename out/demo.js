@@ -262,7 +262,7 @@ function demo11(game, world) {
     j.drawAnchor = false;
     world.register(j);
 }
-Reflect.set(demo12, "SimulationName", "interactive demo");
+Reflect.set(demo12, "SimulationName", "Interactive demo");
 function demo12(game, world) {
     updateSetting("g", true);
     world.register(ground);
@@ -304,4 +304,23 @@ function demo12(game, world) {
             c1.addTorque(c1.inertia * -10);
     };
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12];
+Reflect.set(demo13, "SimulationName", "Circle stacking");
+function demo13(game, world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let yStart = 100;
+    let xStart = -401;
+    let size = 30;
+    let gap = 30;
+    let rows = 10;
+    for (let i = 0; i < rows; i++) {
+        for (let j = i; j < rows; j++) {
+            let c = new Circle(size);
+            c.mass = (1 + i) + (1 + i) * j;
+            c.position.x = xStart + (gap + size * 2) * i;
+            c.position.y = yStart + (gap + size * 2) * j;
+            world.register(c);
+        }
+    }
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13];

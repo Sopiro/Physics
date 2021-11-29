@@ -3,12 +3,6 @@ import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 
-export enum Shape
-{
-    Circle = 0,
-    Polygon
-}
-
 export enum Type
 {
     Ground = 0,
@@ -17,8 +11,6 @@ export enum Type
 
 export class RigidBody extends Entity
 {
-    public readonly shape: Shape;
-
     private _force: Vector2 = new Vector2(0, 0);
     private _torque: number = 0;
     private _mass: number; // kg
@@ -35,10 +27,9 @@ export class RigidBody extends Entity
 
     public id: number = -1;
 
-    constructor(shape: Shape, type: Type, friction = 0.7, restitution = 0.001)
+    constructor(type: Type, friction = 0.7, restitution = 0.001)
     {
         super();
-        this.shape = shape;
 
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;

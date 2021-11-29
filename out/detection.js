@@ -1,5 +1,4 @@
 import { Circle } from "./circle.js";
-import { Shape } from "./rigidbody.js";
 import { ContactManifold } from "./contact.js";
 import { Edge } from "./edge.js";
 import { Vector2 } from "./math.js";
@@ -9,32 +8,31 @@ import { Simplex } from "./simplex.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 export function createAABB(b) {
-    switch (b.shape) {
-        case Shape.Circle:
-            let circle = b;
-            let cmInGlobal = b.localToGlobal.mulVector(b.centerOfMass, 1);
-            return {
-                min: new Vector2(cmInGlobal.x - circle.radius, cmInGlobal.y - circle.radius),
-                max: new Vector2(cmInGlobal.x + circle.radius, cmInGlobal.y + circle.radius)
-            };
-        case Shape.Polygon:
-            let poly = b;
-            const lTg = poly.localToGlobal;
-            let res = { min: lTg.mulVector(poly.vertices[0], 1), max: lTg.mulVector(poly.vertices[0], 1) };
-            for (let i = 1; i < poly.count; i++) {
-                let gv = lTg.mulVector(poly.vertices[i], 1);
-                if (gv.x < res.min.x)
-                    res.min.x = gv.x;
-                else if (gv.x > res.max.x)
-                    res.max.x = gv.x;
-                if (gv.y < res.min.y)
-                    res.min.y = gv.y;
-                else if (gv.y > res.max.y)
-                    res.max.y = gv.y;
-            }
-            return res;
-        default:
-            throw "Not supported shape";
+    if (b instanceof Circle) {
+        let cmInGlobal = b.localToGlobal.mulVector(b.centerOfMass, 1);
+        return {
+            min: new Vector2(cmInGlobal.x - b.radius, cmInGlobal.y - b.radius),
+            max: new Vector2(cmInGlobal.x + b.radius, cmInGlobal.y + b.radius)
+        };
+    }
+    else if (b instanceof Polygon) {
+        const lTg = b.localToGlobal;
+        let res = { min: lTg.mulVector(b.vertices[0], 1), max: lTg.mulVector(b.vertices[0], 1) };
+        for (let i = 1; i < b.count; i++) {
+            let gv = lTg.mulVector(b.vertices[i], 1);
+            if (gv.x < res.min.x)
+                res.min.x = gv.x;
+            else if (gv.x > res.max.x)
+                res.max.x = gv.x;
+            if (gv.y < res.min.y)
+                res.min.y = gv.y;
+            else if (gv.y > res.max.y)
+                res.max.y = gv.y;
+        }
+        return res;
+    }
+    else {
+        throw "Not supported shape";
     }
 }
 export function testCollideAABB(a, b) {
@@ -46,7 +44,7 @@ export function testCollideAABB(a, b) {
 }
 // Returns the fardest vertex in the 'dir' direction
 function support(b, dir) {
-    if (b.shape == Shape.Polygon && b instanceof Polygon) {
+    if (b instanceof Polygon) {
         let idx = 0;
         let maxValue = dir.dot(b.vertices[idx]);
         for (let i = 1; i < b.vertices.length; i++) {
@@ -58,7 +56,7 @@ function support(b, dir) {
         }
         return { vertex: b.vertices[idx], index: idx };
     }
-    else if (b.shape == Shape.Circle && b instanceof Circle) {
+    else if (b instanceof Circle) {
         return { vertex: dir.normalized().mulS(b.radius), index: -1 };
     }
     else {
@@ -144,25 +142,23 @@ function findFarthestEdge(b, dir) {
     let curr = farthest.vertex;
     let idx = farthest.index;
     let localToGlobal = b.localToGlobal;
-    switch (b.shape) {
-        case Shape.Circle:
-            {
-                curr = localToGlobal.mulVector(curr, 1);
-                let tangent = new Vector2(-dir.y, dir.x);
-                tangent = tangent.mulS(0.5);
-                return new Edge(curr.subV(tangent), curr.addV(tangent));
-            }
-        case Shape.Polygon:
-            {
-                let p = b;
-                let prev = p.vertices[(idx - 1 + p.count) % p.count];
-                let next = p.vertices[(idx + 1) % p.count];
-                let e1 = curr.subV(prev).normalized();
-                let e2 = curr.subV(next).normalized();
-                let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
-                curr = localToGlobal.mulVector(curr, 1);
-                return w ? new Edge(localToGlobal.mulVector(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector(next, 1));
-            }
+    if (b instanceof Circle) {
+        curr = localToGlobal.mulVector(curr, 1);
+        let tangent = dir.normal;
+        return new Edge(curr, curr.addV(tangent));
+    }
+    else if (b instanceof Polygon) {
+        let p = b;
+        let prev = p.vertices[(idx - 1 + p.count) % p.count];
+        let next = p.vertices[(idx + 1) % p.count];
+        let e1 = curr.subV(prev).normalized();
+        let e2 = curr.subV(next).normalized();
+        let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
+        curr = localToGlobal.mulVector(curr, 1);
+        return w ? new Edge(localToGlobal.mulVector(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector(next, 1));
+    }
+    else {
+        throw "Not supported shape";
     }
 }
 function clipEdge(edge, p, dir, remove = false) {
@@ -194,7 +190,9 @@ function findContactPoints(n, a, b) {
     let ref = edgeA;
     let inc = edgeB;
     let flip = false;
-    if (Math.abs(edgeA.dir.dot(n)) >= Math.abs(edgeB.dir.dot(n))) {
+    let aPerp = Math.abs(edgeA.dir.dot(n));
+    let bPerp = Math.abs(edgeB.dir.dot(n));
+    if (aPerp > bPerp) {
         ref = edgeB;
         inc = edgeA;
         flip = true;
@@ -205,13 +203,34 @@ function findContactPoints(n, a, b) {
     let contactPoints;
     // If two points are closer than threshold, merge them into one point.
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
-        contactPoints = [inc.midPoint];
+        contactPoints = [inc.p1];
     else
         contactPoints = [inc.p1, inc.p2];
     return contactPoints;
 }
 // Returns contact data if collide, otherwise returns null
 export function detectCollision(a, b) {
+    // Circle vs. Circle collision
+    if (a instanceof Circle && b instanceof Circle) {
+        let d = Util.squared_distance(a.position, b.position);
+        let r2 = a.radius + b.radius;
+        if (d > r2 * r2)
+            return null;
+        else {
+            d = Math.sqrt(d);
+            let contactNormal = b.position.subV(a.position).normalized();
+            let contactPoint = a.position.addV(contactNormal.mulS(a.radius));
+            let penetrationDepth = (r2 - d);
+            if (contactNormal.dot(new Vector2(0, -1)) < 0) {
+                let tmp = a;
+                a = b;
+                b = tmp;
+                contactNormal.invert();
+            }
+            let contact = new ContactManifold(a, b, [contactPoint], penetrationDepth, contactNormal);
+            return contact;
+        }
+    }
     // Broad Phase
     let boundingBoxA = createAABB(a);
     let boundingBoxB = createAABB(b);
@@ -250,7 +269,7 @@ export function detectCollision(a, b) {
             epaResult.contactNormal.invert();
         }
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
-        let contact = new ContactManifold(a, b, contactPoints, epaResult.penetrationDepth, epaResult.contactNormal.fixed());
+        let contact = new ContactManifold(a, b, contactPoints, epaResult.penetrationDepth, epaResult.contactNormal);
         return contact;
     }
 }

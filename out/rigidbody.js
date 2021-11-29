@@ -2,23 +2,17 @@ import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
-export var Shape;
-(function (Shape) {
-    Shape[Shape["Circle"] = 0] = "Circle";
-    Shape[Shape["Polygon"] = 1] = "Polygon";
-})(Shape || (Shape = {}));
 export var Type;
 (function (Type) {
     Type[Type["Ground"] = 0] = "Ground";
     Type[Type["Normal"] = 1] = "Normal";
 })(Type || (Type = {}));
 export class RigidBody extends Entity {
-    constructor(shape, type, friction = 0.7, restitution = 0.001) {
+    constructor(type, friction = 0.7, restitution = 0.001) {
         super();
         this._force = new Vector2(0, 0);
         this._torque = 0;
         this.id = -1;
-        this.shape = shape;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this._cm = new Vector2(0, 0);

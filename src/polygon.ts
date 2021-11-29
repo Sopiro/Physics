@@ -1,4 +1,4 @@
-import { RigidBody, Shape, Type } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 
 export class Polygon extends RigidBody
@@ -7,7 +7,7 @@ export class Polygon extends RigidBody
 
     constructor(vertices: Vector2[], type: Type = Type.Normal, resetPosition: boolean = true)
     {
-        super(Shape.Polygon, type);
+        super(type);
 
         this.vertices = vertices;
 

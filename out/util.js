@@ -1,6 +1,6 @@
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
-import { Shape, Type } from "./rigidbody.js";
+import { Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
@@ -90,22 +90,21 @@ export function calculateCircleInertia(r, mass) {
 }
 export function checkInside(b, p) {
     let localP = b.globalToLocal.mulVector(p, 1);
-    switch (b.shape) {
-        case Shape.Circle:
-            return localP.length <= b.radius;
-        case Shape.Polygon:
-            {
-                let poly = b;
-                let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
-                for (let i = 1; i < poly.vertices.length; i++) {
-                    let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
-                    if (dir * nDir < 0)
-                        return false;
-                }
-                return true;
-            }
-        default:
-            throw "Not supported shape";
+    if (b instanceof Circle) {
+        return localP.length <= b.radius;
+    }
+    else if (b instanceof Polygon) {
+        let poly = b;
+        let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
+        for (let i = 1; i < poly.vertices.length; i++) {
+            let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
+            if (dir * nDir < 0)
+                return false;
+        }
+        return true;
+    }
+    else {
+        throw "Not supported shape";
     }
 }
 // Cantor pairing function, ((N, N) -> N) mapping function

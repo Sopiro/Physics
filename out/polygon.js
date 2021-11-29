@@ -1,7 +1,7 @@
-import { RigidBody, Shape, Type } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 export class Polygon extends RigidBody {
     constructor(vertices, type = Type.Normal, resetPosition = true) {
-        super(Shape.Polygon, type);
+        super(type);
         this.vertices = vertices;
         for (let i = 0; i < this.count; i++) {
             this.centerOfMass.x += this.vertices[i].x;

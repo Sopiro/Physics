@@ -1,6 +1,6 @@
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
-import { RigidBody, Shape, Type } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 
@@ -146,26 +146,27 @@ export function checkInside(b: RigidBody, p: Vector2): boolean
 {
     let localP = b.globalToLocal.mulVector(p, 1);
 
-    switch (b.shape)
+    if (b instanceof Circle)
     {
-        case Shape.Circle:
-            return localP.length <= (b as Circle).radius;
-        case Shape.Polygon:
-            {
-                let poly = b as Polygon;
+        return localP.length <= (b as Circle).radius;
+    }
+    else if (b instanceof Polygon)
+    {
+        let poly = b as Polygon;
 
-                let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
+        let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
 
-                for (let i = 1; i < poly.vertices.length; i++)
-                {
-                    let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
-                    if (dir * nDir < 0)
-                        return false
-                }
-                return true;
-            }
-        default:
-            throw "Not supported shape";
+        for (let i = 1; i < poly.vertices.length; i++)
+        {
+            let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
+            if (dir * nDir < 0)
+                return false
+        }
+        return true;
+    }
+    else
+    {
+        throw "Not supported shape";
     }
 }
 

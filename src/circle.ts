@@ -1,4 +1,4 @@
-import { RigidBody, Shape, Type } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import * as Util from "./util.js";
 
 export class Circle extends RigidBody
@@ -7,7 +7,7 @@ export class Circle extends RigidBody
 
     constructor(radius: number, type: Type = Type.Normal)
     {
-        super(Shape.Circle, type);
+        super(type);
 
         this.radius = radius;
         this.inertia = Util.calculateCircleInertia(radius, this.mass);
