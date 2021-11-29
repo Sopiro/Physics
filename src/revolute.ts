@@ -24,6 +24,10 @@ export class RevoluteJoint extends Joint
 
     override prepare(delta: number)
     {
+        // Calculate Jacobian J and effective mass M
+        // J = [-I, -cross(ra), I, cross(rb)]
+        // M = J · M^-1 · J^t
+
         this.ra = this.bodyA.localToGlobal.mulVector(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector(this.localAnchorB, 0);
 
@@ -57,8 +61,9 @@ export class RevoluteJoint extends Joint
 
     override solve()
     {
-        // Calculate corrective impulse: λ
-        // λ = (J * M^-1 * J^t)^-1 * -(Jv+b)
+        // Calculate corrective impulse: Pc
+        // Pc = J^t * λ (λ: lagrangian multiplier)
+        // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
         let jv: Vector2 = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra)));
@@ -74,6 +79,9 @@ export class RevoluteJoint extends Joint
 
     protected override applyImpulse(impulse: Vector2)
     {
+        // V2 = V2' + M^-1 ⋅ Pc
+        // Pc = J^t ⋅ λ
+        
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(impulse.mulS(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(impulse);
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(impulse.mulS(this.bodyB.inverseMass));

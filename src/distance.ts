@@ -30,6 +30,10 @@ export class DistanceJoint extends Joint
 
     override prepare(delta: number): void
     {
+        // Calculate Jacobian J and effective mass M
+        // J = [-n, -n·cross(ra), n, n·cross(rb)] ( n = (anchorB-anchorA) / ||anchorB-anchorA|| )
+        // M = J · M^-1 · J^t
+
         this.ra = this.bodyA.localToGlobal.mulVector(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector(this.localAnchorB, 0);
 
@@ -60,8 +64,9 @@ export class DistanceJoint extends Joint
 
     override solve(): void
     {
-        // Calculate corrective impulse: λ
-        // λ = (J * M^-1 * J^t)^-1 * -(Jv+b)
+        // Calculate corrective impulse: Pc
+        // Pc = J^t · λ (λ: lagrangian multiplier)
+        // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
         let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
@@ -76,9 +81,12 @@ export class DistanceJoint extends Joint
 
     protected override applyImpulse(impulse: number): void
     {
+        // V2 = V2' + M^-1 ⋅ Pc
+        // Pc = J^t ⋅ λ
+
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(impulse * this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(this.ra.normal) * impulse * this.bodyA.inverseInertia;
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(impulse, this.ra)) * this.bodyA.inverseInertia;
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(impulse * this.bodyB.inverseMass));
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(this.rb.normal) * impulse * this.bodyB.inverseInertia;
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(impulse, this.rb)) * this.bodyB.inverseInertia;
     }
 }

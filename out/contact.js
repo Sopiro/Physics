@@ -18,7 +18,10 @@ class ContactConstraintSolver {
         this.ra = this.contactPoint.subV(this.a.localToGlobal.mulVector(this.a.centerOfMass, 1));
         this.rb = this.contactPoint.subV(this.b.localToGlobal.mulVector(this.b.centerOfMass, 1));
     }
-    init(dir, constraintType, delta) {
+    prepare(dir, constraintType, delta) {
+        // Calculate Jacobian J and effective mass M
+        // J = [-dir, -ra × dir, dir, rb × dir] (dir: Contact vector, normal or tangent)
+        // M = J · M^-1 · J^t
         this.constraintType = constraintType;
         this.beta = Settings.positionCorrectionBeta;
         this.restitution = this.a.restitution * this.b.restitution;
@@ -50,6 +53,9 @@ class ContactConstraintSolver {
             this.applyImpulse(this.impulseSum);
     }
     solve(friendNormal) {
+        // Calculate corrective impulse: Pc
+        // Pc = J^t * λ (λ: lagrangian multiplier)
+        // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
         // Jacobian * velocity vector
         let jv = +this.jacobian.va.dot(this.a.linearVelocity)
             + this.jacobian.wa * this.a.angularVelocity
@@ -84,6 +90,8 @@ class ContactConstraintSolver {
         this.applyImpulse(impulse);
     }
     applyImpulse(impulse) {
+        // V2 = V2' + M^-1 ⋅ Pc
+        // Pc = J^t ⋅ λ
         this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * impulse));
         this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * impulse;
         this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * impulse));
@@ -107,8 +115,8 @@ export class ContactManifold extends Constraint {
     }
     prepare(delta) {
         for (let i = 0; i < this.numContacts; i++) {
-            this.solversN[i].init(this.contactNormal, ConstraintType.Normal, delta);
-            this.solversT[i].init(this.contactTangent, ConstraintType.Tangent, delta);
+            this.solversN[i].prepare(this.contactNormal, ConstraintType.Normal, delta);
+            this.solversT[i].prepare(this.contactTangent, ConstraintType.Tangent, delta);
         }
     }
     solve() {
