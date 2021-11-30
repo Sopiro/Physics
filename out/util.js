@@ -82,11 +82,11 @@ export function clamp(value, min, max) {
 export function cross(scalar, vector) {
     return new Vector2(-scalar * vector.y, scalar * vector.x);
 }
-export function calculateBoxInertia(w, h, mass) {
-    return (w * w + h * h) * mass / 12;
+export function calculateBoxInertia(width, height, mass) {
+    return (width * width + height * height) * mass / 12;
 }
-export function calculateCircleInertia(r, mass) {
-    return mass * r * r / 2.0;
+export function calculateCircleInertia(radius, mass) {
+    return mass * radius * radius / 2.0;
 }
 export function checkInside(b, p) {
     let localP = b.globalToLocal.mulVector(p, 1);

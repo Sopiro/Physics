@@ -132,14 +132,14 @@ export function cross(scalar: number, vector: Vector2): Vector2
     return new Vector2(-scalar * vector.y, scalar * vector.x);
 }
 
-export function calculateBoxInertia(w: number, h: number, mass: number): number
+export function calculateBoxInertia(width: number, height: number, mass: number): number
 {
-    return (w * w + h * h) * mass / 12;
+    return (width * width + height * height) * mass / 12;
 }
 
-export function calculateCircleInertia(r: number, mass: number): number
+export function calculateCircleInertia(radius: number, mass: number): number
 {
-    return mass * r * r / 2.0;
+    return mass * radius * radius / 2.0;
 }
 
 export function checkInside(b: RigidBody, p: Vector2): boolean

@@ -75,10 +75,14 @@ function demo4(game: Game, world: World): void
     updateSetting("g", true);
     world.register(ground);
 
-    let seesaw = new Box(600, 10, Type.Ground);
+    let seesaw = new Box(600, 10);
     seesaw.position = new Vector2(0, 45);
+    seesaw.mass = 10;
     seesaw.inertia = Util.calculateBoxInertia(600, 10, 10);
     world.register(seesaw);
+
+    let j =  new RevoluteJoint(ground, seesaw, seesaw.position);
+    world.register(j);
 
     let b: RigidBody = new Circle(20);
     b.position = new Vector2(-250, 100);
