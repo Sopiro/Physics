@@ -1,4 +1,5 @@
 import { Vector2 } from "./math.js";
+import * as Util from "./util.js";
 export class Edge {
     constructor(p1, p2) {
         this.p1 = p1.copy();
@@ -12,7 +13,7 @@ export class Edge {
         return this.p2.subV(this.p1).length;
     }
     get normal() {
-        return this.dir.normal;
+        return Util.cross(1, this.dir);
     }
     get midPoint() {
         return new Vector2((this.p1.x + this.p2.x) / 2.0, (this.p1.y + this.p2.y) / 2.0);

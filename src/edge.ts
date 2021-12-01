@@ -1,4 +1,5 @@
 import { Vector2 } from "./math.js";
+import * as Util from "./util.js";
 
 export class Edge
 {
@@ -24,7 +25,7 @@ export class Edge
 
     get normal()
     {
-        return this.dir.normal;
+        return Util.cross(1, this.dir);
     }
 
     get midPoint()

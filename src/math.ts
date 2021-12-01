@@ -70,11 +70,6 @@ export class Vector2
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    get normal():Vector2
-    {
-        return new Vector2(-this.y, this.x);
-    }
-
     dot(v: Vector2): number
     {
         return this.x * v.x + this.y * v.y;

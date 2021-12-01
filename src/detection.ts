@@ -228,7 +228,7 @@ function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
     if (b instanceof Circle)
     {
         curr = localToGlobal.mulVector(curr, 1);
-        let tangent = dir.normal;
+        let tangent = Util.cross(1, dir);
 
         return new Edge(curr, curr.addV(tangent));
     }

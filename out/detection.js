@@ -144,7 +144,7 @@ function findFarthestEdge(b, dir) {
     let localToGlobal = b.localToGlobal;
     if (b instanceof Circle) {
         curr = localToGlobal.mulVector(curr, 1);
-        let tangent = dir.normal;
+        let tangent = Util.cross(1, dir);
         return new Edge(curr, curr.addV(tangent));
     }
     else if (b instanceof Polygon) {
