@@ -17,15 +17,28 @@ export class DistanceJoint extends Joint
     private bias!: number;
     private impulseSum: number = 0;
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2, anchorB: Vector2, length: number = -1)
+    private beta;
+    private gamma; // Softness
+
+    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2, anchorB: Vector2, length: number = -1,
+        frequency = 15, dampingRatio = 1.0, mass = -1)
     {
         super(bodyA, bodyB);
         this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchorB, 1);
-        if (length < 0)
-            this.length = anchorB.subV(anchorA).length;
-        else
-            this.length = length;
+        this.length = length <= 0 ? anchorB.subV(anchorA).length : length;
+
+        if (mass <= 0) mass = bodyB.mass;
+        if (frequency <= 0) frequency = 0.01;
+        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
+
+        let omega = 2 * Math.PI * frequency;
+        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
+        let k = mass * omega * omega; // Spring constant
+        let h = Settings.fixedDeltaTime;
+
+        this.beta = h * k / (d + h * k);
+        this.gamma = 1 / ((d + h * k) * h);
     }
 
     override prepare(delta: number): void
@@ -46,22 +59,20 @@ export class DistanceJoint extends Joint
 
         let k = this.bodyA.inverseMass + this.bodyB.inverseMass
             + this.bodyA.inverseInertia * this.n.cross(this.ra) * this.n.cross(this.ra)
-            + this.bodyB.inverseInertia * this.n.cross(this.rb) * this.n.cross(this.rb);
+            + this.bodyB.inverseInertia * this.n.cross(this.rb) * this.n.cross(this.rb)
+            + this.gamma;
 
-        this.m = 1 / k;
+        this.m = 1.0 / k;
 
         let error = (u.length - this.length);
 
         if (Settings.positionCorrection)
-            this.bias = error * Settings.positionCorrectionBeta / delta;
+            this.bias = error * this.beta / delta;
         else
-            this.bias = 0;
+            this.bias = 0.0;
 
         if (Settings.warmStarting)
-        {
-            this.impulseSum *= 0.5;
             this.applyImpulse(this.impulseSum);
-        }
     }
 
     override solve(): void
@@ -73,7 +84,9 @@ export class DistanceJoint extends Joint
         let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
 
-        let lambda = -(jv + this.bias) * this.m;
+        // Check out below for the reason why the (accumulated impulse * gamma) term is on the right hand side
+        // https://pybullet.org/Bullet/phpBB3/viewtopic.php?f=4&t=1354
+        let lambda = this.m * -(jv + this.bias + this.impulseSum * this.gamma);
 
         this.applyImpulse(lambda);
 

@@ -326,4 +326,49 @@ function demo13(game, world) {
         }
     }
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13];
+Reflect.set(demo14, "SimulationName", "Spring test");
+function demo14(game, world) {
+    updateSetting("g", false);
+    let b1 = new Box(30, 600, Type.Ground);
+    b1.position.y = Settings.height / 2;
+    world.register(b1);
+    let b2 = new Box(30, 30);
+    b2.position.x = 300;
+    b2.position.y = Settings.height / 2 + 200;
+    world.register(b2);
+    let j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 1, 0);
+    world.register(j);
+    b2 = new Box(30, 30);
+    b2.position.x = 300;
+    b2.position.y = Settings.height / 2;
+    world.register(b2);
+    j = new DistanceJoint(b1, b2, b1.position, b2.position, 200, 1, 0.2);
+    world.register(j);
+    b2 = new Box(30, 30);
+    b2.position.x = 300;
+    b2.position.y = Settings.height / 2 - 200;
+    world.register(b2);
+    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 1, 0.7);
+    world.register(j);
+    b2 = new Box(30, 30);
+    b2.position.x = -300;
+    b2.position.y = Settings.height / 2 + 200;
+    world.register(b2);
+    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 0.5, 0.2);
+    world.register(j);
+    b2 = new Box(30, 30);
+    b2.position.x = -300;
+    b2.position.y = Settings.height / 2;
+    world.register(b2);
+    let halfLife = 1;
+    let frequency = -Math.log(0.5) / (halfLife * Math.PI * 2);
+    j = new DistanceJoint(b1, b2, b1.position, b2.position, 200, frequency, 1);
+    world.register(j);
+    b2 = new Box(30, 30);
+    b2.position.x = -300;
+    b2.position.y = Settings.height / 2 - 200;
+    world.register(b2);
+    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 2, 0.01);
+    world.register(j);
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14];
