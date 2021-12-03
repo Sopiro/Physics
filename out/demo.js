@@ -213,16 +213,14 @@ function demo10(game, world) {
     let gap = 10;
     let b1 = new Box(sizeW, sizeH);
     b1.position = new Vector2(xStart - (gap + sizeW), yStart);
-    b1.mass = 1;
     world.register(b1);
     let j = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
     world.register(j);
-    for (let i = 1; i < 15; i++) {
+    for (let i = 1; i < 12; i++) {
         let b2 = new Box(sizeW, sizeH);
         b2.position = new Vector2(xStart - (gap + sizeW) * (i + 1), yStart);
-        b2.mass = 1;
         world.register(b2);
-        j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart));
+        j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart), 8, 0.5);
         // j = new DistanceJoint(b1, b2, b1.position.subV(new Vector2(sizeW / 2, 0)), b2.position.addV(new Vector2(sizeW / 2, 0)));
         world.register(j);
         j.drawAnchor = false;
@@ -237,31 +235,38 @@ function demo11(game, world) {
     let xStart = -500;
     let yStart = 400;
     let gap = 10;
-    let sizeX = 30;
-    let sizeY = 15;
+    let pillarWidth = 30;
+    let sizeX = 50;
+    let sizeY = sizeX * 0.25;
+    let pillar = new Box(pillarWidth, yStart, Type.Ground);
+    pillar.position = new Vector2(xStart - pillarWidth - gap, yStart / 2 + 20);
+    world.register(pillar);
     let b1 = new Box(sizeX, sizeY);
+    b1.mass = 10;
     b1.position = new Vector2(xStart, yStart + groundStart);
     world.register(b1);
-    let pillar = new Box(sizeX, yStart, Type.Ground);
-    pillar.position = new Vector2(xStart - sizeX - gap, yStart / 2 + 20);
-    world.register(pillar);
-    let j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 0)));
+    // let j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
+    let j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 5, 1.0);
+    j.drawConnectionLine = false;
     j.drawAnchor = false;
     world.register(j);
     for (let i = 1; i < xStart * -2 / (sizeX + gap); i++) {
         let b2 = new Box(sizeX, sizeY);
+        b2.mass = 10;
         b2.position = new Vector2(xStart + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
-        j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 0)), b2.position.addV(new Vector2(-sizeX / 2, 0)));
-        // j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2));
+        // j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 0)), b2.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
+        j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 5, 1.0);
         j.drawAnchor = false;
         world.register(j);
         b1 = b2;
     }
-    pillar = new Box(sizeX, yStart, Type.Ground);
+    pillar = new Box(pillarWidth, yStart, Type.Ground);
     pillar.position = new Vector2(-(xStart), yStart / 2 + 20);
     world.register(pillar);
-    j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 0)));
+    // j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 0)), -1, 3, 1.0);
+    j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 5, 1.0);
+    j.drawConnectionLine = false;
     j.drawAnchor = false;
     world.register(j);
 }

@@ -88,7 +88,7 @@ export class Game
             this.camera.scale.x += Input.mouseScroll.y * 0.1;
             this.camera.scale.y += Input.mouseScroll.y * 0.1;
 
-            if(this.camera.scale.x < 0.1)
+            if (this.camera.scale.x < 0.1)
             {
                 this.camera.scale.x = 0.1;
                 this.camera.scale.y = 0.1;

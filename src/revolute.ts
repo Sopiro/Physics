@@ -15,11 +15,27 @@ export class RevoluteJoint extends Joint
     private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2();
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2)
+    private beta;
+    private gamma; // Softness
+
+    constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2,
+        frequency = 15, dampingRatio = 1.0, mass = -1)
     {
         super(bodyA, bodyB);
         this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchor, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchor, 1);
+
+        if (mass <= 0) mass = bodyB.mass;
+        if (frequency <= 0) frequency = 0.01;
+        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
+
+        let omega = 2 * Math.PI * frequency;
+        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
+        let k = mass * omega * omega; // Spring constant
+        let h = Settings.fixedDeltaTime;
+
+        this.beta = h * k / (d + h * k);
+        this.gamma = 1 / ((d + h * k) * h);
     }
 
     override prepare(delta: number)
@@ -43,6 +59,9 @@ export class RevoluteJoint extends Joint
         k.m11 = this.bodyA.inverseMass + this.bodyB.inverseMass
             + this.bodyA.inverseInertia * this.ra.x * this.ra.x + this.bodyB.inverseInertia * this.rb.x * this.rb.x;
 
+        k.m00 += this.gamma;
+        k.m11 += this.gamma;
+
         this.m = k.inverted();
 
         let pa = this.bodyA.position.addV(this.ra);
@@ -51,7 +70,7 @@ export class RevoluteJoint extends Joint
         let error = pb.subV(pa);
 
         if (Settings.positionCorrection)
-            this.bias = error.mulS(Settings.positionCorrectionBeta / delta);
+            this.bias = error.mulS(this.beta / delta);
         else
             this.bias = new Vector2(0, 0);
 
@@ -69,7 +88,7 @@ export class RevoluteJoint extends Joint
             .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra)));
 
         // You don't have to clamp the impulse. It's equality constraint.
-        let lambda = this.m.mulVector(jv.addV(this.bias).inverted());
+        let lambda = this.m.mulVector(jv.addV(this.bias).addV(this.impulseSum.mulS(this.gamma)).inverted());
 
         this.applyImpulse(lambda);
 
@@ -81,7 +100,7 @@ export class RevoluteJoint extends Joint
     {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
-        
+
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(lambda.mulS(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda);
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(lambda.mulS(this.bodyB.inverseMass));
