@@ -77,10 +77,11 @@ export class World {
     }
     register(r, passTest = false) {
         if (r instanceof RigidBody) {
-            r.id = World.bid++;
+            r.id = World.uid++;
             this.bodies.push(r);
         }
         else if (r instanceof Joint) {
+            r.id = World.uid++;
             if (r.bodyA.id == -1 || r.bodyB.id == -1)
                 throw "You should register the rigid bodies before registering the joint";
             if (passTest)
@@ -105,7 +106,7 @@ export class World {
         this.manifolds = [];
         this.passTestSet.clear();
         this.manifoldMap.clear();
-        World.bid = 0;
+        World.uid = 0;
     }
     get numBodies() {
         return this.bodies.length;
@@ -114,4 +115,4 @@ export class World {
         return this.joints.length;
     }
 }
-World.bid = 0;
+World.uid = 0;

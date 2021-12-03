@@ -4,5 +4,6 @@ export class Joint extends Constraint {
         super(bodyA, bodyB);
         this.drawAnchor = true;
         this.drawConnectionLine = true;
+        this.id = -1;
     }
 }

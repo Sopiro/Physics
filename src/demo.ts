@@ -311,102 +311,47 @@ function demo11(game: Game, world: World): void
     let sizeY = sizeX * 0.25;
 
     let pillar = new Box(pillarWidth, yStart, Type.Ground);
-    pillar.position = new Vector2(xStart - pillarWidth - gap, yStart / 2 + 20);
+    pillar.position = new Vector2(xStart, yStart / 2 + 20);
     world.register(pillar);
 
     let b1 = new Box(sizeX, sizeY);
     b1.mass = 10;
-    b1.position = new Vector2(xStart, yStart + groundStart);
+    b1.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap, yStart + groundStart);
     world.register(b1);
 
     // let j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
-    let j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 5, 1.0);
+    let j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 7, 1.0);
     j.drawConnectionLine = false;
     j.drawAnchor = false;
     world.register(j);
 
-    for (let i = 1; i < xStart * -2 / (sizeX + gap); i++)
+    for (let i = 1; i + 1 < xStart * -2 / (sizeX + gap); i++)
     {
         let b2 = new Box(sizeX, sizeY);
         b2.mass = 10;
-        b2.position = new Vector2(xStart + (gap + sizeX) * i, yStart + groundStart);
+        b2.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
 
         // j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 0)), b2.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
-        j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 5, 1.0);
+        j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 7, 1.0);
         j.drawAnchor = false;
         world.register(j);
         b1 = b2;
     }
 
     pillar = new Box(pillarWidth, yStart, Type.Ground);
-    pillar.position = new Vector2(-(xStart), yStart / 2 + 20);
+    pillar.position = new Vector2(-xStart, yStart / 2 + 20);
     world.register(pillar);
 
     // j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 0)), -1, 3, 1.0);
-    j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 5, 1.0);
+    j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 7, 1.0);
     j.drawConnectionLine = false;
     j.drawAnchor = false;
     world.register(j);
 }
 
-Reflect.set(demo12, "SimulationName", "Interactive demo");
+Reflect.set(demo12, "SimulationName", "Circle stacking");
 function demo12(game: Game, world: World): void
-{
-    updateSetting("g", true);
-    world.register(ground);
-
-    // let pillar = new Box(30, 400, Type.Ground);
-    // pillar.position = new Vector2(-300, 400 / 2 + 20);
-    // world.register(pillar);
-
-    let c1 = new Circle(30);
-    c1.friction = 1.0;
-    c1.position.x = -100;
-    c1.position.y = 200;
-    world.register(c1);
-
-    let c2 = new Circle(30);
-    c2.friction = 1.0;
-    c2.position.x = 100;
-    c2.position.y = 200;
-    world.register(c2);
-
-    let b = new Polygon([new Vector2(-110, 0), new Vector2(-110, 80), new Vector2(20, 80), new Vector2(110, 20), new Vector2(110, 0)]);
-    b.position.y = 250;
-    world.register(b);
-
-    let j1 = new RevoluteJoint(c1, b, c1.position);
-    world.register(j1, true);
-    let j2 = new RevoluteJoint(c2, b, c2.position);
-    world.register(j2, true);
-
-    let start = 50;
-    let size = 50;
-    let gap = 5;
-
-    for (let i = 0; i < 12; i++)
-    {
-        let b = new Box(size, size);
-        b.mass = 0.5;
-        b.position = new Vector2(1600 + Util.random(-1.5, 1.5), start + i * (size + gap));
-        world.register(b);
-    }
-
-    game.camera.position = new Vector2(900, 400);
-    game.camera.scale = new Vector2(2, 2);
-
-    game.demoCallback = () =>
-    {
-        if (Input.isKeyDown("q"))
-            c1.addTorque(c1.inertia * 10);
-        if (Input.isKeyDown("e"))
-            c1.addTorque(c1.inertia * -10);
-    };
-}
-
-Reflect.set(demo13, "SimulationName", "Circle stacking");
-function demo13(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -432,8 +377,8 @@ function demo13(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo14, "SimulationName", "Spring test");
-function demo14(game: Game, world: World): void
+Reflect.set(demo13, "SimulationName", "Spring test");
+function demo13(game: Game, world: World): void
 {
     updateSetting("g", false);
 
@@ -493,24 +438,5 @@ function demo14(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo15, "SimulationName", "Grab joint");
-function demo15(game: Game, world: World): void
-{
-    updateSetting("g", true);
-    world.register(ground);
-
-    let b1 = new Box(30, 30);
-    b1.position.y = 100;
-    world.register(b1);
-
-    let j = new GrabJoint(b1, b1.position.addV(new Vector2(10, 10)), new Vector2(100, 500));
-    world.register(j);
-
-    game.demoCallback = () =>
-    {
-        j.target = game.cursorPos;
-    }
-}
-
 export const demos: ((game: Game, world: World) => void)[] =
-    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15];
+    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13];

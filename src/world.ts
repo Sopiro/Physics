@@ -10,7 +10,7 @@ type Registrable = RigidBody | Joint;
 
 export class World
 {
-    private static bid = 0;
+    private static uid = 0;
     public manifoldMap: Map<number, ContactManifold> = new Map();
     public passTestSet: Set<number> = new Set();
 
@@ -114,10 +114,11 @@ export class World
     {
         if (r instanceof RigidBody)
         {
-            r.id = World.bid++;
+            r.id = World.uid++;
             this.bodies.push(r);
         } else if (r instanceof Joint)
         {
+            r.id = World.uid++;
             if (r.bodyA.id == -1 || r.bodyB.id == -1)
                 throw "You should register the rigid bodies before registering the joint";
 
@@ -152,7 +153,7 @@ export class World
         this.manifolds = [];
         this.passTestSet.clear();
         this.manifoldMap.clear();
-        World.bid = 0;
+        World.uid = 0;
     }
 
     get numBodies(): number

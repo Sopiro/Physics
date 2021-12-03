@@ -7,7 +7,7 @@ import { World } from "./world.js";
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
-import { GenerationShape, Settings, updateSetting } from "./settings.js";
+import { GenerationShape, MouseMode, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
@@ -54,8 +54,10 @@ export class Game {
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
         this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
-        this.cursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
-        this.cursorPos = this.camera.transform.mulVector(this.cursorPos, 1);
+        let tmpCursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
+        tmpCursorPos = this.camera.transform.mulVector(tmpCursorPos, 1);
+        this.cursorPos.x = tmpCursorPos.x;
+        this.cursorPos.y = tmpCursorPos.y;
         if (Input.isScrolling()) {
             this.camera.scale.x += Input.mouseScroll.y * 0.1;
             this.camera.scale.y += Input.mouseScroll.y * 0.1;
@@ -81,12 +83,17 @@ export class Game {
         }
         if (this.grabBody && !this.cameraMove) {
             if (Input.isMouseReleased()) {
-                let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
-                let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
-                let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
-                    mulVector(this.targetBody.centerOfMass, 1)).cross(force);
-                this.targetBody.addForce(force);
-                this.targetBody.addTorque(torque);
+                if (Settings.mode == MouseMode.Force) {
+                    let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
+                    let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
+                    let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
+                        mulVector(this.targetBody.centerOfMass, 1)).cross(force);
+                    this.targetBody.addForce(force);
+                    this.targetBody.addTorque(torque);
+                }
+                else if (Settings.mode == MouseMode.Grab) {
+                    this.world.joints.splice(this.world.joints.length - 1, 1);
+                }
                 this.grabBody = false;
             }
         }
@@ -104,6 +111,11 @@ export class Game {
                     skipGeneration = true;
                     break;
                 }
+            }
+            if (skipGeneration && Settings.mode == MouseMode.Grab) {
+                let bind = Settings.grabCenter ? this.targetBody.position : this.cursorPos.copy();
+                let j = new GrabJoint(this.targetBody, bind, this.cursorPos);
+                this.world.register(j);
             }
             if (!skipGeneration && !this.cameraMove) {
                 let nb;
@@ -197,8 +209,11 @@ export class Game {
                 r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5);
             });
         }
-        if (this.grabBody)
-            r.drawVectorP(this.targetBody.localToGlobal.mulVector(this.bindPosition, 1), this.cursorPos);
+        if (this.grabBody && (Settings.mode == MouseMode.Force)) {
+            let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
+            r.drawCircleV(bindInGlobal, 3);
+            r.drawVectorP(bindInGlobal, this.cursorPos);
+        }
         this.world.bodies.forEach(b => {
             r.drawBody(b, Settings.indicateCoM);
             if (Settings.showBoundingBox) {

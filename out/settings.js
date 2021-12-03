@@ -6,6 +6,11 @@ export var GenerationShape;
     GenerationShape[GenerationShape["Regular"] = 2] = "Regular";
     GenerationShape[GenerationShape["Random"] = 3] = "Random";
 })(GenerationShape || (GenerationShape = {}));
+export var MouseMode;
+(function (MouseMode) {
+    MouseMode[MouseMode["Grab"] = 0] = "Grab";
+    MouseMode[MouseMode["Force"] = 1] = "Force";
+})(MouseMode || (MouseMode = {}));
 const frequencyRange = { p1: 10, p2: 240 };
 const iterationRange = { p1: 0, p2: 50 };
 const massRange = { p1: 1, p2: 100 };
@@ -32,6 +37,7 @@ export const Settings = {
     indicateCP: false,
     indicateCoM: false,
     showBoundingBox: false,
+    mode: MouseMode.Grab,
     numIterations: 15,
     newBodySettings: {
         shape: GenerationShape.Box,
@@ -81,6 +87,14 @@ indicateContact.addEventListener("click", () => { Settings.indicateCP = indicate
 const showBB = document.querySelector("#showBB");
 showBB.checked = Settings.showBoundingBox;
 showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
+let modeRadios = document.querySelectorAll('input[name="modeRadios"]');
+for (var i = 0; i < 2; i++) {
+    let me = modeRadios[i];
+    me.addEventListener('change', () => {
+        let index = Number(me.value);
+        Settings.mode = index;
+    });
+}
 const frequency = document.querySelector("#frequency");
 frequency.value = String(Util.map(Settings.frequency, frequencyRange.p1, frequencyRange.p2, 0, 100));
 const frequencyLabel = document.querySelector("#frequency_label");
@@ -102,9 +116,9 @@ iteration.addEventListener("input", () => {
     updateSetting("iteration", mappedValue);
 });
 let vertices_div = document.querySelector("#vertices_div");
-let rad = document.querySelectorAll('input[name="shapeRadios"]');
+let shapeRadios = document.querySelectorAll('input[name="shapeRadios"]');
 for (var i = 0; i < 4; i++) {
-    let me = rad[i];
+    let me = shapeRadios[i];
     me.addEventListener('change', () => {
         let index = Number(me.value);
         Settings.newBodySettings.shape = index;

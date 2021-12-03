@@ -8,6 +8,12 @@ export enum GenerationShape
     Random
 }
 
+export enum MouseMode
+{
+    Grab = 0,
+    Force
+}
+
 const frequencyRange: Util.Pair<number, number> = { p1: 10, p2: 240 };
 const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
 const massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
@@ -35,6 +41,7 @@ export const Settings = {
     indicateCP: false,
     indicateCoM: false,
     showBoundingBox: false,
+    mode: MouseMode.Grab,
     numIterations: 15, // Number of resolution iterations
     newBodySettings: {
         shape: GenerationShape.Box,
@@ -95,6 +102,17 @@ const showBB = document.querySelector("#showBB")! as HTMLInputElement;
 showBB.checked = Settings.showBoundingBox;
 showBB.addEventListener("click", () => { Settings.showBoundingBox = showBB.checked; });
 
+let modeRadios = document.querySelectorAll('input[name="modeRadios"]');
+for (var i = 0; i < 2; i++)
+{
+    let me = modeRadios[i] as HTMLInputElement;
+    me.addEventListener('change', () =>
+    {
+        let index = Number(me.value);
+        Settings.mode = index;
+    });
+}
+
 const frequency = document.querySelector("#frequency")! as HTMLInputElement;
 frequency.value = String(Util.map(Settings.frequency, frequencyRange.p1, frequencyRange.p2, 0, 100));
 const frequencyLabel = document.querySelector("#frequency_label")! as HTMLLabelElement;
@@ -123,10 +141,10 @@ iteration.addEventListener("input", () =>
 
 let vertices_div = document.querySelector("#vertices_div")! as HTMLDivElement;
 
-let rad = document.querySelectorAll('input[name="shapeRadios"]');
+let shapeRadios = document.querySelectorAll('input[name="shapeRadios"]');
 for (var i = 0; i < 4; i++)
 {
-    let me = rad[i] as HTMLInputElement;
+    let me = shapeRadios[i] as HTMLInputElement;
     me.addEventListener('change', () =>
     {
         let index = Number(me.value);
