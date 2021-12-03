@@ -8,6 +8,7 @@ import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
 import * as Input from "./input.js";
 import { Polygon } from "./polygon.js";
+import { GrabJoint } from "./grab.js";
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -376,4 +377,17 @@ function demo14(game, world) {
     j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 2, 0.01);
     world.register(j);
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14];
+Reflect.set(demo15, "SimulationName", "Grab joint");
+function demo15(game, world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let b1 = new Box(30, 30);
+    b1.position.y = 100;
+    world.register(b1);
+    let j = new GrabJoint(b1, b1.position.addV(new Vector2(10, 10)), new Vector2(100, 500));
+    world.register(j);
+    game.demoCallback = () => {
+        j.target = game.cursorPos;
+    };
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15];

@@ -12,6 +12,7 @@ import { GenerationShape, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
+import { GrabJoint } from "./grab.js";
 
 export class Game
 {
@@ -300,6 +301,20 @@ export class Game
                 {
                     r.drawCircleV(anchorA, 3);
                     r.drawCircleV(anchorB, 3);
+                }
+            }
+            else if (j instanceof GrabJoint)
+            {
+                let anchor = j.bodyA.localToGlobal.mulVector(j.localAnchor, 1);
+
+                if (j.drawConnectionLine)
+                {
+                    r.drawLineV(anchor, j.target);
+                }
+                if (j.drawAnchor)
+                {
+                    r.drawCircleV(anchor, 3);
+                    r.drawCircleV(j.target, 3);
                 }
             }
         });
