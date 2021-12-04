@@ -112,6 +112,13 @@ export function checkInside(b, p) {
 export function make_pair_natural(a, b) {
     return (a + b) * (a + b + 1) / 2 + b;
 }
+export function separate_pair(p) {
+    let w = Math.floor((Math.sqrt(8 * p + 1) - 1) / 2.0);
+    let t = (w * w + w) / 2.0;
+    let y = p - t;
+    let x = w - y;
+    return { p1: x, p2: y };
+}
 export function squared_distance(a, b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }

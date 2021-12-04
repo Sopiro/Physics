@@ -26,6 +26,7 @@ export class Game
     private grabBody = false;
     private bindPosition!: Vector2;
     private targetBody!: RigidBody;
+    private grabJoint!: GrabJoint;
 
     private currentDemo = 0;
     public demoCallback = () => { };
@@ -135,7 +136,7 @@ export class Game
                 }
                 else if (Settings.mode == MouseMode.Grab)
                 {
-                    this.world.joints.splice(this.world.joints.length - 1, 1);
+                    this.world.unregister(this.grabJoint.id);
                 }
 
                 this.grabBody = false;
@@ -165,8 +166,8 @@ export class Game
             if (skipGeneration && Settings.mode == MouseMode.Grab)
             {
                 let bind = Settings.grabCenter ? this.targetBody.position : this.cursorPos.copy();
-                let j = new GrabJoint(this.targetBody, bind, this.cursorPos);
-                this.world.register(j);
+                this.grabJoint = new GrabJoint(this.targetBody, bind, this.cursorPos);
+                this.world.register(this.grabJoint);
             }
 
             if (!skipGeneration && !this.cameraMove)
@@ -214,7 +215,8 @@ export class Game
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos))
                 {
-                    this.world.unregister(i);
+                    this.world.bodies.splice(i, 1);
+                    b.jointKeys.forEach(jointKey => this.world.unregister(jointKey));
                     break;
                 }
             }

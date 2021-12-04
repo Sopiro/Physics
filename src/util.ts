@@ -177,6 +177,17 @@ export function make_pair_natural(a: number, b: number): number
     return (a + b) * (a + b + 1) / 2 + b;
 }
 
+export function separate_pair(p: number): Pair<number, number>
+{
+    let w = Math.floor((Math.sqrt(8 * p + 1) - 1) / 2.0);
+    let t = (w * w + w) / 2.0;
+
+    let y = p - t;
+    let x = w - y;
+
+    return { p1: x, p2: y };
+}
+
 export function squared_distance(a: Vector2, b: Vector2): number
 {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);

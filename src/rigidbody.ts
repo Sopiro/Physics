@@ -26,6 +26,7 @@ export class RigidBody extends Entity
     public readonly type: Type;
 
     public id: number = -1;
+    public jointKeys: number[] = []; // id of the joints containing this body
 
     constructor(type: Type, friction = 0.7, restitution = 0.001)
     {

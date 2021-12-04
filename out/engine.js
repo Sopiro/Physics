@@ -9,6 +9,8 @@ export class Engine {
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
         this.gfx = this.cvs.getContext("2d");
+        this.gfx.font = "24px system-ui";
+        this.gfx.fillText("Loading...", 6, 24);
         this.frameCounterElement = document.querySelector(".frame_counter");
         this.renderer = new Renderer(this.gfx);
         this.game = new Game();
@@ -29,7 +31,7 @@ export class Engine {
             this.render();
         }
         else {
-            this.gfx.font = "48px verdana";
+            this.gfx.font = "48px system-ui";
             this.gfx.fillText("PAUSE", 4, 40);
         }
         window.requestAnimationFrame(this.run.bind(this));

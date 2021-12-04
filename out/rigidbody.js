@@ -13,6 +13,7 @@ export class RigidBody extends Entity {
         this._force = new Vector2(0, 0);
         this._torque = 0;
         this.id = -1;
+        this.jointKeys = []; // id of the joints containing this body
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this._cm = new Vector2(0, 0);

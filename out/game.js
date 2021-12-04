@@ -92,7 +92,7 @@ export class Game {
                     this.targetBody.addTorque(torque);
                 }
                 else if (Settings.mode == MouseMode.Grab) {
-                    this.world.joints.splice(this.world.joints.length - 1, 1);
+                    this.world.jointMap.delete(this.grabJoint.id);
                 }
                 this.grabBody = false;
             }
@@ -114,8 +114,8 @@ export class Game {
             }
             if (skipGeneration && Settings.mode == MouseMode.Grab) {
                 let bind = Settings.grabCenter ? this.targetBody.position : this.cursorPos.copy();
-                let j = new GrabJoint(this.targetBody, bind, this.cursorPos);
-                this.world.register(j);
+                this.grabJoint = new GrabJoint(this.targetBody, bind, this.cursorPos);
+                this.world.register(this.grabJoint);
             }
             if (!skipGeneration && !this.cameraMove) {
                 let nb;
@@ -152,7 +152,8 @@ export class Game {
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos)) {
-                    this.world.unregister(i);
+                    this.world.bodies.splice(i, 1);
+                    b.jointKeys.forEach(jointKey => this.world.jointMap.delete(jointKey));
                     break;
                 }
             }
@@ -221,7 +222,7 @@ export class Game {
                 r.drawAABB(aabb);
             }
         });
-        this.world.joints.forEach(j => {
+        this.world.jointMap.forEach(j => {
             if (j instanceof RevoluteJoint) {
                 let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
                 let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);

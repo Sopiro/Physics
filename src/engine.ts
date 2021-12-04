@@ -19,6 +19,9 @@ export class Engine
         this.cvs.setAttribute("height", Settings.height.toString());
 
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
+        this.gfx.font = "24px system-ui";
+        this.gfx.fillText("Loading...", 6, 24);
+        
         this.frameCounterElement = document.querySelector(".frame_counter");
 
         this.renderer = new Renderer(this.gfx);
@@ -49,7 +52,7 @@ export class Engine
         }
         else
         {
-            this.gfx.font = "48px verdana";
+            this.gfx.font = "48px system-ui";
             this.gfx.fillText("PAUSE", 4, 40);
         }
 

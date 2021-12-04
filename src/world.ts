@@ -11,12 +11,12 @@ type Registrable = RigidBody | Joint;
 export class World
 {
     private static uid = 0;
-    public manifoldMap: Map<number, ContactManifold> = new Map();
-    public passTestSet: Set<number> = new Set();
 
     public bodies: RigidBody[] = [];
     public joints: Joint[] = [];
     public manifolds: ContactManifold[] = [];
+    public manifoldMap: Map<number, ContactManifold> = new Map();
+    public passTestSet: Set<number> = new Set();
 
     update(delta: number): void
     {
@@ -45,6 +45,7 @@ export class World
                 let b = this.bodies[j];
 
                 if (a.type == Type.Ground && b.type == Type.Ground) continue;
+
                 let key = Util.make_pair_natural(a.id, b.id);
                 if (this.passTestSet.has(key)) continue;
 
@@ -112,38 +113,57 @@ export class World
 
     register(r: Registrable, passTest: boolean = false): void
     {
+        r.id = World.uid++;
+
         if (r instanceof RigidBody)
         {
-            r.id = World.uid++;
             this.bodies.push(r);
         } else if (r instanceof Joint)
         {
-            r.id = World.uid++;
             if (r.bodyA.id == -1 || r.bodyB.id == -1)
                 throw "You should register the rigid bodies before registering the joint";
 
-            if (passTest) this.passTestSet.add(Util.make_pair_natural(r.bodyA.id, r.bodyB.id));
+            if (passTest)
+                this.addPassTestPair(r.bodyA, r.bodyB);
+
+            r.bodyA.jointKeys.push(r.id);
+            r.bodyB.jointKeys.push(r.id);
+
             this.joints.push(r);
         }
     }
 
-    unregister(index: number): void
+    unregister(id: number): boolean
     {
-        let b = this.bodies.splice(index, 1)[0];
-
-        let newJoints: Joint[] = [];
-
         for (let i = 0; i < this.joints.length; i++)
         {
             let j = this.joints[i];
-
-            if (b.id == j.bodyA.id || b.id == j.bodyB.id)
-                continue;
-
-            newJoints.push(j);
+            if (j.id == id)
+            {
+                this.joints.splice(i, 1);
+                return true;
+            }
         }
 
-        this.joints = newJoints;
+        for (let i = 0; i < this.bodies.length; i++)
+        {
+            let b = this.bodies[i];
+
+            if (b.id == id)
+            {
+                this.bodies.splice(i, 1);
+                b.jointKeys.forEach(jointKey => this.unregister(jointKey));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    addPassTestPair(bodyA: RigidBody, bodyB: RigidBody)
+    {
+        this.passTestSet.add(Util.make_pair_natural(bodyA.id, bodyB.id));
+        this.passTestSet.add(Util.make_pair_natural(bodyB.id, bodyA.id));
     }
 
     clear(): void
