@@ -92,7 +92,7 @@ export class Game {
                     this.targetBody.addTorque(torque);
                 }
                 else if (Settings.mode == MouseMode.Grab) {
-                    this.world.jointMap.delete(this.grabJoint.id);
+                    this.world.unregister(this.grabJoint.id);
                 }
                 this.grabBody = false;
             }
@@ -153,7 +153,7 @@ export class Game {
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos)) {
                     this.world.bodies.splice(i, 1);
-                    b.jointKeys.forEach(jointKey => this.world.jointMap.delete(jointKey));
+                    b.jointKeys.forEach(jointKey => this.world.unregister(jointKey));
                     break;
                 }
             }
@@ -222,7 +222,7 @@ export class Game {
                 r.drawAABB(aabb);
             }
         });
-        this.world.jointMap.forEach(j => {
+        this.world.joints.forEach(j => {
             if (j instanceof RevoluteJoint) {
                 let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
                 let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);

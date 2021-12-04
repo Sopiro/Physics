@@ -7,9 +7,9 @@ import { Joint } from "./joint.js";
 export class World {
     constructor() {
         this.bodies = [];
+        this.joints = [];
         this.manifolds = [];
         this.manifoldMap = new Map();
-        this.jointMap = new Map();
         this.passTestSet = new Set();
     }
     update(delta) {
@@ -52,7 +52,7 @@ export class World {
         this.manifolds.forEach(manifold => {
             manifold.prepare(delta);
         });
-        this.jointMap.forEach(joint => {
+        this.joints.forEach(joint => {
             joint.prepare(delta);
         });
         // Iteratively resolve violated velocity constraint
@@ -60,7 +60,7 @@ export class World {
             this.manifolds.forEach(manifold => {
                 manifold.solve();
             });
-            this.jointMap.forEach(joint => {
+            this.joints.forEach(joint => {
                 joint.solve();
             });
         }
@@ -87,17 +87,22 @@ export class World {
                 this.addPassTestPair(r.bodyA, r.bodyB);
             r.bodyA.jointKeys.push(r.id);
             r.bodyB.jointKeys.push(r.id);
-            this.jointMap.set(r.id, r);
+            this.joints.push(r);
         }
     }
     unregister(id) {
-        if (this.jointMap.delete(id))
-            return true;
+        for (let i = 0; i < this.joints.length; i++) {
+            let j = this.joints[i];
+            if (j.id == id) {
+                this.joints.splice(i, 1);
+                return true;
+            }
+        }
         for (let i = 0; i < this.bodies.length; i++) {
             let b = this.bodies[i];
             if (b.id == id) {
                 this.bodies.splice(i, 1);
-                b.jointKeys.forEach(jointKey => this.jointMap.delete(jointKey));
+                b.jointKeys.forEach(jointKey => this.unregister(jointKey));
                 return true;
             }
         }
@@ -109,7 +114,7 @@ export class World {
     }
     clear() {
         this.bodies = [];
-        this.jointMap.clear();
+        this.joints = [];
         this.manifolds = [];
         this.passTestSet.clear();
         this.manifoldMap.clear();
@@ -119,7 +124,7 @@ export class World {
         return this.bodies.length;
     }
     get numJoints() {
-        return this.jointMap.size;
+        return this.joints.length;
     }
 }
 World.uid = 0;

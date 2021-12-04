@@ -47,7 +47,7 @@ export function createRandomConvexBody(radius = 50, numVertices = -1) {
     }));
     return res;
 }
-export function createRegularPolygon(numVertices, radius = 50) {
+export function createRegularPolygon(numVertices, radius) {
     if (numVertices < 3)
         numVertices = Math.trunc(random(3, 11));
     let angleStart = Math.PI / 2;

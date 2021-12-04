@@ -12,6 +12,7 @@ import { Game } from "./game.js";
 import * as Input from "./input.js";
 import { Polygon } from "./polygon.js";
 import { GrabJoint } from "./grab.js";
+import { AngleJoint } from "./angle.js";
 
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
@@ -300,6 +301,7 @@ function demo11(game: Game, world: World): void
     updateSetting("g", true);
     world.register(ground);
 
+    let revoluteBridge = true;
     let groundStart = 20;
 
     let xStart = -500;
@@ -319,11 +321,23 @@ function demo11(game: Game, world: World): void
     b1.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap, yStart + groundStart);
     world.register(b1);
 
-    // let j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
-    let j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 7, 1.0);
-    j.drawConnectionLine = false;
-    j.drawAnchor = false;
-    world.register(j);
+    let j!: Joint;
+
+    if (revoluteBridge)
+    {
+        j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 7, 1.0);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j);
+    } else
+    {
+        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
+        j.drawAnchor = false;
+        world.register(j);
+        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
+        j.drawAnchor = false;
+        world.register(j);
+    }
 
     for (let i = 1; i + 1 < xStart * -2 / (sizeX + gap); i++)
     {
@@ -332,10 +346,22 @@ function demo11(game: Game, world: World): void
         b2.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
 
-        // j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 0)), b2.position.addV(new Vector2(-sizeX / 2, 0)), -1, 3, 1.0);
-        j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 7, 1.0);
-        j.drawAnchor = false;
-        world.register(j);
+        if(revoluteBridge)
+        {
+            j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 7, 1.0);
+            j.drawAnchor = false;
+            world.register(j);
+        }
+        else
+        {
+            j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 3)), b2.position.addV(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
+            j.drawAnchor = false;
+            world.register(j);
+            j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, -3)), b2.position.addV(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
+            j.drawAnchor = false;
+            world.register(j);
+        }
+
         b1 = b2;
     }
 
@@ -343,11 +369,22 @@ function demo11(game: Game, world: World): void
     pillar.position = new Vector2(-xStart, yStart / 2 + 20);
     world.register(pillar);
 
-    // j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-sizeX / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 0)), -1, 3, 1.0);
-    j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 7, 1.0);
-    j.drawConnectionLine = false;
-    j.drawAnchor = false;
-    world.register(j);
+    if(revoluteBridge)
+    {
+        j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 7, 1.0);
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j);
+    }
+    else
+    {
+        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 3)), -1, 3, 1.0);
+        j.drawAnchor = false;
+        world.register(j);
+        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, -3)), -1, 3, 1.0);
+        j.drawAnchor = false;
+        world.register(j);
+    }
 }
 
 Reflect.set(demo12, "SimulationName", "Circle stacking");
@@ -438,5 +475,26 @@ function demo13(game: Game, world: World): void
     world.register(j);
 }
 
+Reflect.set(demo14, "SimulationName", "Angle joint test");
+function demo14(game: Game, world: World): void
+{
+    updateSetting("g", false);
+
+    world.register(ground);
+
+    let b = Util.createRegularPolygon(7, 25);
+    b.position = new Vector2(-100, 400);
+    world.register(b);
+    let c = new Circle(25);
+    c.position = new Vector2(100, 400);
+    world.register(c);
+
+    c.addAngularVelocity(10);
+    let j: Joint = new AngleJoint(b, c);
+    world.register(j);
+    j = new DistanceJoint(b, c);
+    world.register(j);
+}
+
 export const demos: ((game: Game, world: World) => void)[] =
-    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13];
+    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14];

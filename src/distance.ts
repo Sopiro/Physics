@@ -20,7 +20,7 @@ export class DistanceJoint extends Joint
     private beta;
     private gamma; // Softness
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2, anchorB: Vector2, length: number = -1,
+    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position, length: number = -1,
         frequency = 15, dampingRatio = 1.0, mass = -1)
     {
         super(bodyA, bodyB);

@@ -2,7 +2,7 @@ import { Joint } from "./joint.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class DistanceJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA, anchorB, length = -1, frequency = 15, dampingRatio = 1.0, mass = -1) {
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, length = -1, frequency = 15, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.impulseSum = 0;
         this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchorA, 1);
