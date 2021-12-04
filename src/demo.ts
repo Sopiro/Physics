@@ -346,7 +346,7 @@ function demo11(game: Game, world: World): void
         b2.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
 
-        if(revoluteBridge)
+        if (revoluteBridge)
         {
             j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 7, 1.0);
             j.drawAnchor = false;
@@ -369,7 +369,7 @@ function demo11(game: Game, world: World): void
     pillar.position = new Vector2(-xStart, yStart / 2 + 20);
     world.register(pillar);
 
-    if(revoluteBridge)
+    if (revoluteBridge)
     {
         j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 7, 1.0);
         j.drawConnectionLine = false;
@@ -483,6 +483,7 @@ function demo14(game: Game, world: World): void
     world.register(ground);
 
     let b = Util.createRegularPolygon(7, 25);
+    b.rotation = Math.PI;
     b.position = new Vector2(-100, 400);
     world.register(b);
     let c = new Circle(25);

@@ -9,8 +9,6 @@ export class Engine {
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
         this.gfx = this.cvs.getContext("2d");
-        this.gfx.font = "24px system-ui";
-        this.gfx.fillText("Loading...", 6, 24);
         this.frameCounterElement = document.querySelector(".frame_counter");
         this.renderer = new Renderer(this.gfx);
         this.game = new Game();

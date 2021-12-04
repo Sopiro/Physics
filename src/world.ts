@@ -97,17 +97,17 @@ export class World
         }
 
         // Update the positions using the new velocities
-        this.bodies.forEach((c, index) =>
+        this.bodies.forEach((b, index) =>
         {
-            c.position.x += c.linearVelocity.x * delta;
-            c.position.y += c.linearVelocity.y * delta;
-            c.rotation += c.angularVelocity * delta;
+            b.position.x += b.linearVelocity.x * delta;
+            b.position.y += b.linearVelocity.y * delta;
+            b.rotation += b.angularVelocity * delta;
 
-            if (c.position.y < Settings.deadBottom)
+            if (b.position.y < Settings.deadBottom)
                 this.bodies.splice(index, 1);
 
-            c.force.clear();
-            c.torque = 0;
+            b.force.clear();
+            b.torque = 0;
         });
     }
 

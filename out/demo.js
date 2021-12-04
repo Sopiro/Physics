@@ -367,6 +367,7 @@ function demo14(game, world) {
     updateSetting("g", false);
     world.register(ground);
     let b = Util.createRegularPolygon(7, 25);
+    b.rotation = Math.PI;
     b.position = new Vector2(-100, 400);
     world.register(b);
     let c = new Circle(25);

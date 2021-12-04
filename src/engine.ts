@@ -17,10 +17,7 @@ export class Engine
         this.cvs = document.querySelector("#canvas") as HTMLCanvasElement;
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
-
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
-        this.gfx.font = "24px system-ui";
-        this.gfx.fillText("Loading...", 6, 24);
         
         this.frameCounterElement = document.querySelector(".frame_counter");
 

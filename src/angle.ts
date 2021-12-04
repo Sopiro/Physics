@@ -5,14 +5,20 @@ import * as Util from "./util.js";
 
 export class AngleJoint extends Joint
 {
+    private initialAngle;
+    
     private m!: number;
     private impulseSum: number = 0;
+    private bias!: number;
 
+    private beta;
     public gamma; // Softness
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, frequency = Infinity, dampingRatio = 1.0, mass = -1)
+    constructor(bodyA: RigidBody, bodyB: RigidBody, frequency = 60, dampingRatio = 1.0, mass = -1)
     {
         super(bodyA, bodyB);
+
+        this.initialAngle = bodyB.rotation - bodyA.rotation;
 
         if (mass <= 0) mass = bodyB.mass;
         if (frequency <= 0) frequency = 0.01;
@@ -23,6 +29,7 @@ export class AngleJoint extends Joint
         let k = mass * omega * omega; // Spring constant
         let h = Settings.fixedDeltaTime;
 
+        this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
 
@@ -35,6 +42,13 @@ export class AngleJoint extends Joint
         let k = this.bodyA.inverseInertia + this.bodyB.inverseInertia + this.gamma;
 
         this.m = 1.0 / k;
+
+        let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
+
+        if (Settings.positionCorrection)
+            this.bias = error * this.beta / delta;
+        else
+            this.bias = 0;
 
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);
@@ -50,7 +64,7 @@ export class AngleJoint extends Joint
 
         // Check out below for the reason why the (accumulated impulse * gamma) term is on the right hand side
         // https://pybullet.org/Bullet/phpBB3/viewtopic.php?f=4&t=1354
-        let lambda = this.m * -(jv + this.impulseSum * this.gamma);
+        let lambda = this.m * -(jv + this.bias + this.impulseSum * this.gamma);
 
         this.applyImpulse(lambda);
 
