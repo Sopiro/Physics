@@ -203,3 +203,8 @@ export function lerp(left: number, right: number, per: number): number
 {
     return left + (right - left) * per;
 }
+
+export function mid(a: Vector2, b: Vector2): Vector2
+{
+    return new Vector2((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
+}

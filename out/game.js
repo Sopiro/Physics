@@ -12,6 +12,7 @@ import { demos } from "./demo.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
 import { GrabJoint } from "./grab.js";
+import { WeldJoint } from "./weld.js";
 export class Game {
     constructor() {
         this.cursorPos = new Vector2(0, 0);
@@ -255,6 +256,15 @@ export class Game {
                 if (j.drawAnchor) {
                     r.drawCircleV(anchor, 3);
                     r.drawCircleV(j.target, 3);
+                }
+            }
+            else if (j instanceof WeldJoint) {
+                let anchor = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
+                if (j.drawConnectionLine) {
+                    r.drawLineV(j.bodyA.position, j.bodyB.position);
+                }
+                if (j.drawAnchor) {
+                    r.drawCircleV(anchor, 3);
                 }
             }
         });

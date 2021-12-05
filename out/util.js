@@ -129,3 +129,6 @@ export function map(v, left, right, min, max) {
 export function lerp(left, right, per) {
     return left + (right - left) * per;
 }
+export function mid(a, b) {
+    return new Vector2((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
+}

@@ -7,6 +7,7 @@ import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
 import { AngleJoint } from "./angle.js";
+import { WeldJoint } from "./weld.js";
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -379,4 +380,27 @@ function demo14(game, world) {
     j = new DistanceJoint(b, c);
     world.register(j);
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14];
+Reflect.set(demo15, "SimulationName", "Weld joint test");
+function demo15(game, world) {
+    updateSetting("g", true);
+    world.register(ground);
+    for (let i = 0; i < 20; i++) {
+        let start = new Vector2(Util.random(-500, 500), Util.random(50, 700));
+        let rr = Util.random(-0.1, 0.1);
+        let b1 = Util.createRegularPolygon(-1, 25);
+        b1.position = start.addV(new Vector2(-75, 0));
+        world.register(b1);
+        let b2 = new Box(150, 5);
+        b2.position = start;
+        world.register(b2);
+        let b3 = Util.createRegularPolygon(-1, 25);
+        b3.position = start.addV(new Vector2(75, 0));
+        world.register(b3);
+        let j = new WeldJoint(b1, b2);
+        world.register(j, true);
+        j = new WeldJoint(b2, b3);
+        world.register(j, true);
+        b2.rotation = rr;
+    }
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15];
