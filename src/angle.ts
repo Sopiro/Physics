@@ -37,7 +37,7 @@ export class AngleJoint extends Joint
     {
         // Calculate Jacobian J and effective mass M
         // J = [0 -1 0 1]
-        // M = J · M^-1 · J^t
+        // M = (J · M^-1 · J^t)^-1
 
         let k = this.bodyA.inverseInertia + this.bodyB.inverseInertia + this.gamma;
 

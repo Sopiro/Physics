@@ -42,7 +42,7 @@ export class RevoluteJoint extends Joint
     {
         // Calculate Jacobian J and effective mass M
         // J = [-I, -cross(ra), I, cross(rb)]
-        // M = J · M^-1 · J^t
+        // M = (J · M^-1 · J^t)^-1
 
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);

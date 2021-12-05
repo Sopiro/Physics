@@ -24,7 +24,7 @@ export class GrabJoint extends Joint {
     prepare(delta) {
         // Calculate Jacobian J and effective mass M
         // J = [I, skew(r)]
-        // M = J · M^-1 · J^t
+        // M = (J · M^-1 · J^t)^-1
         this.r = this.bodyA.localToGlobal.mulVector2(this.localAnchor, 0);
         let p = this.bodyA.position.addV(this.r);
         let k = new Matrix2();
@@ -52,6 +52,8 @@ export class GrabJoint extends Joint {
             this.impulseSum = this.impulseSum.addV(lambda);
     }
     applyImpulse(lambda) {
+        // V2 = V2' + M^-1 ⋅ Pc
+        // Pc = J^t ⋅ λ
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.addV(lambda.mulS(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity + this.bodyA.inverseInertia * this.r.cross(lambda);
     }

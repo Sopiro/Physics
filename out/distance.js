@@ -23,7 +23,7 @@ export class DistanceJoint extends Joint {
     prepare(delta) {
         // Calculate Jacobian J and effective mass M
         // J = [-n, -n·cross(ra), n, n·cross(rb)] ( n = (anchorB-anchorA) / ||anchorB-anchorA|| )
-        // M = J · M^-1 · J^t
+        // M = (J · M^-1 · J^t)^-1
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
         let pa = this.bodyA.position.addV(this.ra);

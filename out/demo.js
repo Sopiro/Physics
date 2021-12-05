@@ -14,7 +14,7 @@ Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(game, world) {
     updateSetting("g", true);
     world.register(ground);
-    let b = new Box(40, 40);
+    let b = new Box(40);
     b.position = new Vector2(0, 500);
     b.restitution = 0.7;
     b.angularVelocity = Util.random(-8, 8);
@@ -28,7 +28,7 @@ function demo2(game, world) {
     let size = 30;
     let gap = 5;
     for (let i = 0; i < 12; i++) {
-        let b = new Box(size, size);
+        let b = new Box(size);
         b.position = new Vector2(Util.random(-1.5, 1.5), start + i * (size + gap));
         world.register(b);
     }
@@ -45,7 +45,7 @@ function demo3(game, world) {
     const yStart = 60;
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < rows - y; x++) {
-            let b = new Box(boxSize, boxSize);
+            let b = new Box(boxSize);
             b.position = new Vector2(xStart + y * (boxSize + xGap) / 2 + x * (boxSize + xGap), yStart + y * (boxSize + yGap));
             world.register(b);
         }
@@ -65,12 +65,12 @@ function demo4(game, world) {
     let b = new Circle(20);
     b.position = new Vector2(-250, 100);
     world.register(b);
-    b = new Box(20, 20);
+    b = new Box(20);
     b.position = new Vector2(-280, 100);
     b.mass = 1;
     b.inertia = Util.calculateBoxInertia(20, 20, 1);
     world.register(b);
-    b = new Box(50, 50);
+    b = new Box(50);
     b.position = new Vector2(260, 500);
     b.mass = 30;
     b.inertia = Util.calculateBoxInertia(30, 30, 30);
@@ -185,7 +185,7 @@ function demo8(game, world) {
     let yStart = 620;
     let size = 30;
     for (let i = 0; i < count; i++) {
-        let b = new Box(size, size);
+        let b = new Box(size);
         b.position = new Vector2(xStart + gap * i, yStart);
         let attenuation = (count - i) / count;
         b.restitution = 1.0 - attenuation * attenuation;
@@ -196,7 +196,7 @@ Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(game, world) {
     updateSetting("g", true);
     world.register(ground);
-    let b = new Box(30, 30);
+    let b = new Box(30);
     b.position = new Vector2(-300, 500);
     world.register(b);
     let j = new RevoluteJoint(ground, b, new Vector2(0, 500));
@@ -324,31 +324,31 @@ function demo13(game, world) {
     let b1 = new Box(30, 600, Type.Ground);
     b1.position.y = Settings.height / 2;
     world.register(b1);
-    let b2 = new Box(30, 30);
+    let b2 = new Box(30);
     b2.position.x = 300;
     b2.position.y = Settings.height / 2 + 200;
     world.register(b2);
     let j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 1, 0);
     world.register(j);
-    b2 = new Box(30, 30);
+    b2 = new Box(30);
     b2.position.x = 300;
     b2.position.y = Settings.height / 2;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position, b2.position, 200, 1, 0.2);
     world.register(j);
-    b2 = new Box(30, 30);
+    b2 = new Box(30);
     b2.position.x = 300;
     b2.position.y = Settings.height / 2 - 200;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 1, 0.7);
     world.register(j);
-    b2 = new Box(30, 30);
+    b2 = new Box(30);
     b2.position.x = -300;
     b2.position.y = Settings.height / 2 + 200;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 0.5, 0.2);
     world.register(j);
-    b2 = new Box(30, 30);
+    b2 = new Box(30);
     b2.position.x = -300;
     b2.position.y = Settings.height / 2;
     world.register(b2);
@@ -356,7 +356,7 @@ function demo13(game, world) {
     let frequency = -Math.log(0.5) / (halfLife * Math.PI * 2);
     j = new DistanceJoint(b1, b2, b1.position, b2.position, 200, frequency, 1);
     world.register(j);
-    b2 = new Box(30, 30);
+    b2 = new Box(30);
     b2.position.x = -300;
     b2.position.y = Settings.height / 2 - 200;
     world.register(b2);
@@ -365,7 +365,7 @@ function demo13(game, world) {
 }
 Reflect.set(demo14, "SimulationName", "Angle joint test");
 function demo14(game, world) {
-    updateSetting("g", false);
+    updateSetting("g", true);
     world.register(ground);
     let b = Util.createRegularPolygon(7, 25);
     b.rotation = Math.PI;

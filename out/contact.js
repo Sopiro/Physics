@@ -21,7 +21,7 @@ class ContactConstraintSolver {
     prepare(dir, constraintType, delta) {
         // Calculate Jacobian J and effective mass M
         // J = [-dir, -ra × dir, dir, rb × dir] (dir: Contact vector, normal or tangent)
-        // M = J · M^-1 · J^t
+        // M = (J · M^-1 · J^t)^-1
         this.constraintType = constraintType;
         this.beta = Settings.positionCorrectionBeta;
         this.restitution = this.a.restitution * this.b.restitution;
