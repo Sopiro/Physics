@@ -1,4 +1,4 @@
-import { Vector2 } from "./math.js";
+import { Vector2, Vector3 } from "./math.js";
 import { RigidBody } from "./rigidbody.js";
 
 export abstract class Constraint
@@ -14,5 +14,5 @@ export abstract class Constraint
 
     public abstract prepare(delta: number): void;
     public abstract solve(): void;
-    protected abstract applyImpulse(impulse: Vector2 | number): void;
+    protected abstract applyImpulse(impulse: number | Vector2 | Vector3): void;
 }

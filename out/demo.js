@@ -59,7 +59,7 @@ function demo4(game, world) {
     seesaw.mass = 10;
     seesaw.inertia = Util.calculateBoxInertia(600, 10, 10);
     world.register(seesaw);
-    let j = new RevoluteJoint(ground, seesaw, seesaw.position);
+    let j = new RevoluteJoint(ground, seesaw, seesaw.position, 45, 1.0);
     world.register(j);
     let b = new Circle(20);
     b.position = new Vector2(-250, 100);

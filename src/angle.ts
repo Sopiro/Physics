@@ -5,7 +5,7 @@ import * as Util from "./util.js";
 
 export class AngleJoint extends Joint
 {
-    private initialAngle;
+    private initialAngle: number;
     
     private m!: number;
     private impulseSum: number = 0;

@@ -5,8 +5,8 @@ export class DistanceJoint extends Joint {
     constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, length = -1, frequency = 15, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.impulseSum = 0;
-        this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchorA, 1);
-        this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchorB, 1);
+        this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
+        this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
         this.length = length <= 0 ? anchorB.subV(anchorA).length : length;
         if (mass <= 0)
             mass = bodyB.mass;
@@ -24,8 +24,8 @@ export class DistanceJoint extends Joint {
         // Calculate Jacobian J and effective mass M
         // J = [-n, -n·cross(ra), n, n·cross(rb)] ( n = (anchorB-anchorA) / ||anchorB-anchorA|| )
         // M = J · M^-1 · J^t
-        this.ra = this.bodyA.localToGlobal.mulVector(this.localAnchorA, 0);
-        this.rb = this.bodyB.localToGlobal.mulVector(this.localAnchorB, 0);
+        this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
+        this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
         let pa = this.bodyA.position.addV(this.ra);
         let pb = this.bodyB.position.addV(this.rb);
         let u = pb.subV(pa);

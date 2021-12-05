@@ -55,7 +55,7 @@ export class Game {
         this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
         let tmpCursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
-        tmpCursorPos = this.camera.transform.mulVector(tmpCursorPos, 1);
+        tmpCursorPos = this.camera.transform.mulVector2(tmpCursorPos, 1);
         this.cursorPos.x = tmpCursorPos.x;
         this.cursorPos.y = tmpCursorPos.y;
         if (Input.isScrolling()) {
@@ -84,10 +84,10 @@ export class Game {
         if (this.grabBody && !this.cameraMove) {
             if (Input.isMouseReleased()) {
                 if (Settings.mode == MouseMode.Force) {
-                    let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
+                    let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
                     let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
                     let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
-                        mulVector(this.targetBody.centerOfMass, 1)).cross(force);
+                        mulVector2(this.targetBody.centerOfMass, 1)).cross(force);
                     this.targetBody.addForce(force);
                     this.targetBody.addTorque(torque);
                 }
@@ -106,7 +106,7 @@ export class Game {
                     if (Settings.grabCenter)
                         this.bindPosition = b.centerOfMass;
                     else
-                        this.bindPosition = b.globalToLocal.mulVector(this.cursorPos, 1);
+                        this.bindPosition = b.globalToLocal.mulVector2(this.cursorPos, 1);
                     this.targetBody = b;
                     skipGeneration = true;
                     break;
@@ -213,7 +213,7 @@ export class Game {
             });
         }
         if (this.grabBody && (Settings.mode == MouseMode.Force)) {
-            let bindInGlobal = this.targetBody.localToGlobal.mulVector(this.bindPosition, 1);
+            let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
             r.drawCircleV(bindInGlobal, 3);
             r.drawVectorP(bindInGlobal, this.cursorPos);
         }
@@ -226,8 +226,8 @@ export class Game {
         });
         this.world.joints.forEach(j => {
             if (j instanceof RevoluteJoint) {
-                let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
+                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
+                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
                 if (j.drawConnectionLine) {
                     r.drawLineV(anchorA, j.bodyA.position);
                     r.drawLineV(anchorB, j.bodyB.position);
@@ -237,8 +237,8 @@ export class Game {
                 }
             }
             else if (j instanceof DistanceJoint) {
-                let anchorA = j.bodyA.localToGlobal.mulVector(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector(j.localAnchorB, 1);
+                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
+                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
                 if (j.drawConnectionLine) {
                     r.drawLineV(anchorA, anchorB);
                 }
@@ -248,7 +248,7 @@ export class Game {
                 }
             }
             else if (j instanceof GrabJoint) {
-                let anchor = j.bodyA.localToGlobal.mulVector(j.localAnchor, 1);
+                let anchor = j.bodyA.localToGlobal.mulVector2(j.localAnchor, 1);
                 if (j.drawConnectionLine) {
                     r.drawLineV(anchor, j.target);
                 }

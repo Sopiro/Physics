@@ -21,7 +21,7 @@ export class GrabJoint extends Joint
     constructor(body: RigidBody, anchor: Vector2, target: Vector2, frequency = 0.6, dampingRatio = 0.6, mass = -1)
     {
         super(body, body);
-        this.localAnchor = body.globalToLocal.mulVector(anchor, 1);
+        this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
         this.target = target;
         this.length = 0;
 
@@ -44,7 +44,7 @@ export class GrabJoint extends Joint
         // J = [I, skew(r)]
         // M = J · M^-1 · J^t
 
-        this.r = this.bodyA.localToGlobal.mulVector(this.localAnchor, 0);
+        this.r = this.bodyA.localToGlobal.mulVector2(this.localAnchor, 0);
         let p = this.bodyA.position.addV(this.r);
 
         let k = new Matrix2();

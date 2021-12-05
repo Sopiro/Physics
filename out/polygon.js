@@ -24,7 +24,7 @@ export class Polygon extends RigidBody {
         const transform = this.localToGlobal;
         let res = [];
         for (let i = 0; i < this.count; i++)
-            res.push(transform.mulVector(this.vertices[i], 1));
+            res.push(transform.mulVector2(this.vertices[i], 1));
         return res;
     }
 }

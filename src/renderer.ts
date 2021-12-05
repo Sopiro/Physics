@@ -58,7 +58,7 @@ export class Renderer
             tv.y -= height / 2.0;
         }
 
-        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
+        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
         this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
@@ -84,7 +84,7 @@ export class Renderer
             tv.y += radius / 2.0;
         }
 
-        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
+        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
@@ -103,8 +103,8 @@ export class Renderer
 
     drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
     {
-        let tv0 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v0, 1), 1);
-        let tv1 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v1, 1), 1);
+        let tv0 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v0, 1), 1);
+        let tv1 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v1, 1), 1);
 
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();

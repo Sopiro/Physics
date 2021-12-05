@@ -9,7 +9,7 @@ import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 export function createAABB(b) {
     if (b instanceof Circle) {
-        let cmInGlobal = b.localToGlobal.mulVector(b.centerOfMass, 1);
+        let cmInGlobal = b.localToGlobal.mulVector2(b.centerOfMass, 1);
         return {
             min: new Vector2(cmInGlobal.x - b.radius, cmInGlobal.y - b.radius),
             max: new Vector2(cmInGlobal.x + b.radius, cmInGlobal.y + b.radius)
@@ -17,9 +17,9 @@ export function createAABB(b) {
     }
     else if (b instanceof Polygon) {
         const lTg = b.localToGlobal;
-        let res = { min: lTg.mulVector(b.vertices[0], 1), max: lTg.mulVector(b.vertices[0], 1) };
+        let res = { min: lTg.mulVector2(b.vertices[0], 1), max: lTg.mulVector2(b.vertices[0], 1) };
         for (let i = 1; i < b.count; i++) {
-            let gv = lTg.mulVector(b.vertices[i], 1);
+            let gv = lTg.mulVector2(b.vertices[i], 1);
             if (gv.x < res.min.x)
                 res.min.x = gv.x;
             else if (gv.x > res.max.x)
@@ -64,12 +64,12 @@ function support(b, dir) {
     }
 }
 function csoSupport(c1, c2, dir) {
-    const localDirP1 = c1.globalToLocal.mulVector(dir, 0);
-    const localDirP2 = c2.globalToLocal.mulVector(dir.mulS(-1), 0);
+    const localDirP1 = c1.globalToLocal.mulVector2(dir, 0);
+    const localDirP2 = c2.globalToLocal.mulVector2(dir.mulS(-1), 0);
     let supportP1 = support(c1, localDirP1).vertex;
     let supportP2 = support(c2, localDirP2).vertex;
-    supportP1 = c1.localToGlobal.mulVector(supportP1, 1);
-    supportP2 = c2.localToGlobal.mulVector(supportP2, 1);
+    supportP1 = c1.localToGlobal.mulVector2(supportP1, 1);
+    supportP2 = c2.localToGlobal.mulVector2(supportP2, 1);
     return {
         support: supportP1.subV(supportP2),
         supportA: supportP1,
@@ -137,13 +137,13 @@ function epa(c1, c2, gjkResult) {
     };
 }
 function findFarthestEdge(b, dir) {
-    let localDir = b.globalToLocal.mulVector(dir, 0);
+    let localDir = b.globalToLocal.mulVector2(dir, 0);
     let farthest = support(b, localDir);
     let curr = farthest.vertex;
     let idx = farthest.index;
     let localToGlobal = b.localToGlobal;
     if (b instanceof Circle) {
-        curr = localToGlobal.mulVector(curr, 1);
+        curr = localToGlobal.mulVector2(curr, 1);
         let tangent = Util.cross(1, dir);
         return new Edge(curr, curr.addV(tangent));
     }
@@ -154,8 +154,8 @@ function findFarthestEdge(b, dir) {
         let e1 = curr.subV(prev).normalized();
         let e2 = curr.subV(next).normalized();
         let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
-        curr = localToGlobal.mulVector(curr, 1);
-        return w ? new Edge(localToGlobal.mulVector(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector(next, 1));
+        curr = localToGlobal.mulVector2(curr, 1);
+        return w ? new Edge(localToGlobal.mulVector2(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector2(next, 1));
     }
     else {
         throw "Not supported shape";

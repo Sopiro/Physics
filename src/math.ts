@@ -540,7 +540,7 @@ export class Matrix3
         return res;
     }
 
-    mulVector(right: Vector2, z: number): Vector2
+    mulVector2(right: Vector2, z: number): Vector2
     {
         let res = new Vector2(0, 0);
 
@@ -550,12 +550,23 @@ export class Matrix3
         return res;
     }
 
+    mulVector3(right: Vector3): Vector3
+    {
+        let res = new Vector3(0, 0, 0);
+
+        res.x = this.m00 * right.x + this.m01 * right.y + this.m02 * right.z;
+        res.y = this.m10 * right.x + this.m11 * right.y + this.m12 * right.z;
+        res.z = this.m20 * right.x + this.m21 * right.y + this.m22 * right.z;
+
+        return res;
+    }
+
     mulVectors(right: Vector2[], z: number): Vector2[]
     {
         let res: Vector2[] = [];
 
         for (let i = 0; i < right.length; i++)
-            res.push(this.mulVector(right[i], 1));
+            res.push(this.mulVector2(right[i], 1));
 
         return res;
     }
@@ -592,6 +603,31 @@ export class Matrix3
         res.m12 = y;
 
         return this.mulMatrix(res);
+    }
+
+    inverted(): Matrix3
+    {
+        let res = new Matrix3();
+
+        let det =
+            this.m00 * (this.m11 * this.m22 - this.m21 * this.m12) -
+            this.m01 * (this.m10 * this.m22 - this.m12 * this.m20) +
+            this.m02 * (this.m10 * this.m21 - this.m11 * this.m20);
+
+        if (det == 0) throw "Determinant 0";
+        let inv_det = 1.0 / det;
+
+        res.m00 = (this.m11 * this.m22 - this.m21 * this.m12) * inv_det;
+        res.m01 = (this.m02 * this.m21 - this.m01 * this.m22) * inv_det;
+        res.m02 = (this.m01 * this.m12 - this.m02 * this.m11) * inv_det;
+        res.m10 = (this.m12 * this.m20 - this.m10 * this.m22) * inv_det;
+        res.m11 = (this.m00 * this.m22 - this.m02 * this.m20) * inv_det;
+        res.m12 = (this.m10 * this.m02 - this.m00 * this.m12) * inv_det;
+        res.m20 = (this.m10 * this.m21 - this.m20 * this.m11) * inv_det;
+        res.m21 = (this.m20 * this.m01 - this.m00 * this.m21) * inv_det;
+        res.m22 = (this.m00 * this.m11 - this.m10 * this.m01) * inv_det;
+
+        return res;
     }
 }
 

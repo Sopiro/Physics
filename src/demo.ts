@@ -83,7 +83,7 @@ function demo4(game: Game, world: World): void
     seesaw.inertia = Util.calculateBoxInertia(600, 10, 10);
     world.register(seesaw);
 
-    let j = new RevoluteJoint(ground, seesaw, seesaw.position);
+    let j = new RevoluteJoint(ground, seesaw, seesaw.position, 45, 1.0);
     world.register(j);
 
     let b: RigidBody = new Circle(20);

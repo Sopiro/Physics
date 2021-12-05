@@ -6,9 +6,9 @@ import { Polygon } from "./polygon.js";
 export function subPolygon(p1, p2) {
     let res = [];
     for (let i = 0; i < p1.count; i++) {
-        let p1v = p1.localToGlobal.mulVector(p1.vertices[i], 1);
+        let p1v = p1.localToGlobal.mulVector2(p1.vertices[i], 1);
         for (let j = 0; j < p2.count; j++) {
-            let p2v = p2.localToGlobal.mulVector(p2.vertices[j], 1);
+            let p2v = p2.localToGlobal.mulVector2(p2.vertices[j], 1);
             res.push(p1v.subV(p2v));
         }
     }
@@ -89,7 +89,7 @@ export function calculateCircleInertia(radius, mass) {
     return mass * radius * radius / 2.0;
 }
 export function checkInside(b, p) {
-    let localP = b.globalToLocal.mulVector(p, 1);
+    let localP = b.globalToLocal.mulVector2(p, 1);
     if (b instanceof Circle) {
         return localP.length <= b.radius;
     }

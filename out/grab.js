@@ -6,7 +6,7 @@ export class GrabJoint extends Joint {
     constructor(body, anchor, target, frequency = 0.6, dampingRatio = 0.6, mass = -1) {
         super(body, body);
         this.impulseSum = new Vector2(0, 0);
-        this.localAnchor = body.globalToLocal.mulVector(anchor, 1);
+        this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
         this.target = target;
         this.length = 0;
         if (mass <= 0)
@@ -25,7 +25,7 @@ export class GrabJoint extends Joint {
         // Calculate Jacobian J and effective mass M
         // J = [I, skew(r)]
         // M = J · M^-1 · J^t
-        this.r = this.bodyA.localToGlobal.mulVector(this.localAnchor, 0);
+        this.r = this.bodyA.localToGlobal.mulVector2(this.localAnchor, 0);
         let p = this.bodyA.position.addV(this.r);
         let k = new Matrix2();
         k.m00 = this.bodyA.inverseMass + this.bodyA.inverseInertia * this.r.y * this.r.y + this.gamma;

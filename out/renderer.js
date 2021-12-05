@@ -31,7 +31,7 @@ export class Renderer {
             tv.x -= width / 2.0;
             tv.y -= height / 2.0;
         }
-        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
+        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
         if (filled)
@@ -48,7 +48,7 @@ export class Renderer {
             tv.x += radius / 2.0;
             tv.y += radius / 2.0;
         }
-        tv = this.cameraTransform.mulVector(this.modelTransform.mulVector(tv, 1), 1);
+        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
         this.gfx.arc(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
@@ -61,8 +61,8 @@ export class Renderer {
         this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
     }
     drawLineV(v0, v1, lineWidth = 1) {
-        let tv0 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v0, 1), 1);
-        let tv1 = this.cameraTransform.mulVector(this.modelTransform.mulVector(v1, 1), 1);
+        let tv0 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v0, 1), 1);
+        let tv1 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v1, 1), 1);
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
         this.gfx.moveTo(Settings.width / 2.0 - 1 + tv0.x, Settings.height / 2.0 - 1 - tv0.y);

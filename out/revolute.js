@@ -6,8 +6,8 @@ export class RevoluteJoint extends Joint {
     constructor(bodyA, bodyB, anchor, frequency = 15, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.impulseSum = new Vector2();
-        this.localAnchorA = this.bodyA.globalToLocal.mulVector(anchor, 1);
-        this.localAnchorB = this.bodyB.globalToLocal.mulVector(anchor, 1);
+        this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);
+        this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchor, 1);
         if (mass <= 0)
             mass = bodyB.mass;
         if (frequency <= 0)
@@ -24,8 +24,8 @@ export class RevoluteJoint extends Joint {
         // Calculate Jacobian J and effective mass M
         // J = [-I, -cross(ra), I, cross(rb)]
         // M = J · M^-1 · J^t
-        this.ra = this.bodyA.localToGlobal.mulVector(this.localAnchorA, 0);
-        this.rb = this.bodyB.localToGlobal.mulVector(this.localAnchorB, 0);
+        this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
+        this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
         let k = new Matrix2();
         k.m00 = this.bodyA.inverseMass + this.bodyB.inverseMass +
             this.bodyA.inverseInertia * this.ra.y * this.ra.y + this.bodyB.inverseInertia * this.rb.y * this.rb.y;
