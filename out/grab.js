@@ -3,7 +3,7 @@ import { Matrix2, Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class GrabJoint extends Joint {
-    constructor(body, anchor, target, frequency = 0.6, dampingRatio = 0.6, mass = -1) {
+    constructor(body, anchor, target, frequency = 0.8, dampingRatio = 0.6, mass = -1) {
         super(body, body);
         this.impulseSum = new Vector2(0, 0);
         this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);

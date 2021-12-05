@@ -384,23 +384,26 @@ Reflect.set(demo15, "SimulationName", "Weld joint test");
 function demo15(game, world) {
     updateSetting("g", true);
     world.register(ground);
-    for (let i = 0; i < 20; i++) {
-        let start = new Vector2(Util.random(-500, 500), Util.random(50, 700));
-        let rr = Util.random(-0.1, 0.1);
-        let b1 = Util.createRegularPolygon(-1, 25);
-        b1.position = start.addV(new Vector2(-75, 0));
+    for (let i = 0; i < 30; i++) {
+        let start = new Vector2(Util.random(-800, 800), Util.random(50, 1500));
+        let rr = Util.random(-0.05, 0.05);
+        let cos = Math.cos(rr);
+        let sin = Math.sin(rr);
+        let b1 = Util.createRegularPolygon(-1, 15);
+        b1.position = start.addV(new Vector2(cos, sin).mulS(-40));
         world.register(b1);
-        let b2 = new Box(150, 5);
+        let b2 = new Box(80, 3);
         b2.position = start;
+        b2.rotation = rr;
         world.register(b2);
-        let b3 = Util.createRegularPolygon(-1, 25);
-        b3.position = start.addV(new Vector2(75, 0));
+        let b3 = Util.createRegularPolygon(-1, 15);
+        b3.position = start.addV(new Vector2(cos, sin).mulS(40));
         world.register(b3);
         let j = new WeldJoint(b1, b2);
         world.register(j, true);
         j = new WeldJoint(b2, b3);
         world.register(j, true);
-        b2.rotation = rr;
+        b2.addVelocity(new Vector2(-b2.position.x, 0));
     }
 }
 export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15];

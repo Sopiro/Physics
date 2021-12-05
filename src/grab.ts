@@ -18,7 +18,7 @@ export class GrabJoint extends Joint
     private beta;
     private gamma; // Softness
 
-    constructor(body: RigidBody, anchor: Vector2, target: Vector2, frequency = 0.6, dampingRatio = 0.6, mass = -1)
+    constructor(body: RigidBody, anchor: Vector2, target: Vector2, frequency = 0.8, dampingRatio = 0.6, mass = -1)
     {
         super(body, body);
         this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
