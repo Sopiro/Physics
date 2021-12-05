@@ -191,7 +191,7 @@ export class Game
                         }
                     case GenerationShape.Regular:
                         {
-                            nb = Util.createRegularPolygon(nbs.numVertices, nbs.size / 2);
+                            nb = Util.createRegularPolygon(nbs.size / 2, nbs.numVertices);
                             break;
                         }
                     case GenerationShape.Random:

@@ -8,11 +8,11 @@ export class AngleJoint extends Joint
     private initialAngle: number;
     
     private m!: number;
-    private impulseSum: number = 0;
     private bias!: number;
+    private impulseSum: number = 0;
 
     private beta;
-    public gamma; // Softness
+    private gamma; // Softness
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, frequency = 60, dampingRatio = 1.0, mass = -1)
     {

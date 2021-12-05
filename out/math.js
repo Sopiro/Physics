@@ -183,14 +183,14 @@ export class Vector4 {
         return new Vector4(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9, Math.round(this.w * 1e9) / 1e9);
     }
     normalize() {
-        const len = this.getLength();
+        const len = this.length;
         this.x /= len;
         this.y /= len;
         this.z /= len;
         this.w /= len;
     }
     normalized() {
-        const len = this.getLength();
+        const len = this.length;
         if (len != 0)
             return this.divS(len);
         else
@@ -205,7 +205,7 @@ export class Vector4 {
     inverted() {
         return new Vector4(this.x * -1, this.y * -1, this.z * -1, this.w * -1);
     }
-    getLength() {
+    get length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
     }
     dot(v) {
@@ -377,12 +377,6 @@ export class Matrix3 {
         res.z = this.m20 * right.x + this.m21 * right.y + this.m22 * right.z;
         return res;
     }
-    mulVectors(right, z) {
-        let res = [];
-        for (let i = 0; i < right.length; i++)
-            res.push(this.mulVector2(right[i], 1));
-        return res;
-    }
     scale(x, y) {
         let scale = new Matrix3();
         scale.m00 = x;
@@ -524,17 +518,7 @@ export class Matrix4 {
         res.z = this.m20 * right.x + this.m21 * right.y + this.m22 * right.z + this.m23 * w;
         return res;
     }
-    mulVectors(right, z) {
-        let res = [];
-        for (let i = 0; i < right.length; i++)
-            res.push(this.mulVector(right[i], 1));
-        return res;
-    }
-    scale(x, y, z) {
-        if (y == undefined && z == undefined) {
-            y = x;
-            z = x;
-        }
+    scale(x, y = x, z = x) {
         let scale = new Matrix4();
         scale.m00 = x;
         scale.m11 = y;

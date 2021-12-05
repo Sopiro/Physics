@@ -9,8 +9,8 @@ export class GrabJoint extends Joint
     public localAnchor: Vector2;
     public length;
     public target: Vector2;
+    
     private r!: Vector2;
-
     private m!: Matrix2;
     private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2(0, 0);

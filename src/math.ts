@@ -297,7 +297,7 @@ export class Vector4
 
     normalize(): void
     {
-        const len = this.getLength();
+        const len = this.length;
 
         this.x /= len;
         this.y /= len;
@@ -307,7 +307,7 @@ export class Vector4
 
     normalized(): Vector4
     {
-        const len = this.getLength();
+        const len = this.length;
 
         if (len != 0)
             return this.divS(len);
@@ -328,7 +328,7 @@ export class Vector4
         return new Vector4(this.x * -1, this.y * -1, this.z * -1, this.w * -1);
     }
 
-    getLength(): number
+    get length(): number
     {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
     }
@@ -561,16 +561,6 @@ export class Matrix3
         return res;
     }
 
-    mulVectors(right: Vector2[], z: number): Vector2[]
-    {
-        let res: Vector2[] = [];
-
-        for (let i = 0; i < right.length; i++)
-            res.push(this.mulVector2(right[i], 1));
-
-        return res;
-    }
-
     scale(x: number, y: number): Matrix3
     {
         let scale = new Matrix3();
@@ -717,25 +707,8 @@ export class Matrix4
         return res;
     }
 
-
-    mulVectors(right: Vector3[], z: number): Vector3[]
+    scale(x: number, y: number = x, z: number = x): Matrix4
     {
-        let res: Vector3[] = [];
-
-        for (let i = 0; i < right.length; i++)
-            res.push(this.mulVector(right[i], 1));
-
-        return res;
-    }
-
-    scale(x: number, y: number, z: number): Matrix4
-    {
-        if (y == undefined && z == undefined)
-        {
-            y = x;
-            z = x;
-        }
-
         let scale = new Matrix4();
         scale.m00 = x;
         scale.m11 = y;

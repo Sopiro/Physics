@@ -81,7 +81,7 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
     return res;
 }
 
-export function createRegularPolygon(numVertices: number, radius: number): RigidBody
+export function createRegularPolygon(radius: number, numVertices: number = -1): RigidBody
 {
     if (numVertices < 3) numVertices = Math.trunc(random(3, 11));
 

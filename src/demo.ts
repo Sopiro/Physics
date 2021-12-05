@@ -483,18 +483,30 @@ function demo14(game: Game, world: World): void
 
     world.register(ground);
 
-    let b = Util.createRegularPolygon(7, 25);
-    b.rotation = Math.PI;
-    b.position = new Vector2(-100, 400);
-    world.register(b);
-    let c = new Circle(25);
+    let b1 = Util.createRegularPolygon(25, 7);
+    b1.rotation = Math.PI;
+    b1.position = new Vector2(-100, 400);
+    world.register(b1);
+    let c: RigidBody = new Circle(25);
     c.position = new Vector2(100, 400);
     world.register(c);
 
     c.addAngularVelocity(10);
-    let j: Joint = new AngleJoint(b, c);
+    let j: Joint = new AngleJoint(b1, c);
     world.register(j);
-    j = new DistanceJoint(b, c);
+    j = new DistanceJoint(b1, c);
+    world.register(j);
+
+    let b2 = new Box(15, 15, Type.Ground);
+    b2.position = new Vector2(400, 600);
+    world.register(b2);
+    c = Util.createRegularPolygon(25, 5);
+    c.position = new Vector2(400, 400);
+    world.register(c);
+    j = new DistanceJoint(b2, c);
+    world.register(j);
+
+    j = new AngleJoint(b1, c);
     world.register(j);
 }
 
@@ -513,7 +525,7 @@ function demo15(game: Game, world: World): void
         let cos = Math.cos(rr);
         let sin = Math.sin(rr);
 
-        let b1 = Util.createRegularPolygon(-1, 15);
+        let b1 = Util.createRegularPolygon(15);
         b1.position = start.addV(new Vector2(cos, sin).mulS(-40));
         world.register(b1);
 
@@ -522,7 +534,7 @@ function demo15(game: Game, world: World): void
         b2.rotation = rr;
         world.register(b2);
 
-        let b3 = Util.createRegularPolygon(-1, 15);
+        let b3 = Util.createRegularPolygon(15);
         b3.position = start.addV(new Vector2(cos, sin).mulS(40));
         world.register(b3);
 
