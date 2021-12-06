@@ -436,6 +436,9 @@ function demo16(game, world) {
     c.position.x = -100;
     c.position.y = 300;
     world.register(c);
+    j = new MaxDistanceJoint(b2, c, 500, undefined, undefined, 1, 0.1);
+    j.drawConnectionLine = false;
+    world.register(j);
     j = new LineJoint(b2, c);
     world.register(j);
     j = new AngleJoint(b1, c);
@@ -462,15 +465,26 @@ Reflect.set(demo17, "SimulationName", "Max distance joint test");
 function demo17(game, world) {
     updateSetting("g", true);
     world.register(ground);
-    let c = new Circle(15, Type.Ground);
+    let c = new Box(30, 30, Type.Ground);
     c.position.y = 500;
     world.register(c);
     let b = Util.createRegularPolygon(25);
-    b.position.y = 50;
+    b.position.y = 150;
+    b.position.x = Util.random(-100, 100);
     world.register(b);
     let j = new MaxDistanceJoint(c, b, 200, undefined, undefined, 0.7, 0.1);
-    world.register(j);
+    world.register(j, true);
     // j = new MaxDistanceJoint(ground, b, 300, undefined, undefined, 1, 0.1);
     // world.register(j)
+    c = new Box(30, 30);
+    c.position.x = -200;
+    c.position.y = 600;
+    world.register(c);
+    b = Util.createRegularPolygon(15);
+    b.position.x = 200;
+    b.position.y = 600;
+    world.register(b);
+    j = new MaxDistanceJoint(c, b, 120, undefined, undefined, 0.7, 0.1);
+    world.register(j);
 }
 export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16, demo17];
