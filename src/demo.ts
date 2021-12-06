@@ -14,6 +14,7 @@ import { Polygon } from "./polygon.js";
 import { GrabJoint } from "./grab.js";
 import { AngleJoint } from "./angle.js";
 import { WeldJoint } from "./weld.js";
+import { LineJoint } from "./line.js";
 
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
@@ -547,5 +548,60 @@ function demo15(game: Game, world: World): void
     }
 }
 
+Reflect.set(demo16, "SimulationName", "Line joint test");
+function demo16(game: Game, world: World): void
+{
+    updateSetting("g", true);
+
+    world.register(ground);
+
+    let b1 = new Box(30);
+    b1.position.y = 500;
+    b1.angularVelocity = 100;
+    world.register(b1);
+
+    let j: Joint = new LineJoint(ground, b1);
+    world.register(j);
+
+    let b2 = new Box(100, 20, Type.Ground);
+    b2.position.x = -300;
+    b2.position.y = 300;
+    world.register(b2);
+
+    let c: RigidBody = Util.createRegularPolygon(25, 3);
+    c.position.x = -100;
+    c.position.y = 300;
+    world.register(c);
+
+    j = new LineJoint(b2, c);
+    world.register(j);
+
+    j = new AngleJoint(b1, c);
+    world.register(j);
+
+    c = new Circle(15);
+    c.position = b2.position.addV(new Vector2(-100, 100));
+    world.register(c);
+
+    j = new LineJoint(b2, c);
+    world.register(j);
+
+    c = new Circle(15);
+    c.position = b2.position.addV(new Vector2(100, 100));
+    world.register(c);
+
+    j = new LineJoint(b2, c);
+    world.register(j);
+
+    let b3 = new Box(30);
+    b3.position = b2.position.addV(new Vector2(0, -100));
+    world.register(b3);
+
+    j = new LineJoint(b2, b3, b2.position, b3.position);
+    world.register(j);
+    j = new AngleJoint(b2, b3, 240);
+    world.register(j);
+}
+
 export const demos: ((game: Game, world: World) => void)[] =
-    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15];
+    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16];
