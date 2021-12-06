@@ -5,7 +5,7 @@ export class Polygon extends RigidBody
 {
     public readonly vertices: Vector2[];
 
-    constructor(vertices: Vector2[], type: Type = Type.Normal, resetPosition: boolean = true)
+    constructor(vertices: Vector2[], type: Type = Type.Dynamic, resetPosition: boolean = true)
     {
         super(type);
 

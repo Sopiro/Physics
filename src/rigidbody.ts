@@ -5,8 +5,8 @@ import * as Util from "./util.js";
 
 export enum Type
 {
-    Ground = 0,
-    Normal
+    Static = 0,
+    Dynamic
 }
 
 export class RigidBody extends Entity
@@ -41,13 +41,13 @@ export class RigidBody extends Entity
 
         switch (this.type)
         {
-            case Type.Ground:
+            case Type.Static:
                 this._mass = Number.MAX_VALUE;
                 this._invMass = 0;
                 this._inertia = Number.MAX_VALUE;
                 this._invInertia = 0;
                 break;
-            case Type.Normal:
+            case Type.Dynamic:
                 this._mass = Settings.newBodySettings.mass;
                 this._invMass = 1 / this._mass;
                 this._inertia = Util.calculateCircleInertia(Settings.newBodySettings.size, this.mass);

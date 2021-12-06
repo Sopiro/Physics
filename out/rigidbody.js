@@ -4,8 +4,8 @@ import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export var Type;
 (function (Type) {
-    Type[Type["Ground"] = 0] = "Ground";
-    Type[Type["Normal"] = 1] = "Normal";
+    Type[Type["Static"] = 0] = "Static";
+    Type[Type["Dynamic"] = 1] = "Dynamic";
 })(Type || (Type = {}));
 export class RigidBody extends Entity {
     constructor(type, friction = 0.7, restitution = 0.001) {
@@ -21,13 +21,13 @@ export class RigidBody extends Entity {
         this._restitution = restitution;
         this.type = type;
         switch (this.type) {
-            case Type.Ground:
+            case Type.Static:
                 this._mass = Number.MAX_VALUE;
                 this._invMass = 0;
                 this._inertia = Number.MAX_VALUE;
                 this._invInertia = 0;
                 break;
-            case Type.Normal:
+            case Type.Dynamic:
                 this._mass = Settings.newBodySettings.mass;
                 this._invMass = 1 / this._mass;
                 this._inertia = Util.calculateCircleInertia(Settings.newBodySettings.size, this.mass);

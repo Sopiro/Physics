@@ -29,7 +29,7 @@ export class World
             b.addAngularVelocity(b.torque * b.inverseInertia * delta);
 
             // Apply gravity 
-            if (b.type != Type.Ground && Settings.applyGravity)
+            if (b.type != Type.Static && Settings.applyGravity)
                 b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * delta));
         });
 
@@ -44,7 +44,7 @@ export class World
             {
                 let b = this.bodies[j];
 
-                if (a.type == Type.Ground && b.type == Type.Ground) continue;
+                if (a.type == Type.Static && b.type == Type.Static) continue;
 
                 let key = Util.make_pair_natural(a.id, b.id);
                 if (this.passTestSet.has(key)) continue;

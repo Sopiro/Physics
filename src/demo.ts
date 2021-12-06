@@ -18,7 +18,7 @@ import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 
-const ground = new Box(Settings.width * 5, 40, Type.Ground);
+const ground = new Box(Settings.width * 5, 40, Type.Static);
 ground.restitution = 0.45;
 
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -188,26 +188,26 @@ function demo7(game: Game, world: World): void
     updateSetting("g", true);
     world.register(ground);
 
-    let b = new Box(600, 10, Type.Ground);
+    let b = new Box(600, 10, Type.Static);
     b.position = new Vector2(-60, 500);
     b.rotation = -0.15;
     b.friction = 1.0;
     world.register(b);
-    b = new Box(600, 10, Type.Ground);
+    b = new Box(600, 10, Type.Static);
     b.position = new Vector2(0, 300);
     b.rotation = 0.15;
     b.friction = 1.0;
     world.register(b);
-    b = new Box(600, 10, Type.Ground);
+    b = new Box(600, 10, Type.Static);
     b.position = new Vector2(-60, 100);
     b.rotation = -0.15;
     b.friction = 1.0;
     world.register(b);
 
-    b = new Box(10, 110, Type.Ground);
+    b = new Box(10, 110, Type.Static);
     b.position = new Vector2(310, 430);
     world.register(b);
-    b = new Box(10, 110, Type.Ground);
+    b = new Box(10, 110, Type.Static);
     b.position = new Vector2(-370, 230);
     world.register(b);
 
@@ -232,7 +232,7 @@ Reflect.set(demo8, "SimulationName", "Restitution test");
 function demo8(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let g = new Box(Settings.width * 2, 20, Type.Ground);
+    let g = new Box(Settings.width * 2, 20, Type.Static);
     g.restitution = 0.7;
     world.register(g);
 
@@ -316,7 +316,7 @@ function demo11(game: Game, world: World): void
     let sizeX = 50;
     let sizeY = sizeX * 0.25;
 
-    let pillar = new Box(pillarWidth, yStart, Type.Ground);
+    let pillar = new Box(pillarWidth, yStart, Type.Static);
     pillar.position = new Vector2(xStart, yStart / 2 + 20);
     world.register(pillar);
 
@@ -369,7 +369,7 @@ function demo11(game: Game, world: World): void
         b1 = b2;
     }
 
-    pillar = new Box(pillarWidth, yStart, Type.Ground);
+    pillar = new Box(pillarWidth, yStart, Type.Static);
     pillar.position = new Vector2(-xStart, yStart / 2 + 20);
     world.register(pillar);
 
@@ -423,7 +423,7 @@ function demo13(game: Game, world: World): void
 {
     updateSetting("g", false);
 
-    let b1 = new Box(30, 600, Type.Ground);
+    let b1 = new Box(30, 600, Type.Static);
     b1.position.y = Settings.height / 2;
     world.register(b1);
 
@@ -500,7 +500,7 @@ function demo14(game: Game, world: World): void
     j = new DistanceJoint(b1, c);
     world.register(j);
 
-    let b2 = new Box(15, 15, Type.Ground);
+    let b2 = new Box(15, 15, Type.Static);
     b2.position = new Vector2(400, 600);
     world.register(b2);
     c = Util.createRegularPolygon(25, 5);
@@ -565,7 +565,7 @@ function demo16(game: Game, world: World): void
     let j: Joint = new LineJoint(ground, b1);
     world.register(j);
 
-    let b2 = new Box(100, 20, Type.Ground);
+    let b2 = new Box(100, 20, Type.Static);
     b2.position.x = -300;
     b2.position.y = 300;
     world.register(b2);
@@ -616,7 +616,7 @@ function demo17(game: Game, world: World): void
 
     world.register(ground);
 
-    let c = new Box(30, 30, Type.Ground);
+    let c = new Box(30, 30, Type.Static);
     c.position.y = 500;
     world.register(c);
 
@@ -652,11 +652,80 @@ function demo18(game: Game, world: World): void
 
     world.register(ground);
 
-    let b = new Box(30);
-    b.position.y = 100;
+    let b0: RigidBody = new Box(30);
+    b0.position.y = 100;
+    world.register(b0);
+
+    let j: Joint = new PrismaticJoint(ground, b0);
+    world.register(j);
+
+    let b1 = new Box(200, 30, Type.Static);
+    b1.position = new Vector2(-400, 600);
+    world.register(b1);
+
+    let b2 = new Box(80, 20);
+    b2.restitution = 0.7;
+    b2.position = new Vector2(-400, 100);
+    world.register(b2);
+
+    j = new PrismaticJoint(b1, b2, undefined, undefined);
+    world.register(j);
+    j = new MaxDistanceJoint(b1, b2, 390, undefined, undefined, 1, 0.1);
+    j.drawAnchor = false;
+    j.drawConnectionLine = false;
+    world.register(j);
+
+    let b: RigidBody = new Box(40);
+    b.restitution = 0.7;
+    b.position = new Vector2(-400, 250);
     world.register(b);
 
-    let j = new PrismaticJoint(ground, b, new Vector2);
+    let b3 = new Box(120, 20);
+    b3.position = new Vector2(300, 600);
+    world.register(b3);
+    j = new PrismaticJoint(b1, b3, undefined, undefined, new Vector2(1, 0));
+    world.register(j);
+
+    j = new MaxDistanceJoint(b1, b3, 630, undefined, undefined, 1, 0.2);
+    j.drawConnectionLine = false;
+    world.register(j);
+
+    b = Util.createRegularPolygon(15);
+    b.position = new Vector2(250, 500);
+    world.register(b);
+
+    j = new DistanceJoint(b3, b);
+    world.register(j);
+
+    b = Util.createRegularPolygon(15);
+    b.position = new Vector2(250, 350);
+    world.register(b);
+
+    j = new DistanceJoint(b, j.bodyB);
+    world.register(j);
+
+    b = new Box(120, 20);
+    b.position = new Vector2(350, 250);
+    world.register(b);
+
+    j = new DistanceJoint(b, j.bodyA);
+    world.register(j);
+
+    b = new Box(20, 80, Type.Static);
+    b.position = new Vector2(600, 250);
+    world.register(b);
+
+    let j1 = new PrismaticJoint(b, j.bodyA, new Vector2(600, 250), undefined, new Vector2(-1, 0));
+    world.register(j);
+
+    b = new Box(80, 15);
+    b.position = new Vector2(450, 500);
+    world.register(b);
+
+    j = new LineJoint(j1.bodyA, b);
+    world.register(j);
+
+    j = new AngleJoint(ground, j1.bodyB);
     world.register(j);
 }
 

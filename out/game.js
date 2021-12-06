@@ -21,7 +21,7 @@ export class Game {
         this.cursorPos = new Vector2(0, 0);
         this.cameraMove = false;
         this.grabBody = false;
-        this.currentDemo = 0;
+        this.currentDemo = 17;
         this.callback = () => { };
         this.camera = new Camera();
         this.camera.position = new Vector2(0, Settings.height / 2.0);
@@ -105,7 +105,7 @@ export class Game {
             let skipGeneration = false;
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
-                if (b.type != Type.Ground && Util.checkInside(b, this.cursorPos)) {
+                if (b.type != Type.Static && Util.checkInside(b, this.cursorPos)) {
                     this.grabBody = true;
                     if (Settings.grabCenter)
                         this.bindPosition = b.centerOfMass;

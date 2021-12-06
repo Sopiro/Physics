@@ -12,7 +12,7 @@ export function subPolygon(p1, p2) {
             res.push(p1v.subV(p2v));
         }
     }
-    return new Polygon(res, Type.Normal, false);
+    return new Polygon(res, Type.Dynamic, false);
 }
 export function toFixed(value, limit = 1e-13) {
     return Math.round(value / limit) * limit;
@@ -59,7 +59,7 @@ export function createRegularPolygon(radius, numVertices = -1) {
         let currentAngle = angleStart + angle * i;
         vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mulS(radius * 1.4142));
     }
-    return new Polygon(vertices, Type.Normal);
+    return new Polygon(vertices, Type.Dynamic);
     ;
 }
 export function random(left = -1, right = 1) {

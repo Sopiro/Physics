@@ -17,7 +17,8 @@ export abstract class Constraint
     // M = (J · M^-1 · J^t)^-1
     public abstract prepare(delta: number): void;
 
-    // Calculate corrective impulse: Pc
+    // Solve velocity constraint by applying corrective impulse
+    // Corrective impulse: Pc
     // Pc = J^t * λ (λ: lagrangian multiplier)
     // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
     public abstract solve(): void;

@@ -19,7 +19,7 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
         }
     }
 
-    return new Polygon(res, Type.Normal, false);
+    return new Polygon(res, Type.Dynamic, false);
 }
 
 export function toFixed(value: number, limit = 1e-13): number
@@ -98,7 +98,7 @@ export function createRegularPolygon(radius: number, numVertices: number = -1): 
         vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mulS(radius * 1.4142));
     }
 
-    return new Polygon(vertices, Type.Normal);;
+    return new Polygon(vertices, Type.Dynamic);;
 }
 
 export interface Pair<A, B>

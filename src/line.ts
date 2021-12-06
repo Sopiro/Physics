@@ -8,7 +8,7 @@ export class LineJoint extends Joint
 {
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
-    
+
     private t: Vector2;
 
     private ra!: Vector2;
@@ -22,13 +22,13 @@ export class LineJoint extends Joint
     private gamma; // Softness
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
-        frequency = 20000, dampingRatio = 1.0, mass = 10000)
+        dir?: Vector2, frequency = 20000, dampingRatio = 1.0, mass = 10000)
     {
         super(bodyA, bodyB);
 
-        if (bodyA.type == Type.Ground && bodyB.type == Type.Ground)
+        if (bodyA.type == Type.Static && bodyB.type == Type.Static)
             throw "Can't make line constraint between static bodies";
-        if (bodyB.type == Type.Ground)
+        if (bodyB.type == Type.Static)
             throw "Please make line constraint by using the bodyA as a static body"
 
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
@@ -36,6 +36,16 @@ export class LineJoint extends Joint
 
         let u = anchorB.subV(anchorA);
         this.t = new Vector2(-u.y, u.x).normalized();
+
+        if (dir == undefined)
+        {
+            let u = anchorB.subV(anchorA);
+            this.t = new Vector2(-u.y, u.x).normalized();
+        }
+        else
+        {
+            this.t = new Vector2(-dir.y, dir.x).normalized();
+        }
 
         if (mass <= 0) mass = bodyB.mass;
         if (frequency <= 0) frequency = 0.01;

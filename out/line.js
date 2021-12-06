@@ -4,17 +4,24 @@ import { Type } from "./rigidbody.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class LineJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, frequency = 20000, dampingRatio = 1.0, mass = 10000) {
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, dir, frequency = 20000, dampingRatio = 1.0, mass = 10000) {
         super(bodyA, bodyB);
         this.impulseSum = 0;
-        if (bodyA.type == Type.Ground && bodyB.type == Type.Ground)
+        if (bodyA.type == Type.Static && bodyB.type == Type.Static)
             throw "Can't make line constraint between static bodies";
-        if (bodyB.type == Type.Ground)
+        if (bodyB.type == Type.Static)
             throw "Please make line constraint by using the bodyA as a static body";
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
         let u = anchorB.subV(anchorA);
         this.t = new Vector2(-u.y, u.x).normalized();
+        if (dir == undefined) {
+            let u = anchorB.subV(anchorA);
+            this.t = new Vector2(-u.y, u.x).normalized();
+        }
+        else {
+            this.t = new Vector2(-dir.y, dir.x).normalized();
+        }
         if (mass <= 0)
             mass = bodyB.mass;
         if (frequency <= 0)

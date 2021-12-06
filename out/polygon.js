@@ -1,6 +1,6 @@
 import { RigidBody, Type } from "./rigidbody.js";
 export class Polygon extends RigidBody {
-    constructor(vertices, type = Type.Normal, resetPosition = true) {
+    constructor(vertices, type = Type.Dynamic, resetPosition = true) {
         super(type);
         this.vertices = vertices;
         for (let i = 0; i < this.count; i++) {

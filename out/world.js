@@ -19,7 +19,7 @@ export class World {
             b.addVelocity(b.force.mulS(b.inverseMass * delta));
             b.addAngularVelocity(b.torque * b.inverseInertia * delta);
             // Apply gravity 
-            if (b.type != Type.Ground && Settings.applyGravity)
+            if (b.type != Type.Static && Settings.applyGravity)
                 b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * delta));
         });
         let newManifolds = [];
@@ -28,7 +28,7 @@ export class World {
             let a = this.bodies[i];
             for (let j = i + 1; j < this.bodies.length; j++) {
                 let b = this.bodies[j];
-                if (a.type == Type.Ground && b.type == Type.Ground)
+                if (a.type == Type.Static && b.type == Type.Static)
                     continue;
                 let key = Util.make_pair_natural(a.id, b.id);
                 if (this.passTestSet.has(key))

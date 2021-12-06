@@ -5,7 +5,7 @@ export class Circle extends RigidBody
 {
     public readonly radius: number;
 
-    constructor(radius: number, type: Type = Type.Normal)
+    constructor(radius: number, type: Type = Type.Dynamic)
     {
         super(type);
 

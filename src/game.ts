@@ -32,7 +32,7 @@ export class Game
     private targetBody!: RigidBody;
     private grabJoint!: GrabJoint;
 
-    private currentDemo = 0;
+    private currentDemo = 17;
     public callback = () => { };
 
     constructor()
@@ -154,7 +154,7 @@ export class Game
             for (let i = 0; i < this.world.bodies.length; i++)
             {
                 let b = this.world.bodies[i];
-                if (b.type != Type.Ground && Util.checkInside(b, this.cursorPos))
+                if (b.type != Type.Static && Util.checkInside(b, this.cursorPos))
                 {
                     this.grabBody = true;
                     if (Settings.grabCenter)
