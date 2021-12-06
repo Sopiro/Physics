@@ -6,7 +6,7 @@ import * as Util from "./util.js";
 export class AngleJoint extends Joint
 {
     private initialAngle: number;
-    
+
     private m!: number;
     private bias!: number;
     private impulseSum: number = 0;

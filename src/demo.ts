@@ -597,7 +597,7 @@ function demo16(game: Game, world: World): void
     b3.position = b2.position.addV(new Vector2(0, -100));
     world.register(b3);
 
-    j = new LineJoint(b2, b3, b2.position, b3.position);
+    j = new LineJoint(b2, b3, b2.position.addV(new Vector2(15, 0)), b3.position.addV(new Vector2(15, 0)));
     world.register(j);
     j = new AngleJoint(b2, b3, 240);
     world.register(j);

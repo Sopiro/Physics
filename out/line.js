@@ -4,7 +4,7 @@ import { Type } from "./rigidbody.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class LineJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, frequency = 15, dampingRatio = 1.0, mass = -1) {
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, frequency = 20000, dampingRatio = 1.0, mass = 10000) {
         super(bodyA, bodyB);
         this.impulseSum = 0;
         if (bodyA.type == Type.Ground && bodyB.type == Type.Ground)
@@ -39,7 +39,7 @@ export class LineJoint extends Joint {
         let k = this.bodyB.inverseMass + this.rb.cross(this.t) * this.bodyB.inverseInertia
             - this.bodyA.inverseMass - this.ra.addV(this.u).cross(this.t) * this.bodyA.inverseInertia;
         this.m = 1.0 / k;
-        let error = 0;
+        let error = this.u.dot(this.t);
         if (Settings.positionCorrection)
             this.bias = error * this.beta / delta;
         else
@@ -52,8 +52,9 @@ export class LineJoint extends Joint {
         // Pc = J^t · λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
         let jv = this.t.dot(this.bodyB.linearVelocity) + this.rb.cross(this.t) * this.bodyB.angularVelocity
-            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity);
-        let lambda = this.m * -(jv);
+            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity)
+            + this.gamma;
+        let lambda = this.m * -(jv + this.bias + this.impulseSum * this.gamma);
         this.applyImpulse(lambda);
         if (Settings.warmStarting)
             this.impulseSum += lambda;

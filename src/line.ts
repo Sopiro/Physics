@@ -22,7 +22,7 @@ export class LineJoint extends Joint
     private gamma; // Softness
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
-        frequency = 15, dampingRatio = 1.0, mass = -1)
+        frequency = 20000, dampingRatio = 1.0, mass = 10000)
     {
         super(bodyA, bodyB);
 
@@ -69,7 +69,7 @@ export class LineJoint extends Joint
 
         this.m = 1.0 / k;
 
-        let error = 0;
+        let error = this.u.dot(this.t);
 
         if (Settings.positionCorrection)
             this.bias = error * this.beta / delta;
@@ -87,9 +87,10 @@ export class LineJoint extends Joint
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
         let jv = this.t.dot(this.bodyB.linearVelocity) + this.rb.cross(this.t) * this.bodyB.angularVelocity
-            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity);
+            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity)
+            + this.gamma;
 
-        let lambda = this.m * -(jv);
+        let lambda = this.m * -(jv + this.bias + this.impulseSum * this.gamma);
 
         this.applyImpulse(lambda);
 

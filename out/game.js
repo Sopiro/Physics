@@ -20,7 +20,7 @@ export class Game {
         this.cameraMove = false;
         this.grabBody = false;
         this.currentDemo = 0;
-        this.demoCallback = () => { };
+        this.callback = () => { };
         this.camera = new Camera();
         this.camera.position = new Vector2(0, Settings.height / 2.0);
         this.world = new World();
@@ -43,12 +43,12 @@ export class Game {
     }
     initDemo() {
         this.world.clear();
-        this.demoCallback = () => { };
+        this.callback = () => { };
         demos[this.currentDemo](this, this.world);
     }
     update(delta) {
         this.handleInput(delta);
-        this.demoCallback();
+        this.callback();
         this.world.update(delta);
     }
     handleInput(delta) {
@@ -196,10 +196,10 @@ export class Game {
                 r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(4)) + "kg⋅m²", line++);
                 r.log("Friction: " + String(target.friction), line++);
                 r.log("Restitution: " + String(target.restitution), line++);
-                r.log("Position: [" + String(target.position.x) + ", " + String(target.position.y) + "]", line++);
-                r.log("Rotation: " + String((target.rotation / 100).toFixed(4)), line++);
+                r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
+                r.log("Rotation: " + String(target.rotation.toFixed(4)), line++);
                 r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
-                r.log("Angular velocity: " + String((target.angularVelocity).toFixed(4)) + "rad/s", line++);
+                r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
             }
         }
         if (Settings.indicateCP) {
