@@ -1,22 +1,24 @@
 import { Joint } from "./joint.js";
-import { Vector2 } from "./math.js";
+import { Matrix2, Vector2 } from "./math.js";
 import { RigidBody, Type } from "./rigidbody.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 
-export class LineJoint extends Joint
+// Line joint + Angle joint
+export class PrismaticJoint extends Joint
 {
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
     
+    private initialAngle: number;
     private t: Vector2;
-
+    
     private ra!: Vector2;
     private rb!: Vector2;
-    private m!: number;
+    private m!: Matrix2;
     private u!: Vector2;
-    private bias!: number;
-    private impulseSum: number = 0;
+    private bias!: Vector2;
+    private impulseSum: Vector2 = new Vector2();
 
     private beta;
     private gamma; // Softness
@@ -27,12 +29,14 @@ export class LineJoint extends Joint
         super(bodyA, bodyB);
 
         if (bodyA.type == Type.Ground && bodyB.type == Type.Ground)
-            throw "Can't make line constraint between static bodies";
+            throw "Can't make prismatic constraint between static bodies";
         if (bodyB.type == Type.Ground)
-            throw "Please make line constraint by using the bodyA as a static body"
+            throw "Please make prismatic constraint by using the bodyA as a static body"
 
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
+
+        this.initialAngle = bodyB.rotation - bodyA.rotation;
 
         let u = anchorB.subV(anchorA);
         this.t = new Vector2(-u.y, u.x).normalized();
@@ -53,7 +57,8 @@ export class LineJoint extends Joint
     override prepare(delta: number): void
     {
         // Calculate Jacobian J and effective mass M
-        // J = [-t^t, -(ra + u)×t, t^t, rb×t]
+        // J = [-t^t, -(ra + u)×t, t^t, rb×t
+        //         0,          -1,   0,    1]
         // M = (J · M^-1 · J^t)^-1
 
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
@@ -64,17 +69,27 @@ export class LineJoint extends Joint
 
         this.u = pb.subV(pa).normalized();
 
-        let k = this.bodyB.inverseMass + this.rb.cross(this.t) * this.bodyB.inverseInertia
-            - this.bodyA.inverseMass - this.ra.addV(this.u).cross(this.t) * this.bodyA.inverseInertia;
+        let sa = this.ra.addV(this.u).cross(this.t);
+        let sb = this.rb.cross(this.t);
 
-        this.m = 1.0 / k;
+        let k = new Matrix2();
+        k.m00 = this.bodyA.inverseMass + sa * sa * this.bodyA.inverseInertia + this.bodyB.inverseMass + sb * sb * this.bodyB.inverseInertia;
+        k.m01 = sa * this.bodyA.inverseInertia + sb * this.bodyB.inverseInertia;
+        k.m10 = sa * this.bodyA.inverseInertia + sb * this.bodyB.inverseInertia;
+        k.m11 = this.bodyA.inverseInertia + this.bodyB.inverseInertia;
 
-        let error = this.u.dot(this.t);
+        k.m00 += this.gamma;
+        k.m11 += this.gamma;
+
+        this.m = k.inverted();
+
+        let error0 = this.u.dot(this.t);
+        let error1 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
 
         if (Settings.positionCorrection)
-            this.bias = error * this.beta / delta;
+            this.bias = new Vector2(error0, error1).mulS(this.beta / delta);
         else
-            this.bias = 0.0;
+            this.bias = new Vector2();
 
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);
@@ -86,26 +101,36 @@ export class LineJoint extends Joint
         // Pc = J^t · λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
-        let jv = this.t.dot(this.bodyB.linearVelocity) + this.rb.cross(this.t) * this.bodyB.angularVelocity
+        let jv0 = this.t.dot(this.bodyB.linearVelocity) + this.rb.cross(this.t) * this.bodyB.angularVelocity
             - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity)
             + this.gamma;
 
-        let lambda = this.m * -(jv + this.bias + this.impulseSum * this.gamma);
+        let jv1 = this.bodyB.angularVelocity - this.bodyA.angularVelocity;
+
+        let jv = new Vector2(jv0, jv1);
+
+        let lambda = this.m.mulVector(jv.addV(this.bias).addV(this.impulseSum.mulS(this.gamma)).inverted());
 
         this.applyImpulse(lambda);
 
         if (Settings.warmStarting)
-            this.impulseSum += lambda;
+            this.impulseSum.addV(lambda);
     }
 
-    protected override applyImpulse(lambda: number): void
+    protected override applyImpulse(lambda: Vector2): void
     {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
 
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.t.mulS(lambda * this.bodyA.inverseMass));
+        let lambda0 = lambda.x;
+        let lambda1 = lambda.y;
+
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.t.mulS(lambda0 * this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.ra.addV(this.u).cross(this.t) * this.bodyA.inverseInertia;
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.t.mulS(lambda * this.bodyB.inverseMass));
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.t.mulS(lambda0 * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.rb.cross(this.t) * this.bodyB.inverseInertia;
+
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda1 * this.bodyA.inverseInertia;
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda1 * this.bodyB.inverseInertia;
     }
 }

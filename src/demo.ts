@@ -16,6 +16,7 @@ import { AngleJoint } from "./angle.js";
 import { WeldJoint } from "./weld.js";
 import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
+import { PrismaticJoint } from "./prismatic.js";
 
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
@@ -644,5 +645,20 @@ function demo17(game: Game, world: World): void
     world.register(j);
 }
 
+Reflect.set(demo18, "SimulationName", "Prismatic joint test");
+function demo18(game: Game, world: World): void
+{
+    updateSetting("g", true);
+
+    world.register(ground);
+
+    let b = new Box(30);
+    b.position.y = 100;
+    world.register(b);
+
+    let j = new PrismaticJoint(ground, b, new Vector2);
+    world.register(j);
+}
+
 export const demos: ((game: Game, world: World) => void)[] =
-    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16, demo17];
+    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18];

@@ -8,9 +8,9 @@ export class RevoluteJoint extends Joint
 {
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
+
     private ra!: Vector2;
     private rb!: Vector2;
-
     private m!: Matrix2;
     private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2();

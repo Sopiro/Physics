@@ -4,14 +4,16 @@ import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 import { Joint } from "./joint.js";
 
+// Revolute joint + Angle joint
 export class WeldJoint extends Joint
 {
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
-    private ra!: Vector2;
-    private rb!: Vector2;
+
     private initialAngle: number;
 
+    private ra!: Vector2;
+    private rb!: Vector2;
     private m!: Matrix3;
     private bias!: Vector3;
     private impulseSum: Vector3 = new Vector3();

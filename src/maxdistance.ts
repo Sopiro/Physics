@@ -9,9 +9,9 @@ export class MaxDistanceJoint extends Joint
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
     public maxDistance;
+
     private ra!: Vector2;
     private rb!: Vector2;
-
     private m!: number;
     private n!: Vector2;
     private bias!: number;
