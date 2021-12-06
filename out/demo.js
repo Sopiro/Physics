@@ -9,6 +9,7 @@ import { DistanceJoint } from "./distance.js";
 import { AngleJoint } from "./angle.js";
 import { WeldJoint } from "./weld.js";
 import { LineJoint } from "./line.js";
+import { MaxDistanceJoint } from "./maxdistance.js";
 const ground = new Box(Settings.width * 5, 40, Type.Ground);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -457,4 +458,19 @@ function demo16(game, world) {
     j = new AngleJoint(b2, b3, 240);
     world.register(j);
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16];
+Reflect.set(demo17, "SimulationName", "Max distance joint test");
+function demo17(game, world) {
+    updateSetting("g", true);
+    world.register(ground);
+    let c = new Circle(15, Type.Ground);
+    c.position.y = 500;
+    world.register(c);
+    let b = Util.createRegularPolygon(25);
+    b.position.y = 50;
+    world.register(b);
+    let j = new MaxDistanceJoint(c, b, 200, undefined, undefined, 0.7, 0.1);
+    world.register(j);
+    // j = new MaxDistanceJoint(ground, b, 300, undefined, undefined, 1, 0.1);
+    // world.register(j)
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16, demo17];
