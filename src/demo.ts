@@ -432,7 +432,7 @@ function demo13(game: Game, world: World): void
     b2.position.y = Settings.height / 2 + 200;
     world.register(b2);
 
-    let j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 1, 0);
+    let j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 1, 0.05);
     world.register(j);
 
     b2 = new Box(30);
@@ -503,14 +503,23 @@ function demo14(game: Game, world: World): void
     let b2 = new Box(15, 15, Type.Static);
     b2.position = new Vector2(400, 600);
     world.register(b2);
-    c = Util.createRegularPolygon(25, 5);
+    c = Util.createRegularPolygon(50, 5);
     c.position = new Vector2(400, 400);
     world.register(c);
-    j = new DistanceJoint(b2, c);
+    j = new LineJoint(b2, c);
+    world.register(j);
+
+    j = new MaxDistanceJoint(b2, c);
+    j.drawAnchor = false;
+    j.drawConnectionLine = false;
     world.register(j);
 
     j = new AngleJoint(b1, c);
     world.register(j);
+
+    let b = new Polygon([new Vector2(0,0), new Vector2(0, 50), new Vector2(400, 0)]);
+    b.position = new Vector2(-400, 40);
+    world.register(b);
 }
 
 Reflect.set(demo15, "SimulationName", "Weld joint test");
@@ -592,7 +601,7 @@ function demo16(game: Game, world: World): void
     j = new LineJoint(b2, c);
     world.register(j);
 
-    c = new Circle(15);
+    c = Util.createRegularPolygon(20);
     c.position = b2.position.addV(new Vector2(100, 100));
     world.register(c);
 

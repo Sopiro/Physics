@@ -9,7 +9,7 @@ Video: https://youtu.be/mHnHj9HHSBg
 ![img](.github/rigidbody.gif)
 
 ## Features
-- Basic input, rendering system(Game engine-like)
+- Basic input, Rendering system
 - Collision detection
   - Convex polygons and circles
   - AABB Broad phase
@@ -21,7 +21,8 @@ Video: https://youtu.be/mHnHj9HHSBg
   - Sequential impulses  
 - Constraint-basd simulation
   - Contact constraint
-  - Joints: Revolute, Distance joint
+  - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Line, Angle, Grab
+  - Soft constraints
 
 
 ## References

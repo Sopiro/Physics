@@ -32,7 +32,7 @@ export class Game
     private targetBody!: RigidBody;
     private grabJoint!: GrabJoint;
 
-    private currentDemo = 17;
+    private currentDemo = 0;
     public callback = () => { };
 
     constructor()
@@ -132,7 +132,7 @@ export class Game
                 if (Settings.mode == MouseMode.Force)
                 {
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
-                    let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency);
+                    let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
                     let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
                         mulVector2(this.targetBody.centerOfMass, 1)).cross(force);
                     this.targetBody.addForce(force);
@@ -170,7 +170,7 @@ export class Game
             if (skipGeneration && Settings.mode == MouseMode.Grab)
             {
                 let bind = Settings.grabCenter ? this.targetBody.position : this.cursorPos.copy();
-                this.grabJoint = new GrabJoint(this.targetBody, bind, this.cursorPos);
+                this.grabJoint = new GrabJoint(this.targetBody, bind, this.cursorPos, Settings.mouseStrength, undefined);
                 this.world.register(this.grabJoint);
             }
 

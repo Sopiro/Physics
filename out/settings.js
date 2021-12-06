@@ -20,6 +20,7 @@ const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
 const restitutionRange = { p1: 0, p2: 1 };
 const numVerticesRange = { p1: 2.9, p2: 17 };
+const strengthRange = { p1: 0.2, p2: 3.0 };
 // Simulation settings
 export const Settings = {
     width: 1280,
@@ -38,6 +39,7 @@ export const Settings = {
     indicateCoM: false,
     showBoundingBox: false,
     mode: MouseMode.Grab,
+    mouseStrength: 0.6,
     numIterations: 15,
     newBodySettings: {
         shape: GenerationShape.Box,
@@ -95,6 +97,16 @@ for (var i = 0; i < 2; i++) {
         Settings.mode = index;
     });
 }
+const strength = document.querySelector("#strength");
+strength.value = String(Util.map(Settings.mouseStrength, strengthRange.p1, strengthRange.p2, 0, 100));
+const strengthLabel = document.querySelector("#strength_label");
+strengthLabel.innerHTML = String(Settings.mouseStrength);
+strength.addEventListener("input", () => {
+    let mappedValue = Util.map(Number(strength.value), 0, 100, strengthRange.p1, strengthRange.p2);
+    mappedValue = Number(mappedValue.toFixed(2));
+    strengthLabel.innerHTML = String(mappedValue);
+    updateSetting("strength", mappedValue);
+});
 const frequency = document.querySelector("#frequency");
 frequency.value = String(Util.map(Settings.frequency, frequencyRange.p1, frequencyRange.p2, 0, 100));
 const frequencyLabel = document.querySelector("#frequency_label");
@@ -151,7 +163,7 @@ const frictionLabel = document.querySelector("#friction_label");
 frictionLabel.innerHTML = String(Settings.newBodySettings.friction);
 friction.addEventListener("input", () => {
     let mappedValue = Util.map(Number(friction.value), 0, 100, frictionRange.p1, frictionRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2));
+    mappedValue = Number(mappedValue.toFixed(2));
     frictionLabel.innerHTML = String(mappedValue);
     updateSetting("friction", mappedValue);
 });
@@ -161,7 +173,7 @@ const restitutionLabel = document.querySelector("#restitution_label");
 restitutionLabel.innerHTML = String(Settings.newBodySettings.restitution);
 restitution.addEventListener("input", () => {
     let mappedValue = Util.map(Number(restitution.value), 0, 100, restitutionRange.p1, restitutionRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2));
+    mappedValue = Number(mappedValue.toFixed(2));
     restitutionLabel.innerHTML = String(mappedValue);
     updateSetting("restitution", mappedValue);
 });
@@ -272,6 +284,9 @@ export function updateSetting(id, content = undefined) {
             break;
         case "beta":
             Settings.positionCorrectionBeta = content;
+            break;
+        case "strength":
+            Settings.mouseStrength = content;
             break;
         default:
             break;
