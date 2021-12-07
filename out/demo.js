@@ -6,12 +6,12 @@ import * as Util from "./util.js";
 import { Circle } from "./circle.js";
 import { RevoluteJoint } from "./revolute.js";
 import { DistanceJoint } from "./distance.js";
-import { Polygon } from "./polygon.js";
 import { AngleJoint } from "./angle.js";
 import { WeldJoint } from "./weld.js";
 import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
+import { MotorJoint } from "./motor.js";
 const ground = new Box(Settings.width * 5, 40, Type.Static);
 ground.restitution = 0.45;
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -367,42 +367,8 @@ function demo13(game, world) {
     j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -200)), b2.position, 200, 2, 0.01);
     world.register(j);
 }
-Reflect.set(demo14, "SimulationName", "Angle joint test");
+Reflect.set(demo14, "SimulationName", "Weld joint test");
 function demo14(game, world) {
-    updateSetting("g", true);
-    world.register(ground);
-    let b1 = Util.createRegularPolygon(25, 7);
-    b1.rotation = Math.PI;
-    b1.position = new Vector2(-100, 400);
-    world.register(b1);
-    let c = new Circle(25);
-    c.position = new Vector2(100, 400);
-    world.register(c);
-    c.addAngularVelocity(10);
-    let j = new AngleJoint(b1, c);
-    world.register(j);
-    j = new DistanceJoint(b1, c);
-    world.register(j);
-    let b2 = new Box(15, 15, Type.Static);
-    b2.position = new Vector2(400, 600);
-    world.register(b2);
-    c = Util.createRegularPolygon(50, 5);
-    c.position = new Vector2(400, 400);
-    world.register(c);
-    j = new LineJoint(b2, c);
-    world.register(j);
-    j = new MaxDistanceJoint(b2, c);
-    j.drawAnchor = false;
-    j.drawConnectionLine = false;
-    world.register(j);
-    j = new AngleJoint(b1, c);
-    world.register(j);
-    let b = new Polygon([new Vector2(0, 0), new Vector2(0, 50), new Vector2(400, 0)]);
-    b.position = new Vector2(-400, 40);
-    world.register(b);
-}
-Reflect.set(demo15, "SimulationName", "Weld joint test");
-function demo15(game, world) {
     updateSetting("g", true);
     world.register(ground);
     for (let i = 0; i < 30; i++) {
@@ -427,8 +393,8 @@ function demo15(game, world) {
         b2.addVelocity(new Vector2(-b2.position.x, 0));
     }
 }
-Reflect.set(demo16, "SimulationName", "Line joint test");
-function demo16(game, world) {
+Reflect.set(demo15, "SimulationName", "Line joint test");
+function demo15(game, world) {
     updateSetting("g", true);
     world.register(ground);
     let b1 = new Box(30);
@@ -470,8 +436,8 @@ function demo16(game, world) {
     j = new AngleJoint(b2, b3, 240);
     world.register(j);
 }
-Reflect.set(demo17, "SimulationName", "Max distance joint test");
-function demo17(game, world) {
+Reflect.set(demo16, "SimulationName", "Max distance joint test");
+function demo16(game, world) {
     updateSetting("g", true);
     world.register(ground);
     let c = new Box(30, 30, Type.Static);
@@ -496,8 +462,8 @@ function demo17(game, world) {
     j = new MaxDistanceJoint(c, b, 120, undefined, undefined, 0.7, 0.1);
     world.register(j);
 }
-Reflect.set(demo18, "SimulationName", "Prismatic joint test");
-function demo18(game, world) {
+Reflect.set(demo17, "SimulationName", "Prismatic joint test");
+function demo17(game, world) {
     updateSetting("g", true);
     world.register(ground);
     let b0 = new Box(30);
@@ -558,4 +524,28 @@ function demo18(game, world) {
     j = new AngleJoint(ground, j1.bodyB);
     world.register(j);
 }
-export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10, demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18];
+Reflect.set(demo18, "SimulationName", "Motor joint test");
+function demo18(game, world) {
+    updateSetting("g", true);
+    let b1 = new Box(20, 320, Type.Static);
+    b1.position.y = 150;
+    world.register(b1);
+    let b2 = new Box(200, 20);
+    b2.position.y = 300;
+    world.register(b2);
+    let j = new MotorJoint(b1, b2);
+    world.register(j, true);
+    let last_spawn = 0;
+    game.callback = () => {
+        j.angularOffset = b2.rotation + 0.05;
+        if (game.time - last_spawn > 0.2) {
+            let c = Util.createRegularPolygon(15);
+            c.position.x = Util.random(-200, 200);
+            c.position.y = 600;
+            world.register(c);
+            last_spawn = game.time;
+        }
+    };
+}
+export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
+    demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18];

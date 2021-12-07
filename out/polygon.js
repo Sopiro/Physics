@@ -20,11 +20,4 @@ export class Polygon extends RigidBody {
     get count() {
         return this.vertices.length;
     }
-    get globalVertices() {
-        const transform = this.localToGlobal;
-        let res = [];
-        for (let i = 0; i < this.count; i++)
-            res.push(transform.mulVector2(this.vertices[i], 1));
-        return res;
-    }
 }

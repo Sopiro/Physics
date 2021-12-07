@@ -121,6 +121,8 @@ export function random(left: number = -1, right: number = 1): number
 
 export function clamp(value: number, min: number, max: number): number
 {
+    // return Math.max(min, Math.min(value, max));
+
     if (value < min) return min;
     else if (value > max) return max;
     else return value;
@@ -133,7 +135,7 @@ export function cross(scalar: number, vector: Vector2): Vector2
 
 export function calculateBoxInertia(width: number, height: number, mass: number): number
 {
-    return (width * width + height * height) * mass / 12;
+    return (width * width + height * height) * mass / 12.0;
 }
 
 export function calculateCircleInertia(radius: number, mass: number): number

@@ -36,16 +36,4 @@ export class Polygon extends RigidBody
     {
         return this.vertices.length;
     }
-
-    get globalVertices(): Vector2[]
-    {
-        const transform = this.localToGlobal;
-
-        let res: Vector2[] = [];
-
-        for (let i = 0; i < this.count; i++)
-            res.push(transform.mulVector2(this.vertices[i], 1));
-
-        return res;
-    }
 }

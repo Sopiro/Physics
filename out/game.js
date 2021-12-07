@@ -16,9 +16,11 @@ import { WeldJoint } from "./weld.js";
 import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
+import { MotorJoint } from "./motor.js";
 export class Game {
     constructor() {
         this.cursorPos = new Vector2(0, 0);
+        this.time = 0.0;
         this.cameraMove = false;
         this.grabBody = false;
         this.currentDemo = 0;
@@ -44,11 +46,13 @@ export class Game {
         this.initDemo();
     }
     initDemo() {
+        this.time = 0.0;
         this.world.clear();
         this.callback = () => { };
         demos[this.currentDemo](this, this.world);
     }
     update(delta) {
+        this.time += delta;
         this.handleInput(delta);
         this.callback();
         this.world.update();
@@ -302,6 +306,17 @@ export class Game {
                 }
                 if (j.drawAnchor) {
                     r.drawCircleV(anchorA, 3);
+                    r.drawCircleV(anchorB, 3);
+                }
+            }
+            else if (j instanceof MotorJoint) {
+                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
+                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
+                if (j.drawConnectionLine) {
+                    r.drawLineV(anchorA, anchorB);
+                }
+                if (j.drawAnchor) {
+                    r.drawCircleV(anchorA.add(j.linearOffset), 3);
                     r.drawCircleV(anchorB, 3);
                 }
             }

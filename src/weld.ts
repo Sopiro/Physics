@@ -121,7 +121,7 @@ export class WeldJoint extends Joint
         let lambda01 = new Vector2(lambda.x, lambda.y);
         let lambda2 = lambda.z;
 
-        // Solve for revolute constraint
+        // Solve for point-to-point constraint
         this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(lambda01.mul(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda01);
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(lambda01.mul(this.bodyB.inverseMass));

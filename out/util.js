@@ -72,6 +72,7 @@ export function random(left = -1, right = 1) {
     return Math.random() * range + left;
 }
 export function clamp(value, min, max) {
+    // return Math.max(min, Math.min(value, max));
     if (value < min)
         return min;
     else if (value > max)
@@ -83,7 +84,7 @@ export function cross(scalar, vector) {
     return new Vector2(-scalar * vector.y, scalar * vector.x);
 }
 export function calculateBoxInertia(width, height, mass) {
-    return (width * width + height * height) * mass / 12;
+    return (width * width + height * height) * mass / 12.0;
 }
 export function calculateCircleInertia(radius, mass) {
     return mass * radius * radius / 2.0;

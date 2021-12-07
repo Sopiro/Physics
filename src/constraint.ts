@@ -29,5 +29,5 @@ export abstract class Constraint
     // Apply impulse
     // V2 = V2' + M^-1 ⋅ Pc
     // Pc = J^t ⋅ λ
-    protected abstract applyImpulse(impulse: number | Vector2 | Vector3): void;
+    protected abstract applyImpulse(impulse: number | Vector2 | Vector3, impulse2?: number): void;
 }
