@@ -16,7 +16,7 @@ export class PrismaticJoint extends Joint {
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
         this.initialAngle = bodyB.rotation - bodyA.rotation;
         if (dir == undefined) {
-            let u = anchorB.subV(anchorA);
+            let u = anchorB.sub(anchorA);
             this.t = new Vector2(-u.y, u.x).normalized();
         }
         else {
@@ -30,21 +30,21 @@ export class PrismaticJoint extends Joint {
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
-    prepare(delta) {
+    prepare() {
         // Calculate Jacobian J and effective mass M
-        // J = [-t^t, -(ra + u)×t, t^t, rb×t
-        //         0,          -1,   0,    1]
+        // J = [-t^t, -(ra + u)×t, t^t, rb×t] // Line 
+        //     [   0,          -1,   0,    1] // Angle
         // M = (J · M^-1 · J^t)^-1
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
-        let pa = this.bodyA.position.addV(this.ra);
-        let pb = this.bodyB.position.addV(this.rb);
-        this.u = pb.subV(pa).normalized();
-        let sa = this.ra.addV(this.u).cross(this.t);
+        let pa = this.bodyA.position.add(this.ra);
+        let pb = this.bodyB.position.add(this.rb);
+        this.u = pb.sub(pa).normalized();
+        let sa = this.ra.add(this.u).cross(this.t);
         let sb = this.rb.cross(this.t);
         let k = new Matrix2();
         k.m00 = this.bodyA.inverseMass + sa * sa * this.bodyA.inverseInertia + this.bodyB.inverseMass + sb * sb * this.bodyB.inverseInertia;
@@ -57,7 +57,7 @@ export class PrismaticJoint extends Joint {
         let error0 = this.u.dot(this.t);
         let error1 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
         if (Settings.positionCorrection)
-            this.bias = new Vector2(error0, error1).mulS(this.beta / delta);
+            this.bias = new Vector2(error0, error1).mul(this.beta * Settings.inv_dt);
         else
             this.bias = new Vector2();
         if (Settings.warmStarting)
@@ -68,23 +68,23 @@ export class PrismaticJoint extends Joint {
         // Pc = J^t · λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
         let jv0 = this.t.dot(this.bodyB.linearVelocity) + this.rb.cross(this.t) * this.bodyB.angularVelocity
-            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.addV(this.u).cross(this.t) * this.bodyA.angularVelocity)
+            - (this.t.dot(this.bodyA.linearVelocity) + this.rb.add(this.u).cross(this.t) * this.bodyA.angularVelocity)
             + this.gamma;
         let jv1 = this.bodyB.angularVelocity - this.bodyA.angularVelocity;
         let jv = new Vector2(jv0, jv1);
-        let lambda = this.m.mulVector(jv.addV(this.bias).addV(this.impulseSum.mulS(this.gamma)).inverted());
+        let lambda = this.m.mulVector(jv.add(this.bias).add(this.impulseSum.mul(this.gamma)).inverted());
         this.applyImpulse(lambda);
         if (Settings.warmStarting)
-            this.impulseSum.addV(lambda);
+            this.impulseSum.add(lambda);
     }
     applyImpulse(lambda) {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
         let lambda0 = lambda.x;
         let lambda1 = lambda.y;
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.t.mulS(lambda0 * this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.ra.addV(this.u).cross(this.t) * this.bodyA.inverseInertia;
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.t.mulS(lambda0 * this.bodyB.inverseMass));
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(this.t.mul(lambda0 * this.bodyA.inverseMass));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.ra.add(this.u).cross(this.t) * this.bodyA.inverseInertia;
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.t.mul(lambda0 * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.rb.cross(this.t) * this.bodyB.inverseInertia;
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda1 * this.bodyA.inverseInertia;
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda1 * this.bodyB.inverseInertia;

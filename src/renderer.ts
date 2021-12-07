@@ -123,7 +123,7 @@ export class Renderer
     drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
     {
         this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
-        let n = new Vector2(-v.y, v.x).normalized().mulS(3 * arrowSize);
+        let n = new Vector2(-v.y, v.x).normalized().mul(3 * arrowSize);
         const nv = v.normalized();
         arrowSize *= 4;
 
@@ -134,7 +134,7 @@ export class Renderer
     // Draw p1 to p2 vector
     drawVectorP(p1: Vector2, p2: Vector2, arrowSize: number = 3): void
     {
-        this.drawVector(p1, p2.subV(p1), arrowSize);
+        this.drawVector(p1, p2.sub(p1), arrowSize);
     }
 
     drawSimplex(sp: Simplex): void
@@ -180,7 +180,7 @@ export class Renderer
         else if (b instanceof Circle)
         {
             this.drawCircleV(b.centerOfMass, b.radius);
-            this.drawLineV(b.centerOfMass, b.centerOfMass.addV(new Vector2(b.radius, 0)));
+            this.drawLineV(b.centerOfMass, b.centerOfMass.add(new Vector2(b.radius, 0)));
         }
         else
         {

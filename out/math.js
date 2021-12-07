@@ -35,7 +35,7 @@ export class Vector2 {
     normalized() {
         const len = this.length;
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -48,23 +48,23 @@ export class Vector2 {
     cross(v) {
         return this.x * v.y - this.y * v.x;
     }
-    addV(v) {
+    add(v) {
         return new Vector2(this.x + v.x, this.y + v.y);
     }
-    subV(v) {
+    sub(v) {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
-    divS(v) {
+    div(v) {
         return new Vector2(this.x / v, this.y / v);
     }
-    mulS(v) {
+    mul(v) {
         return new Vector2(this.x * v, this.y * v);
     }
     equals(v) {
         return this.x == v.x && this.y == v.y;
     }
     to(v) {
-        return v.subV(this);
+        return v.sub(this);
     }
     unNaN() {
         if (isNaN(this.x) || isNaN(this.y)) {
@@ -104,7 +104,7 @@ export class Vector3 {
     normalized() {
         const len = this.length;
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -131,14 +131,14 @@ export class Vector3 {
     sub(v) {
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
-    divS(v) {
-        return new Vector3(this.x / v, this.y / v, this.z / v);
+    div(s) {
+        return new Vector3(this.x / s, this.y / s, this.z / s);
     }
     divXYZ(x, y, z) {
         return new Vector3(this.x / x, this.y / y, this.z / z);
     }
-    mulS(v) {
-        return new Vector3(this.x * v, this.y * v, this.z * v);
+    mul(s) {
+        return new Vector3(this.x * s, this.y * s, this.z * s);
     }
     mulXYZ(x, y, z) {
         return new Vector3(this.x * x, this.y * y, this.z * z);
@@ -192,7 +192,7 @@ export class Vector4 {
     normalized() {
         const len = this.length;
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -217,14 +217,14 @@ export class Vector4 {
     sub(v) {
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
     }
-    divS(v) {
-        return new Vector4(this.x / v, this.y / v, this.z / v, this.w / v);
+    div(s) {
+        return new Vector4(this.x / s, this.y / s, this.z / s, this.w / s);
     }
     divXYZW(x, y, z, w) {
         return new Vector4(this.x / x, this.y / y, this.z / z, this.w / w);
     }
-    mulS(v) {
-        return new Vector4(this.x * v, this.y * v, this.z * v, this.w * v);
+    mul(s) {
+        return new Vector4(this.x * s, this.y * s, this.z * s, this.w * s);
     }
     mulXYZW(x, y, z, w) {
         return new Vector4(this.x * x, this.y * y, this.z * z, this.w * w);

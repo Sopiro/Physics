@@ -3,6 +3,7 @@ import { Circle } from "./circle.js";
 import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
+import { Settings } from "./settings.js";
 
 export function subPolygon(p1: Polygon, p2: Polygon): Polygon
 {
@@ -15,7 +16,7 @@ export function subPolygon(p1: Polygon, p2: Polygon): Polygon
         {
             let p2v = p2.localToGlobal.mulVector2(p2.vertices[j], 1);
 
-            res.push(p1v.subV(p2v));
+            res.push(p1v.sub(p2v));
         }
     }
 
@@ -36,11 +37,11 @@ export interface UV
 // Project point p to edge ab, calculate barycentric weights and return it
 export function getUV(a: Vector2, b: Vector2, p: Vector2): UV
 {
-    let dir = b.subV(a);
+    let dir = b.sub(a);
     const len = dir.length;
     dir.normalize();
 
-    const region = dir.dot(p.subV(a)) / len;
+    const region = dir.dot(p.sub(a)) / len;
 
     return { u: 1 - region, v: region };
 }
@@ -48,20 +49,18 @@ export function getUV(a: Vector2, b: Vector2, p: Vector2): UV
 // Linearly combine(interpolate) the vector using weights u, v
 export function lerpVector(a: Vector2, b: Vector2, uv: UV): Vector2
 {
-    return a.mulS(uv.u).addV(b.mulS(uv.v));
+    return a.mul(uv.u).add(b.mul(uv.v));
 }
-
-const maxVertices = 8;
 
 export function createRandomConvexBody(radius: number = 50, numVertices: number = -1): RigidBody
 {
     if (numVertices < 0)
-        numVertices = Math.trunc(Math.random() * maxVertices);
+        numVertices = Math.trunc(Math.random() * Settings.randonConvexMaxVertices);
 
     if (numVertices == 0)
         return new Circle(radius);
 
-    if (numVertices == maxVertices - 1)
+    if (numVertices == Settings.randonConvexMaxVertices - 1)
         return new Box(radius * 2, radius * 2);
 
     numVertices += 2;
@@ -75,7 +74,7 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
 
     let res = new Polygon(angles.map((angle) =>
     {
-        return new Vector2(Math.cos(angle), Math.sin(angle)).mulS(radius);
+        return new Vector2(Math.cos(angle), Math.sin(angle)).mul(radius);
     }));
 
     return res;
@@ -83,7 +82,7 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
 
 export function createRegularPolygon(radius: number, numVertices: number = -1): RigidBody
 {
-    if (numVertices < 3) numVertices = Math.trunc(random(3, 11));
+    if (numVertices < 3) numVertices = Math.trunc(random(3, Settings.regularPolygonMaxVertices));
 
     let angleStart = Math.PI / 2;
     let angle = Math.PI * 2 / numVertices;
@@ -95,7 +94,7 @@ export function createRegularPolygon(radius: number, numVertices: number = -1): 
     for (let i = 0; i < numVertices; i++)
     {
         let currentAngle = angleStart + angle * i;
-        vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mulS(radius * 1.4142));
+        vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mul(radius * 1.4142));
     }
 
     return new Polygon(vertices, Type.Dynamic);;
@@ -154,11 +153,11 @@ export function checkInside(b: RigidBody, p: Vector2): boolean
     {
         let poly = b as Polygon;
 
-        let dir = poly.vertices[0].subV(localP).cross(poly.vertices[1].subV(localP));
+        let dir = poly.vertices[0].sub(localP).cross(poly.vertices[1].sub(localP));
 
         for (let i = 1; i < poly.vertices.length; i++)
         {
-            let nDir = poly.vertices[i].subV(localP).cross(poly.vertices[(i + 1) % poly.count].subV(localP));
+            let nDir = poly.vertices[i].sub(localP).cross(poly.vertices[(i + 1) % poly.count].sub(localP));
             if (dir * nDir < 0)
                 return false
         }

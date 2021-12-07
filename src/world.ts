@@ -10,7 +10,7 @@ type Registrable = RigidBody | Joint;
 
 export class World
 {
-    private static uid = 0;
+    private uid = 0;
 
     public bodies: RigidBody[] = [];
     public joints: Joint[] = [];
@@ -18,20 +18,20 @@ export class World
     public manifoldMap: Map<number, ContactManifold> = new Map();
     public passTestSet: Set<number> = new Set();
 
-    update(delta: number): void
+    update(): void
     {
-        delta = Settings.fixedDeltaTime;
-
         // Integrate forces, yield tentative velocities that possibly violate the constraint
-        this.bodies.forEach(b =>
+        for (let i = 0; i < this.bodies.length; i++)
         {
-            b.addVelocity(b.force.mulS(b.inverseMass * delta));
-            b.addAngularVelocity(b.torque * b.inverseInertia * delta);
+            let b = this.bodies[i];
+
+            b.addVelocity(b.force.mul(b.inverseMass * Settings.dt));
+            b.addAngularVelocity(b.torque * b.inverseInertia * Settings.dt);
 
             // Apply gravity 
             if (b.type != Type.Static && Settings.applyGravity)
-                b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * delta));
-        });
+                b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt));
+        }
 
         let newManifolds: ContactManifold[] = [];
 
@@ -72,48 +72,43 @@ export class World
         this.manifolds = newManifolds;
 
         // Prepare for resolution step
-        this.manifolds.forEach(manifold =>
-        {
-            manifold.prepare(delta);
-        });
+        for (let i = 0; i < this.manifolds.length; i++)
+            this.manifolds[i].prepare();
 
-        this.joints.forEach(joint =>
-        {
-            joint.prepare(delta);
-        });
+        for (let i = 0; i < this.joints.length; i++)
+            this.joints[i].prepare();
 
         // Iteratively resolve violated velocity constraint
         for (let i = 0; i < Settings.numIterations; i++)
         {
-            this.manifolds.forEach(manifold =>
-            {
-                manifold.solve();
-            });
+            for (let i = 0; i < this.manifolds.length; i++)
+                this.manifolds[i].solve();
 
-            this.joints.forEach(joint =>
-            {
-                joint.solve();
-            });
+            for (let i = 0; i < this.joints.length; i++)
+                this.joints[i].solve();
         }
 
-        // Update the positions using the new velocities
-        this.bodies.forEach((b, index) =>
+        // Update positions using corrected velocities
+        for (let i = 0; i < this.bodies.length; i++)
         {
-            b.position.x += b.linearVelocity.x * delta;
-            b.position.y += b.linearVelocity.y * delta;
-            b.rotation += b.angularVelocity * delta;
+            let b = this.bodies[i];
+            if (b.type == Type.Static) continue;
+
+            b.position.x += b.linearVelocity.x * Settings.dt;
+            b.position.y += b.linearVelocity.y * Settings.dt;
+            b.rotation += b.angularVelocity * Settings.dt;
 
             if (b.position.y < Settings.deadBottom)
-                this.bodies.splice(index, 1);
+                this.bodies.splice(i, 1);
 
             b.force.clear();
             b.torque = 0;
-        });
+        }
     }
 
     register(r: Registrable, passTest: boolean = false): void
     {
-        r.id = World.uid++;
+        r.id = ++this.uid;
 
         if (r instanceof RigidBody)
         {
@@ -126,8 +121,8 @@ export class World
             if (passTest)
                 this.addPassTestPair(r.bodyA, r.bodyB);
 
-            r.bodyA.jointKeys.push(r.id);
-            r.bodyB.jointKeys.push(r.id);
+            r.bodyA.jointIDs.push(r.id);
+            r.bodyB.jointIDs.push(r.id);
 
             this.joints.push(r);
         }
@@ -152,7 +147,8 @@ export class World
             if (b.id == id)
             {
                 this.bodies.splice(i, 1);
-                b.jointKeys.forEach(jointKey => this.unregister(jointKey));
+                for (let i = 0; i < b.jointIDs.length; i++)
+                    this.unregister(b.jointIDs[i]);
                 return true;
             }
         }
@@ -173,7 +169,7 @@ export class World
         this.manifolds = [];
         this.passTestSet.clear();
         this.manifoldMap.clear();
-        World.uid = 0;
+        this.uid = 0;
     }
 
     get numBodies(): number

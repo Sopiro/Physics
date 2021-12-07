@@ -75,7 +75,7 @@ export class Game
     {
         this.handleInput(delta);
         this.callback();
-        this.world.update(delta);
+        this.world.update();
     }
 
     private handleInput(delta: number)
@@ -83,7 +83,7 @@ export class Game
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
 
-        this.camera.translate(new Vector2(mx, my).mulS(delta * 500 * this.camera.scale.x));
+        this.camera.translate(new Vector2(mx, my).mul(delta * 500 * this.camera.scale.x));
         // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
 
         let tmpCursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
@@ -119,10 +119,10 @@ export class Game
 
         if (this.cameraMove)
         {
-            let dist = Input.mousePosition.subV(this.cursorStart);
+            let dist = Input.mousePosition.sub(this.cursorStart);
             dist.x *= -1;
-            dist = dist.mulS(this.camera.scale.x);
-            this.camera.position = this.cameraPosStart.addV(dist);
+            dist = dist.mul(this.camera.scale.x);
+            this.camera.position = this.cameraPosStart.add(dist);
         }
 
         if (this.grabBody && !this.cameraMove)
@@ -132,8 +132,8 @@ export class Game
                 if (Settings.mode == MouseMode.Force)
                 {
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
-                    let force = this.cursorPos.subV(bindInGlobal).mulS(this.targetBody.mass).mulS(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
-                    let torque = bindInGlobal.subV(this.targetBody.localToGlobal.
+                    let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
+                    let torque = bindInGlobal.sub(this.targetBody.localToGlobal.
                         mulVector2(this.targetBody.centerOfMass, 1)).cross(force);
                     this.targetBody.addForce(force);
                     this.targetBody.addTorque(torque)
@@ -220,7 +220,7 @@ export class Game
                 if (Util.checkInside(b, this.cursorPos))
                 {
                     this.world.bodies.splice(i, 1);
-                    b.jointKeys.forEach(jointKey => this.world.unregister(jointKey));
+                    b.jointIDs.forEach(jointID => this.world.unregister(jointID));
                     break;
                 }
             }
@@ -261,7 +261,7 @@ export class Game
                 r.log("Friction: " + String(target.friction), line++);
                 r.log("Restitution: " + String(target.restitution), line++);
                 r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
-                r.log("Rotation: " + String(target.rotation.toFixed(4)), line++);
+                r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
                 r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
                 r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
             }
@@ -275,11 +275,11 @@ export class Game
                 let mid = new Vector2();
                 for (; i < m.numContacts; i++)
                 {
-                    mid = mid.addV(m.contactPoints[i]);
+                    mid = mid.add(m.contactPoints[i]);
                     r.drawCircleV(m.contactPoints[i], 4);
                 }
-                mid = mid.divS(i);
-                r.drawVectorP(mid, mid.addV(m.contactNormal.mulS(20)), 1.5)
+                mid = mid.div(i);
+                r.drawVectorP(mid, mid.add(m.contactNormal.mul(20)), 1.5)
             });
         }
 
@@ -339,10 +339,10 @@ export class Game
 
                 if (j.drawConnectionLine)
                 {
-                    let dir = anchorB.subV(anchorA).normalized().mulS(j.maxDistance);
+                    let dir = anchorB.sub(anchorA).normalized().mul(j.maxDistance);
 
-                    r.drawLineV(anchorA, anchorA.addV(dir));
-                    r.drawLineV(anchorB, anchorB.addV(dir.inverted()));
+                    r.drawLineV(anchorA, anchorA.add(dir));
+                    r.drawLineV(anchorB, anchorB.add(dir.inverted()));
                 }
                 if (j.drawAnchor)
                 {

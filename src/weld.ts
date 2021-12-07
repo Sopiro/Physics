@@ -18,9 +18,6 @@ export class WeldJoint extends Joint
     private bias!: Vector3;
     private impulseSum: Vector3 = new Vector3();
 
-    private beta;
-    private gamma; // Softness
-
     constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
         frequency = 240, dampingRatio = 1.0, mass = -1)
     {
@@ -36,7 +33,7 @@ export class WeldJoint extends Joint
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
 
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
@@ -45,11 +42,11 @@ export class WeldJoint extends Joint
         this.drawConnectionLine = false;
     }
 
-    override prepare(delta: number)
+    override prepare()
     {
         // Calculate Jacobian J and effective mass M
-        // J = [-I, -skew(ra), I, skew(rb)
-        //       0,        -1, 0,        1] 
+        // J = [-I, -skew(ra), I, skew(rb)] // Revolute
+        //     [ 0,        -1, 0,        1] // Angle
         // M = (J · M^-1 · J^t)^-1
 
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
@@ -81,14 +78,14 @@ export class WeldJoint extends Joint
 
         this.m = k.inverted();
 
-        let pa = this.bodyA.position.addV(this.ra);
-        let pb = this.bodyB.position.addV(this.rb);
+        let pa = this.bodyA.position.add(this.ra);
+        let pb = this.bodyB.position.add(this.rb);
 
-        let error01 = pb.subV(pa);
+        let error01 = pb.sub(pa);
         let error2 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
 
         if (Settings.positionCorrection)
-            this.bias = new Vector3(error01.x, error01.y, error2).mulS(this.beta / delta);
+            this.bias = new Vector3(error01.x, error01.y, error2).mul(this.beta * Settings.inv_dt);
         else
             this.bias = new Vector3(0, 0, 0);
 
@@ -102,13 +99,13 @@ export class WeldJoint extends Joint
         // Pc = J^t * λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
-        let jv01 = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
-            .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra)));
+        let jv01 = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
+            .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra)));
         let jv2 = this.bodyB.angularVelocity - this.bodyA.angularVelocity;
 
         let jv = new Vector3(jv01.x, jv01.y, jv2);
 
-        let lambda = this.m.mulVector3(jv.add(this.bias).add(this.impulseSum.mulS(this.gamma)).inverted());
+        let lambda = this.m.mulVector3(jv.add(this.bias).add(this.impulseSum.mul(this.gamma)).inverted());
 
         this.applyImpulse(lambda);
 
@@ -124,11 +121,13 @@ export class WeldJoint extends Joint
         let lambda01 = new Vector2(lambda.x, lambda.y);
         let lambda2 = lambda.z;
 
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(lambda01.mulS(this.bodyA.inverseMass));
+        // Solve for revolute constraint
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(lambda01.mul(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda01);
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(lambda01.mulS(this.bodyB.inverseMass));
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(lambda01.mul(this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(lambda01);
 
+        // Solve for angle constraint
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda2 * this.bodyA.inverseInertia;
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda2 * this.bodyB.inverseInertia;
     }

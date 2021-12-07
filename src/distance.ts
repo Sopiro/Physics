@@ -15,10 +15,7 @@ export class DistanceJoint extends Joint
     private m!: number;
     private n!: Vector2;
     private bias!: number;
-    private impulseSum: number = 0;
-
-    private beta;
-    private gamma; // Softness
+    private impulseSum: number = 0.0;
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position, length: number = -1,
         frequency = 15, dampingRatio = 1.0, mass = -1)
@@ -26,7 +23,7 @@ export class DistanceJoint extends Joint
         super(bodyA, bodyB);
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
-        this.length = length <= 0 ? anchorB.subV(anchorA).length : length;
+        this.length = length <= 0 ? anchorB.sub(anchorA).length : length;
 
         if (mass <= 0) mass = bodyB.mass;
         if (frequency <= 0) frequency = 0.01;
@@ -35,13 +32,13 @@ export class DistanceJoint extends Joint
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
 
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
 
-    override prepare(delta: number): void
+    override prepare(): void
     {
         // Calculate Jacobian J and effective mass M
         // J = [-n, -n·cross(ra), n, n·cross(rb)] ( n = (anchorB-anchorA) / ||anchorB-anchorA|| )
@@ -50,10 +47,10 @@ export class DistanceJoint extends Joint
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
 
-        let pa = this.bodyA.position.addV(this.ra);
-        let pb = this.bodyB.position.addV(this.rb);
+        let pa = this.bodyA.position.add(this.ra);
+        let pb = this.bodyB.position.add(this.rb);
 
-        let u = pb.subV(pa);
+        let u = pb.sub(pa);
 
         this.n = u.normalized();
 
@@ -67,7 +64,7 @@ export class DistanceJoint extends Joint
         let error = (u.length - this.length);
 
         if (Settings.positionCorrection)
-            this.bias = error * this.beta / delta;
+            this.bias = error * this.beta * Settings.inv_dt;
         else
             this.bias = 0.0;
 
@@ -81,8 +78,8 @@ export class DistanceJoint extends Joint
         // Pc = J^t · λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
-        let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
-            .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
+        let jv = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
+            .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra))).dot(this.n);
 
         // Check out below for the reason why the (accumulated impulse * gamma) term is on the right hand side
         // https://pybullet.org/Bullet/phpBB3/viewtopic.php?f=4&t=1354
@@ -99,9 +96,9 @@ export class DistanceJoint extends Joint
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
 
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(this.n.mulS(lambda * this.bodyA.inverseMass));
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(this.n.mul(lambda * this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(lambda, this.ra)) * this.bodyA.inverseInertia;
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(this.n.mulS(lambda * this.bodyB.inverseMass));
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.n.mul(lambda * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(lambda, this.rb)) * this.bodyB.inverseInertia;
     }
 }

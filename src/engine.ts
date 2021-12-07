@@ -7,10 +7,10 @@ export class Engine
 {
     public cvs: HTMLCanvasElement;
     public gfx: CanvasRenderingContext2D;
-    public frameCounterElement: any;
+    public frameCounter: HTMLDivElement;
     public renderer: Renderer;
     public game: Game;
-    public time: number = 0;
+    public time: number;
 
     constructor()
     {
@@ -18,11 +18,12 @@ export class Engine
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
         this.gfx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
-        
-        this.frameCounterElement = document.querySelector(".frame_counter");
+
+        this.frameCounter = document.querySelector(".frame_counter") as HTMLDivElement;
 
         this.renderer = new Renderer(this.gfx);
         this.game = new Game();
+        this.time = 0;
 
         Input.init(this);
     }
@@ -34,17 +35,15 @@ export class Engine
 
     run(t: number): void // Gameloop
     {
-        let delta = t - this.time;
-        if (isNaN(delta)) delta = 1;
-
+        let delta = (t - this.time) / 1000.0;
         this.time = t;
-        const fps = Math.round(1000 / delta);
+        let fps = Math.round(1.0 / delta);
 
-        this.frameCounterElement.innerHTML = fps + "fps";
+        this.frameCounter.innerHTML = fps + "fps";
 
         if (!Settings.paused)
         {
-            this.update(delta / 1000.0);
+            this.update(delta);
             this.render();
         }
         else
@@ -64,6 +63,7 @@ export class Engine
 
     render(): void
     {
+        this.gfx.globalCompositeOperation
         this.gfx.clearRect(0, 0, Settings.width, Settings.height);
         this.game.render(this.renderer);
     }

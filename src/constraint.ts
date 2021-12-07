@@ -6,6 +6,9 @@ export abstract class Constraint
     public readonly bodyA: RigidBody;
     public readonly bodyB: RigidBody;
 
+    protected beta = 0.0; // Coefficient of position correction (Positional error feedback factor)
+    protected gamma = 0.0; // Coefficient of Softness (Force feedback factor)
+
     constructor(bodyA: RigidBody, bodyB: RigidBody)
     {
         this.bodyA = bodyA;
@@ -15,7 +18,7 @@ export abstract class Constraint
     // Calculate Jacobian J and effective mass M
     // J = (depend on constraint)
     // M = (J · M^-1 · J^t)^-1
-    public abstract prepare(delta: number): void;
+    public abstract prepare(): void;
 
     // Solve velocity constraint by applying corrective impulse
     // Corrective impulse: Pc

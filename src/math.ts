@@ -60,7 +60,7 @@ export class Vector2
         const len = this.length;
 
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -80,22 +80,22 @@ export class Vector2
         return this.x * v.y - this.y * v.x;
     }
 
-    addV(v: Vector2): Vector2
+    add(v: Vector2): Vector2
     {
         return new Vector2(this.x + v.x, this.y + v.y);
     }
 
-    subV(v: Vector2): Vector2
+    sub(v: Vector2): Vector2
     {
         return new Vector2(this.x - v.x, this.y - v.y);
     }
 
-    divS(v: number): Vector2
+    div(v: number): Vector2
     {
         return new Vector2(this.x / v, this.y / v);
     }
 
-    mulS(v: number): Vector2
+    mul(v: number): Vector2
     {
         return new Vector2(this.x * v, this.y * v);
     }
@@ -107,7 +107,7 @@ export class Vector2
 
     to(v: Vector2): Vector2
     {
-        return v.subV(this);
+        return v.sub(this);
     }
 
     unNaN(): void
@@ -171,7 +171,7 @@ export class Vector3
         const len = this.length;
 
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -213,9 +213,9 @@ export class Vector3
         return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
-    divS(v: number): Vector3
+    div(s: number): Vector3
     {
-        return new Vector3(this.x / v, this.y / v, this.z / v);
+        return new Vector3(this.x / s, this.y / s, this.z / s);
     }
 
     divXYZ(x: number, y: number, z: number): Vector3
@@ -223,9 +223,9 @@ export class Vector3
         return new Vector3(this.x / x, this.y / y, this.z / z);
     }
 
-    mulS(v: number): Vector3
+    mul(s: number): Vector3
     {
-        return new Vector3(this.x * v, this.y * v, this.z * v);
+        return new Vector3(this.x * s, this.y * s, this.z * s);
     }
 
     mulXYZ(x: number, y: number, z: number): Vector3
@@ -310,7 +310,7 @@ export class Vector4
         const len = this.length;
 
         if (len != 0)
-            return this.divS(len);
+            return this.div(len);
         else
             return this;
     }
@@ -348,9 +348,9 @@ export class Vector4
         return new Vector4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
     }
 
-    divS(v: number): Vector4
+    div(s: number): Vector4
     {
-        return new Vector4(this.x / v, this.y / v, this.z / v, this.w / v);
+        return new Vector4(this.x / s, this.y / s, this.z / s, this.w / s);
     }
 
     divXYZW(x: number, y: number, z: number, w: number): Vector4
@@ -358,9 +358,9 @@ export class Vector4
         return new Vector4(this.x / x, this.y / y, this.z / z, this.w / w);
     }
 
-    mulS(v: number): Vector4
+    mul(s: number): Vector4
     {
-        return new Vector4(this.x * v, this.y * v, this.z * v, this.w * v);
+        return new Vector4(this.x * s, this.y * s, this.z * s, this.w * s);
     }
 
     mulXYZW(x: number, y: number, z: number, w: number): Vector4

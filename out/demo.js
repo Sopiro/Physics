@@ -124,9 +124,9 @@ function demo6(game, world) {
     for (let i = 0; i < 70; i++) {
         let r = Util.random(30, 280);
         let a = Util.random(0, Math.PI * 2);
-        let p = new Vector2(Math.cos(a), Math.sin(a)).mulS(r);
+        let p = new Vector2(Math.cos(a), Math.sin(a)).mul(r);
         let c = Util.createRandomConvexBody(9);
-        c.position = center.addV(p);
+        c.position = center.add(p);
         c.mass = 1;
         c.inertia = Util.calculateCircleInertia(9, 1);
         world.register(c);
@@ -252,16 +252,16 @@ function demo11(game, world) {
     world.register(b1);
     let j;
     if (revoluteBridge) {
-        j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth, yStart).divS(2)), 7, 1.0);
+        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth, yStart).div(2)), 7, 1.0);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j);
     }
     else {
-        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
         j.drawAnchor = false;
         world.register(j);
-        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
         j.drawAnchor = false;
         world.register(j);
     }
@@ -271,15 +271,15 @@ function demo11(game, world) {
         b2.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
         if (revoluteBridge) {
-            j = new RevoluteJoint(b1, b2, b1.position.addV(b2.position).divS(2), 7, 1.0);
+            j = new RevoluteJoint(b1, b2, b1.position.add(b2.position).div(2), 7, 1.0);
             j.drawAnchor = false;
             world.register(j);
         }
         else {
-            j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, 3)), b2.position.addV(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
+            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, 3)), b2.position.add(new Vector2(-sizeX / 2, 3)), -1, 3, 1.0);
             j.drawAnchor = false;
             world.register(j);
-            j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(sizeX / 2, -3)), b2.position.addV(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
+            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, -3)), b2.position.add(new Vector2(-sizeX / 2, -3)), -1, 3, 1.0);
             j.drawAnchor = false;
             world.register(j);
         }
@@ -289,16 +289,16 @@ function demo11(game, world) {
     pillar.position = new Vector2(-xStart, yStart / 2 + 20);
     world.register(pillar);
     if (revoluteBridge) {
-        j = new RevoluteJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth, yStart).divS(2)), 7, 1.0);
+        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth, yStart).div(2)), 7, 1.0);
         j.drawConnectionLine = false;
         j.drawAnchor = false;
         world.register(j);
     }
     else {
-        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, 3)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, 3)), -1, 3, 1.0);
         j.drawAnchor = false;
         world.register(j);
-        j = new DistanceJoint(pillar, b1, pillar.position.addV(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.addV(new Vector2(sizeX / 2, -3)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, -3)), -1, 3, 1.0);
         j.drawAnchor = false;
         world.register(j);
     }
@@ -332,7 +332,7 @@ function demo13(game, world) {
     b2.position.x = 300;
     b2.position.y = Settings.height / 2 + 200;
     world.register(b2);
-    let j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 1, 0.05);
+    let j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, 200)), b2.position, 200, 1, 0.05);
     world.register(j);
     b2 = new Box(30);
     b2.position.x = 300;
@@ -344,13 +344,13 @@ function demo13(game, world) {
     b2.position.x = 300;
     b2.position.y = Settings.height / 2 - 200;
     world.register(b2);
-    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 1, 0.7);
+    j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -200)), b2.position, 200, 1, 0.7);
     world.register(j);
     b2 = new Box(30);
     b2.position.x = -300;
     b2.position.y = Settings.height / 2 + 200;
     world.register(b2);
-    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, 200)), b2.position, 200, 0.5, 0.2);
+    j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, 200)), b2.position, 200, 0.5, 0.2);
     world.register(j);
     b2 = new Box(30);
     b2.position.x = -300;
@@ -364,7 +364,7 @@ function demo13(game, world) {
     b2.position.x = -300;
     b2.position.y = Settings.height / 2 - 200;
     world.register(b2);
-    j = new DistanceJoint(b1, b2, b1.position.addV(new Vector2(0, -200)), b2.position, 200, 2, 0.01);
+    j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -200)), b2.position, 200, 2, 0.01);
     world.register(j);
 }
 Reflect.set(demo14, "SimulationName", "Angle joint test");
@@ -411,14 +411,14 @@ function demo15(game, world) {
         let cos = Math.cos(rr);
         let sin = Math.sin(rr);
         let b1 = Util.createRegularPolygon(15);
-        b1.position = start.addV(new Vector2(cos, sin).mulS(-40));
+        b1.position = start.add(new Vector2(cos, sin).mul(-40));
         world.register(b1);
         let b2 = new Box(80, 3);
         b2.position = start;
         b2.rotation = rr;
         world.register(b2);
         let b3 = Util.createRegularPolygon(15);
-        b3.position = start.addV(new Vector2(cos, sin).mulS(40));
+        b3.position = start.add(new Vector2(cos, sin).mul(40));
         world.register(b3);
         let j = new WeldJoint(b1, b2);
         world.register(j, true);
@@ -453,19 +453,19 @@ function demo16(game, world) {
     j = new AngleJoint(b1, c);
     world.register(j);
     c = new Circle(15);
-    c.position = b2.position.addV(new Vector2(-100, 100));
+    c.position = b2.position.add(new Vector2(-100, 100));
     world.register(c);
     j = new LineJoint(b2, c);
     world.register(j);
     c = Util.createRegularPolygon(20);
-    c.position = b2.position.addV(new Vector2(100, 100));
+    c.position = b2.position.add(new Vector2(100, 100));
     world.register(c);
     j = new LineJoint(b2, c);
     world.register(j);
     let b3 = new Box(30);
-    b3.position = b2.position.addV(new Vector2(0, -100));
+    b3.position = b2.position.add(new Vector2(0, -100));
     world.register(b3);
-    j = new LineJoint(b2, b3, b2.position.addV(new Vector2(15, 0)), b3.position.addV(new Vector2(15, 0)));
+    j = new LineJoint(b2, b3, b2.position.add(new Vector2(15, 0)), b3.position.add(new Vector2(15, 0)));
     world.register(j);
     j = new AngleJoint(b2, b3, 240);
     world.register(j);

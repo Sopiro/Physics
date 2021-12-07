@@ -20,36 +20,38 @@ interface Jacobian
 
 class ContactConstraintSolver
 {
-    private readonly manifold: ContactManifold;
+    private manifold: ContactManifold;
 
-    private readonly a: RigidBody;
-    private readonly b: RigidBody;
-    private readonly contactPoint: Vector2;
-    private readonly ra: Vector2;
-    private readonly rb: Vector2;
+    private bodyA: RigidBody;
+    private bodyB: RigidBody;
+    private contactPoint: Vector2;
     private constraintType!: ConstraintType;
 
+    private ra!: Vector2;
+    private rb!: Vector2;
     private jacobian!: Jacobian;
-    private bias: number = 0.0;
+    private bias!: number;
     private effectiveMass!: number;
 
-    private beta!: number;
-    private restitution!: number;
-    private friction!: number;
+    private beta: number;
+    private restitution: number;
+    private friction: number;
 
     public impulseSum: number = 0.0; // For accumulated impulse
 
     constructor(manifold: ContactManifold, contactPoint: Vector2)
     {
         this.manifold = manifold;
-        this.a = manifold.bodyA;
-        this.b = manifold.bodyB;
+        this.bodyA = manifold.bodyA;
+        this.bodyB = manifold.bodyB;
         this.contactPoint = contactPoint;
-        this.ra = this.contactPoint.subV(this.a.localToGlobal.mulVector2(this.a.centerOfMass, 1));
-        this.rb = this.contactPoint.subV(this.b.localToGlobal.mulVector2(this.b.centerOfMass, 1));
+
+        this.beta = Settings.positionCorrectionBeta;
+        this.restitution = this.bodyA.restitution * this.bodyB.restitution;
+        this.friction = this.bodyA.friction * this.bodyB.friction;
     }
 
-    prepare(dir: Vector2, constraintType: ConstraintType, delta: number)
+    prepare(dir: Vector2, constraintType: ConstraintType)
     {
         // Calculate Jacobian J and effective mass M
         // J = [-dir, -ra × dir, dir, rb × dir] (dir: Contact vector, normal or tangent)
@@ -57,26 +59,27 @@ class ContactConstraintSolver
 
         this.constraintType = constraintType;
 
-        this.beta = Settings.positionCorrectionBeta;
-        this.restitution = this.a.restitution * this.b.restitution;
-        this.friction = this.a.friction * this.b.friction;
+        this.ra = this.contactPoint.sub(this.bodyA.localToGlobal.mulVector2(this.bodyA.centerOfMass, 1));
+        this.rb = this.contactPoint.sub(this.bodyB.localToGlobal.mulVector2(this.bodyB.centerOfMass, 1));
 
-        this.jacobian = {
+        this.jacobian =
+        {
             va: dir.inverted(),
             wa: -this.ra!.cross(dir),
             vb: dir,
             wb: this.rb!.cross(dir),
         }
 
+        this.bias = 0.0;
         if (this.constraintType == ConstraintType.Normal)
         {
             // Relative velocity at contact point
-            let relativeVelocity = this.b.linearVelocity.addV(Util.cross(this.b.angularVelocity, this.rb))
-                .subV(this.a.linearVelocity.addV(Util.cross(this.a.angularVelocity, this.ra)));
+            let relativeVelocity = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
+                .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra)));
             let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal!);
 
             if (Settings.positionCorrection)
-                this.bias = -(this.beta / delta) * Math.max(this.manifold.penetrationDepth! - Settings.penetrationSlop, 0.0);
+                this.bias = -(this.beta * Settings.inv_dt) * Math.max(this.manifold.penetrationDepth! - Settings.penetrationSlop, 0.0);
 
             this.bias += this.restitution * Math.min(approachingVelocity + Settings.restitutionSlop, 0.0);
             // if (approachingVelocity + Settings.restitutionSlop < 0)
@@ -84,10 +87,10 @@ class ContactConstraintSolver
         }
 
         let k: number =
-            + this.a.inverseMass
-            + this.jacobian.wa * this.a.inverseInertia * this.jacobian.wa
-            + this.b.inverseMass
-            + this.jacobian.wb * this.b.inverseInertia * this.jacobian.wb;
+            + this.bodyA.inverseMass
+            + this.jacobian.wa * this.bodyA.inverseInertia * this.jacobian.wa
+            + this.bodyB.inverseMass
+            + this.jacobian.wb * this.bodyB.inverseInertia * this.jacobian.wb;
 
         this.effectiveMass = 1.0 / k;
 
@@ -96,7 +99,7 @@ class ContactConstraintSolver
             this.applyImpulse(this.impulseSum);
     }
 
-    solve(friendNormal?: ContactConstraintSolver)
+    solve(normalContact?: ContactConstraintSolver)
     {
         // Calculate corrective impulse: Pc
         // Pc = J^t * λ (λ: lagrangian multiplier)
@@ -104,10 +107,10 @@ class ContactConstraintSolver
 
         // Jacobian * velocity vector
         let jv: number =
-            + this.jacobian.va.dot(this.a.linearVelocity)
-            + this.jacobian.wa * this.a.angularVelocity
-            + this.jacobian.vb.dot(this.b.linearVelocity)
-            + this.jacobian.wb * this.b.angularVelocity;
+            + this.jacobian.va.dot(this.bodyA.linearVelocity)
+            + this.jacobian.wa * this.bodyA.angularVelocity
+            + this.jacobian.vb.dot(this.bodyB.linearVelocity)
+            + this.jacobian.wb * this.bodyB.angularVelocity;
 
         let lambda = this.effectiveMass * -(jv + this.bias);
 
@@ -124,7 +127,7 @@ class ContactConstraintSolver
                 }
             case ConstraintType.Tangent:
                 {
-                    let maxFriction = this.friction * friendNormal!.impulseSum;
+                    let maxFriction = this.friction * normalContact!.impulseSum;
                     if (Settings.impulseAccumulation)
                         this.impulseSum = Util.clamp(this.impulseSum + lambda, -maxFriction, maxFriction);
                     else
@@ -147,10 +150,10 @@ class ContactConstraintSolver
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
 
-        this.a.linearVelocity = this.a.linearVelocity.addV(this.jacobian.va.mulS(this.a.inverseMass * lambda));
-        this.a.angularVelocity = this.a.angularVelocity + this.a.inverseInertia * this.jacobian.wa * lambda;
-        this.b.linearVelocity = this.b.linearVelocity.addV(this.jacobian.vb.mulS(this.b.inverseMass * lambda));
-        this.b.angularVelocity = this.b.angularVelocity + this.b.inverseInertia * this.jacobian.wb * lambda;
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.add(this.jacobian.va.mul(this.bodyA.inverseMass * lambda));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity + this.bodyA.inverseInertia * this.jacobian.wa * lambda;
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.jacobian.vb.mul(this.bodyB.inverseMass * lambda));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.jacobian.wb * lambda;
     }
 }
 
@@ -182,12 +185,12 @@ export class ContactManifold extends Constraint
         }
     }
 
-    override prepare(delta: number): void
+    override prepare(): void
     {
         for (let i = 0; i < this.numContacts; i++)
         {
-            this.solversN[i].prepare(this.contactNormal!, ConstraintType.Normal, delta);
-            this.solversT[i].prepare(this.contactTangent!, ConstraintType.Tangent, delta);
+            this.solversN[i].prepare(this.contactNormal!, ConstraintType.Normal);
+            this.solversT[i].prepare(this.contactTangent!, ConstraintType.Tangent);
         }
     }
 

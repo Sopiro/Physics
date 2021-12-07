@@ -4,7 +4,7 @@ import * as Util from "./util.js";
 export class AngleJoint extends Joint {
     constructor(bodyA, bodyB, frequency = 60, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
-        this.impulseSum = 0;
+        this.impulseSum = 0.0;
         this.initialAngle = bodyB.rotation - bodyA.rotation;
         if (mass <= 0)
             mass = bodyB.mass;
@@ -14,11 +14,11 @@ export class AngleJoint extends Joint {
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
-    prepare(delta) {
+    prepare() {
         // Calculate Jacobian J and effective mass M
         // J = [0 -1 0 1]
         // M = (J · M^-1 · J^t)^-1
@@ -26,7 +26,7 @@ export class AngleJoint extends Joint {
         this.m = 1.0 / k;
         let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
         if (Settings.positionCorrection)
-            this.bias = error * this.beta / delta;
+            this.bias = error * this.beta * Settings.inv_dt;
         else
             this.bias = 0;
         if (Settings.warmStarting)

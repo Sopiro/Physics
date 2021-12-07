@@ -27,7 +27,8 @@ export const Settings = {
     height: 720,
     paused: false,
     frequency: 60,
-    fixedDeltaTime: 1 / 60.0,
+    dt: 1.0 / 60.0,
+    inv_dt: 60.0,
     GJK_MAX_ITERATION: 20,
     EPA_MAX_ITERATION: 20,
     EPA_TOLERANCE: 1e-9,
@@ -57,7 +58,9 @@ export const Settings = {
     warmStartingThreshold: 0.08,
     deadBottom: -1000,
     grabCenter: false,
-    showInfo: false
+    showInfo: false,
+    randonConvexMaxVertices: 8,
+    regularPolygonMaxVertices: 11
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -216,7 +219,7 @@ beta.addEventListener("input", () => {
     betaLabel.innerHTML = String(mappedValue);
     updateSetting("beta", mappedValue);
 });
-export function updateSetting(id, content = undefined) {
+export function updateSetting(id, content) {
     switch (id) {
         case "pause":
             Settings.paused = !Settings.paused;
@@ -259,7 +262,8 @@ export function updateSetting(id, content = undefined) {
             break;
         case "frequency":
             Settings.frequency = content;
-            Settings.fixedDeltaTime = 1 / content;
+            Settings.dt = 1 / content;
+            Settings.inv_dt = content;
             break;
         case "iteration":
             Settings.numIterations = content;

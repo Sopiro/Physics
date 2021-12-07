@@ -10,13 +10,13 @@ export var Type;
 export class RigidBody extends Entity {
     constructor(type, friction = 0.7, restitution = 0.001) {
         super();
-        this._force = new Vector2(0, 0);
-        this._torque = 0;
         this.id = -1;
-        this.jointKeys = []; // id of the joints containing this body
+        this.jointIDs = []; // id of the joints containing this body
+        this._force = new Vector2(0, 0);
+        this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._cm = new Vector2(0, 0);
+        this._centerOfMass = new Vector2(0, 0);
         this._friction = friction;
         this._restitution = restitution;
         this.type = type;
@@ -56,22 +56,22 @@ export class RigidBody extends Entity {
         return this._invInertia;
     }
     get centerOfMass() {
-        return this._cm;
+        return this._centerOfMass;
     }
     set centerOfMass(cm) {
-        this._cm = cm.copy();
+        this._centerOfMass = cm.copy();
     }
     get friction() {
         return this._friction;
     }
     set friction(f) {
-        this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
+        this._friction = Util.clamp(f, 0.0, Number.MAX_VALUE);
     }
     get restitution() {
         return this._restitution;
     }
     set restitution(r) {
-        this._restitution = Util.clamp(r, 0, 1);
+        this._restitution = Util.clamp(r, 0.0, 1.0);
     }
     get linearVelocity() {
         return this._linearVelocity;
@@ -98,7 +98,7 @@ export class RigidBody extends Entity {
         this._torque = t;
     }
     addForce(f) {
-        this._force = this._force.addV(f);
+        this._force = this._force.add(f);
     }
     addTorque(t) {
         this._torque += t;

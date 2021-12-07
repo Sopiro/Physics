@@ -11,13 +11,13 @@ export enum Type
 
 export class RigidBody extends Entity
 {
-    private _force: Vector2 = new Vector2(0, 0);
-    private _torque: number = 0;
+    private _force: Vector2;
+    private _torque: number;
     private _mass: number; // kg
     private _invMass: number;
     private _inertia: number; // kg⋅cm²
     private _invInertia: number;
-    private _cm: Vector2;
+    private _centerOfMass: Vector2;
     private _linearVelocity: Vector2; // cm/s
     private _angularVelocity: number; // rad/s
     private _friction: number;
@@ -26,15 +26,17 @@ export class RigidBody extends Entity
     public readonly type: Type;
 
     public id: number = -1;
-    public jointKeys: number[] = []; // id of the joints containing this body
+    public jointIDs: number[] = []; // id of the joints containing this body
 
     constructor(type: Type, friction = 0.7, restitution = 0.001)
     {
         super();
 
+        this._force = new Vector2(0, 0);
+        this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._cm = new Vector2(0, 0);
+        this._centerOfMass = new Vector2(0, 0);
         this._friction = friction;
         this._restitution = restitution;
         this.type = type;
@@ -90,12 +92,12 @@ export class RigidBody extends Entity
 
     get centerOfMass(): Vector2
     {
-        return this._cm;
+        return this._centerOfMass;
     }
 
     protected set centerOfMass(cm: Vector2)
     {
-        this._cm = cm.copy();
+        this._centerOfMass = cm.copy();
     }
 
     get friction(): number
@@ -105,7 +107,7 @@ export class RigidBody extends Entity
 
     set friction(f: number)
     {
-        this._friction = Util.clamp(f, 0, Number.MAX_VALUE);
+        this._friction = Util.clamp(f, 0.0, Number.MAX_VALUE);
     }
 
     get restitution(): number
@@ -115,7 +117,7 @@ export class RigidBody extends Entity
 
     set restitution(r: number)
     {
-        this._restitution = Util.clamp(r, 0, 1);
+        this._restitution = Util.clamp(r, 0.0, 1.0);
     }
 
     get linearVelocity(): Vector2
@@ -160,7 +162,7 @@ export class RigidBody extends Entity
 
     addForce(f: Vector2): void
     {
-        this._force = this._force.addV(f);
+        this._force = this._force.add(f);
     }
 
     addTorque(t: number): void

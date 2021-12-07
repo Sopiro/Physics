@@ -12,3 +12,5 @@ export abstract class Joint extends Constraint
         super(bodyA, bodyB);
     }
 }
+
+// Children: Revolute, Prismatic, Distance, Max distance, Weld, Line, Angle, Grab

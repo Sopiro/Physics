@@ -67,13 +67,13 @@ export class Simplex
                     else if (wbc.u <= 0 && wca.v <= 0) // C area
                         return { result: c, info: [2] };
 
-                    const area = b.subV(a).cross(c.subV(a));
+                    const area = b.sub(a).cross(c.sub(a));
 
                     // If area == 0, 3 vertices are in collinear position, which means all aligned in a line
 
-                    const u = b.subV(q).cross(c.subV(q));
-                    const v = c.subV(q).cross(a.subV(q));
-                    const w = a.subV(q).cross(b.subV(q));
+                    const u = b.sub(q).cross(c.sub(q));
+                    const v = c.sub(q).cross(a.sub(q));
+                    const w = a.sub(q).cross(b.sub(q));
 
                     if (wab.u > 0 && wab.v > 0 && w * area <= 0) // On the AB edge
                     {

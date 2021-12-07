@@ -7,3 +7,4 @@ export class Joint extends Constraint {
         this.id = -1;
     }
 }
+// Children: Revolute, Prismatic, Distance, Max distance, Weld, Line, Angle, Grab

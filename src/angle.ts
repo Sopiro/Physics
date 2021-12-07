@@ -9,10 +9,7 @@ export class AngleJoint extends Joint
 
     private m!: number;
     private bias!: number;
-    private impulseSum: number = 0;
-
-    private beta;
-    private gamma; // Softness
+    private impulseSum: number = 0.0;
 
     constructor(bodyA: RigidBody, bodyB: RigidBody, frequency = 60, dampingRatio = 1.0, mass = -1)
     {
@@ -27,13 +24,13 @@ export class AngleJoint extends Joint
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
 
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
 
-    override prepare(delta: number): void
+    override prepare(): void
     {
         // Calculate Jacobian J and effective mass M
         // J = [0 -1 0 1]
@@ -46,7 +43,7 @@ export class AngleJoint extends Joint
         let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
 
         if (Settings.positionCorrection)
-            this.bias = error * this.beta / delta;
+            this.bias = error * this.beta * Settings.inv_dt;
         else
             this.bias = 0;
 

@@ -8,7 +8,7 @@ export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
 export let last_scroll = false;
 export let curr_scroll = false;
-export let mouseScroll = new Vector2(0, 0);
+export const mouseScroll = new Vector2(0, 0);
 export const mouseAcceleration = new Vector2(0, 0);
 export function init(engine) {
     // Registers event listeners

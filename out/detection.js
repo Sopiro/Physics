@@ -57,7 +57,7 @@ function support(b, dir) {
         return { vertex: b.vertices[idx], index: idx };
     }
     else if (b instanceof Circle) {
-        return { vertex: dir.normalized().mulS(b.radius), index: -1 };
+        return { vertex: dir.normalized().mul(b.radius), index: -1 };
     }
     else {
         throw "Not supported shape";
@@ -65,13 +65,13 @@ function support(b, dir) {
 }
 function csoSupport(c1, c2, dir) {
     const localDirP1 = c1.globalToLocal.mulVector2(dir, 0);
-    const localDirP2 = c2.globalToLocal.mulVector2(dir.mulS(-1), 0);
+    const localDirP2 = c2.globalToLocal.mulVector2(dir.mul(-1), 0);
     let supportP1 = support(c1, localDirP1).vertex;
     let supportP2 = support(c2, localDirP2).vertex;
     supportP1 = c1.localToGlobal.mulVector2(supportP1, 1);
     supportP2 = c2.localToGlobal.mulVector2(supportP2, 1);
     return {
-        support: supportP1.subV(supportP2),
+        support: supportP1.sub(supportP2),
         supportA: supportP1,
         supportB: supportP2
     };
@@ -96,11 +96,11 @@ function gjk(c1, c2) {
                 newSimplex.addVertex(simplex.vertices[closest.info[i]]);
             simplex = newSimplex;
         }
-        dir = origin.subV(closest.result);
+        dir = origin.sub(closest.result);
         supportPoint = csoSupport(c1, c2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // the two objects are not colliding so you can early return here.
-        if (Util.toFixed(dir.length - dir.normalized().dot(supportPoint.support.subV(closest.result))) > 0) {
+        if (Util.toFixed(dir.length - dir.normalized().dot(supportPoint.support.sub(closest.result))) > 0) {
             result.collide = false;
             break;
         }
@@ -145,14 +145,14 @@ function findFarthestEdge(b, dir) {
     if (b instanceof Circle) {
         curr = localToGlobal.mulVector2(curr, 1);
         let tangent = Util.cross(1, dir);
-        return new Edge(curr, curr.addV(tangent));
+        return new Edge(curr, curr.add(tangent));
     }
     else if (b instanceof Polygon) {
         let p = b;
         let prev = p.vertices[(idx - 1 + p.count) % p.count];
         let next = p.vertices[(idx + 1) % p.count];
-        let e1 = curr.subV(prev).normalized();
-        let e2 = curr.subV(next).normalized();
+        let e1 = curr.sub(prev).normalized();
+        let e2 = curr.sub(next).normalized();
         let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
         curr = localToGlobal.mulVector2(curr, 1);
         return w ? new Edge(localToGlobal.mulVector2(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector2(next, 1));
@@ -162,8 +162,8 @@ function findFarthestEdge(b, dir) {
     }
 }
 function clipEdge(edge, p, dir, remove = false) {
-    let d1 = edge.p1.subV(p).dot(dir);
-    let d2 = edge.p2.subV(p).dot(dir);
+    let d1 = edge.p1.sub(p).dot(dir);
+    let d2 = edge.p2.sub(p).dot(dir);
     if (d1 >= 0 && d2 >= 0)
         return;
     let per = Math.abs(d1) + Math.abs(d2);
@@ -171,13 +171,13 @@ function clipEdge(edge, p, dir, remove = false) {
         if (remove)
             edge.p1 = edge.p2;
         else
-            edge.p1 = edge.p1.addV(edge.p2.subV(edge.p1).mulS(-d1 / per));
+            edge.p1 = edge.p1.add(edge.p2.sub(edge.p1).mul(-d1 / per));
     }
     else if (d2 < 0) {
         if (remove)
             edge.p2 = edge.p1;
         else
-            edge.p2 = edge.p2.addV(edge.p1.subV(edge.p2).mulS(-d2 / per));
+            edge.p2 = edge.p2.add(edge.p1.sub(edge.p2).mul(-d2 / per));
     }
 }
 // Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
@@ -186,7 +186,7 @@ const CONTACT_MERGE_THRESHOLD = 1.4143;
 function findContactPoints(n, a, b) {
     // collision normal in the world space
     let edgeA = findFarthestEdge(a, n);
-    let edgeB = findFarthestEdge(b, n.mulS(-1));
+    let edgeB = findFarthestEdge(b, n.mul(-1));
     let ref = edgeA;
     let inc = edgeB;
     let flip = false;
@@ -198,8 +198,8 @@ function findContactPoints(n, a, b) {
         flip = true;
     }
     clipEdge(inc, ref.p1, ref.dir);
-    clipEdge(inc, ref.p2, ref.dir.mulS(-1));
-    clipEdge(inc, ref.p1, flip ? n : n.mulS(-1), true);
+    clipEdge(inc, ref.p2, ref.dir.mul(-1));
+    clipEdge(inc, ref.p1, flip ? n : n.mul(-1), true);
     let contactPoints;
     // If two points are closer than threshold, merge them into one point.
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
@@ -218,8 +218,8 @@ export function detectCollision(a, b) {
             return null;
         else {
             d = Math.sqrt(d);
-            let contactNormal = b.position.subV(a.position).normalized();
-            let contactPoint = a.position.addV(contactNormal.mulS(a.radius));
+            let contactNormal = b.position.sub(a.position).normalized();
+            let contactPoint = a.position.add(contactNormal.mul(a.radius));
             let penetrationDepth = (r2 - d);
             if (contactNormal.dot(new Vector2(0, -1)) < 0) {
                 let tmp = a;

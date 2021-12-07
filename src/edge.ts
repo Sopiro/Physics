@@ -15,12 +15,12 @@ export class Edge
         if (this.p1.equals(this.p2))
             this.dir = new Vector2(0, 0);
         else
-            this.dir = p2.subV(p1).normalized();
+            this.dir = p2.sub(p1).normalized();
     }
 
     get length()
     {
-        return this.p2.subV(this.p1).length;
+        return this.p2.sub(this.p1).length;
     }
 
     get normal()
@@ -30,6 +30,6 @@ export class Edge
 
     get midPoint()
     {
-        return new Vector2((this.p1.x + this.p2.x) / 2.0, (this.p1.y + this.p2.y) / 2.0);
+        return Util.mid(this.p1, this.p2);
     }
 }

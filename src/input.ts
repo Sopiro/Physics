@@ -22,7 +22,7 @@ export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
 export let last_scroll: boolean = false;
 export let curr_scroll: boolean = false;
-export let mouseScroll: Vector2 = new Vector2(0, 0);
+export const mouseScroll: Vector2 = new Vector2(0, 0);
 export const mouseAcceleration = new Vector2(0, 0);
 
 export function init(engine: Engine)

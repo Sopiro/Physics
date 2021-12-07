@@ -16,13 +16,13 @@ export class RevoluteJoint extends Joint {
         let omega = 2 * Math.PI * frequency;
         let d = 2 * mass * dampingRatio * omega; // Damping coefficient
         let k = mass * omega * omega; // Spring constant
-        let h = Settings.fixedDeltaTime;
+        let h = Settings.dt;
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
     }
-    prepare(delta) {
+    prepare() {
         // Calculate Jacobian J and effective mass M
-        // J = [-I, -cross(ra), I, cross(rb)]
+        // J = [-I, -skew(ra), I, skew(rb)]
         // M = (J · M^-1 · J^t)^-1
         this.ra = this.bodyA.localToGlobal.mulVector2(this.localAnchorA, 0);
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
@@ -36,11 +36,11 @@ export class RevoluteJoint extends Joint {
         k.m00 += this.gamma;
         k.m11 += this.gamma;
         this.m = k.inverted();
-        let pa = this.bodyA.position.addV(this.ra);
-        let pb = this.bodyB.position.addV(this.rb);
-        let error = pb.subV(pa);
+        let pa = this.bodyA.position.add(this.ra);
+        let pb = this.bodyB.position.add(this.rb);
+        let error = pb.sub(pa);
         if (Settings.positionCorrection)
-            this.bias = error.mulS(this.beta / delta);
+            this.bias = error.mul(this.beta * Settings.inv_dt);
         else
             this.bias = new Vector2(0, 0);
         if (Settings.warmStarting)
@@ -50,20 +50,20 @@ export class RevoluteJoint extends Joint {
         // Calculate corrective impulse: Pc
         // Pc = J^t * λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
-        let jv = this.bodyB.linearVelocity.addV(Util.cross(this.bodyB.angularVelocity, this.rb))
-            .subV(this.bodyA.linearVelocity.addV(Util.cross(this.bodyA.angularVelocity, this.ra)));
+        let jv = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
+            .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra)));
         // You don't have to clamp the impulse. It's equality constraint.
-        let lambda = this.m.mulVector(jv.addV(this.bias).addV(this.impulseSum.mulS(this.gamma)).inverted());
+        let lambda = this.m.mulVector(jv.add(this.bias).add(this.impulseSum.mul(this.gamma)).inverted());
         this.applyImpulse(lambda);
         if (Settings.warmStarting)
-            this.impulseSum = this.impulseSum.addV(lambda);
+            this.impulseSum = this.impulseSum.add(lambda);
     }
     applyImpulse(lambda) {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.subV(lambda.mulS(this.bodyA.inverseMass));
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(lambda.mul(this.bodyA.inverseMass));
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda);
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.addV(lambda.mulS(this.bodyB.inverseMass));
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(lambda.mul(this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(lambda);
     }
 }

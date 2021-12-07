@@ -21,7 +21,7 @@ export class Polytope {
             let j = (i + 1) % this.count;
             let vertexI = this.vertices[i];
             let vertexJ = this.vertices[j];
-            let edge = vertexJ.subV(vertexI);
+            let edge = vertexJ.sub(vertexI);
             let normal = new Vector2(-edge.y, edge.x).normalized();
             let distance = normal.dot(vertexI);
             if (distance < 0) {
