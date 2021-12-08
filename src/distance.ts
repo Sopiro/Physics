@@ -17,8 +17,12 @@ export class DistanceJoint extends Joint
     private bias!: number;
     private impulseSum: number = 0.0;
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position, length: number = -1,
-        frequency = 15, dampingRatio = 1.0, mass = -1)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
+        length: number = -1,
+        frequency = 15, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);

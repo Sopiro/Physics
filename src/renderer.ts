@@ -4,21 +4,37 @@ import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 import { AABB } from "./detection.js";
-import { Camera } from "./camera.js";
 import { Settings } from "./settings.js";
 
 export class Renderer
 {
     private gfx: CanvasRenderingContext2D;
-    private camera!: Camera;
-    private cameraTransform: Matrix3;
-    private modelTransform: Matrix3;
+
+    private cameraTransform!: Matrix3;
+    private modelTransform!: Matrix3;
+    private projectionTransform!: Matrix3;
+    private viewportTransform!: Matrix3;
+    private vpc!: Matrix3;
 
     constructor(gfx: CanvasRenderingContext2D)
     {
         this.gfx = gfx;
-        this.cameraTransform = new Matrix3();
-        this.modelTransform = new Matrix3();
+    }
+
+    init(viewportTransform: Matrix3, projectionTransform: Matrix3, cameraTransform: Matrix3): void
+    {
+        this.viewportTransform = viewportTransform;
+        this.projectionTransform = projectionTransform;
+        this.cameraTransform = cameraTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+
+    // Mouse picking
+    pick(screenPosition: Vector2): Vector2
+    {
+        let inv_vp = this.vpc.inverted();
+
+        return inv_vp.mulVector2(screenPosition, 1.0);
     }
 
     log(content: any, line: number = 0): void
@@ -27,10 +43,23 @@ export class Renderer
         this.drawText(30, y, content);
     }
 
-    setCamera(camera: Camera)
+    setCameraTransform(cameraTransform: Matrix3)
     {
-        this.camera = camera;
-        this.cameraTransform = this.camera.globalToLocal;
+        this.cameraTransform = cameraTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+
+
+    setProjectionTransform(projectionTransform: Matrix3): void
+    {
+        this.projectionTransform = projectionTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+
+    setViewportTransform(viewportTransform: Matrix3): void
+    {
+        this.viewportTransform = viewportTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
     }
 
     setModelTransform(modelTransform: Matrix3): void
@@ -43,52 +72,21 @@ export class Renderer
         this.modelTransform.loadIdentity();
     }
 
-    drawRect(x: number, y: number, width: number, height: number, filled: boolean = false, centered: boolean = false): void
+    drawCircle(x: number, y: number, radius: number = 0.05, filled: boolean = false): void
     {
-        this.drawRectV(new Vector2(x, y), width, height, filled, centered);
+        this.drawCircleV(new Vector2(x, y), radius, filled);
     }
 
-    drawRectV(v: Vector2, width: number, height: number, filled: boolean = false, centered: boolean = false): void
+    drawCircleV(v: Vector2, radius: number = 0.05, filled: boolean = false): void
     {
-        let tv = v.copy();
+        let vpcm = this.vpc.mulMatrix(this.modelTransform);
 
-        if (!centered)
-        {
-            tv.x -= width / 2.0;
-            tv.y -= height / 2.0;
-        }
-
-        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
-
-        this.gfx.lineWidth = 1;
-        this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
-
-        if (filled)
-            this.gfx.fill();
-        else
-            this.gfx.stroke();
-    }
-
-    drawCircle(x: number, y: number, radius: number = 5, filled: boolean = false, centered: boolean = true): void
-    {
-        this.drawCircleV(new Vector2(x, y), radius, filled, centered);
-    }
-
-    drawCircleV(v: Vector2, radius: number = 5, filled: boolean = false, centered: boolean = true): void
-    {
-        let tv = v.copy();
-
-        if (!centered)
-        {
-            tv.x += radius / 2.0;
-            tv.y += radius / 2.0;
-        }
-
-        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
+        let tv = vpcm.mulVector2(v, 1);
+        let tr = this.vpc.mulVector2(new Vector2(radius, 0), 0).x;
 
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
+        this.gfx.arc(tv.x, Settings.height - tv.y, tr, 0, 2 * Math.PI);
 
         if (filled)
             this.gfx.fill();
@@ -103,13 +101,15 @@ export class Renderer
 
     drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
     {
-        let tv0 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v0, 1), 1);
-        let tv1 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v1, 1), 1);
+        let vpcm = this.vpc.mulMatrix(this.modelTransform);
+
+        let tv0 = vpcm.mulVector2(v0, 1);
+        let tv1 = vpcm.mulVector2(v1, 1);
 
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
-        this.gfx.moveTo(Settings.width / 2.0 - 1 + tv0.x, Settings.height / 2.0 - 1 - tv0.y);
-        this.gfx.lineTo(Settings.width / 2.0 - 1 + tv1.x, Settings.height / 2.0 - 1 - tv1.y);
+        this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
+        this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
         this.gfx.stroke();
     }
 
@@ -120,7 +120,7 @@ export class Renderer
     }
 
     // Draw vector from point p toward direction v
-    drawVector(p: Vector2, v: Vector2, arrowSize: number = 3): void
+    drawVector(p: Vector2, v: Vector2, arrowSize: number = 0.03): void
     {
         this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
         let n = new Vector2(-v.y, v.x).normalized().mul(3 * arrowSize);
@@ -132,7 +132,7 @@ export class Renderer
     }
 
     // Draw p1 to p2 vector
-    drawVectorP(p1: Vector2, p2: Vector2, arrowSize: number = 3): void
+    drawVectorP(p1: Vector2, p2: Vector2, arrowSize: number = 0.03): void
     {
         this.drawVector(p1, p2.sub(p1), arrowSize);
     }
@@ -142,7 +142,7 @@ export class Renderer
         switch (sp.count)
         {
             case 1:
-                this.drawCircleV(sp.vertices[0], 10, false, true);
+                this.drawCircleV(sp.vertices[0], 0.1, false);
                 break;
             case 2:
                 this.drawLineV(sp.vertices[0], sp.vertices[1]);
@@ -167,7 +167,7 @@ export class Renderer
             {
                 if (drawVerticesOnly)
                 {
-                    this.drawCircleV(b.vertices[i], 5, true);
+                    this.drawCircleV(b.vertices[i], 0.05, true);
                 }
                 else
                 {
@@ -188,7 +188,7 @@ export class Renderer
         }
 
         if (drawCenterOfMass)
-            this.drawCircleV(b.centerOfMass, 1, true);
+            this.drawCircleV(b.centerOfMass, 0.01, true);
 
         this.resetModelTransform();
     }

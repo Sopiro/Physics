@@ -1,20 +1,37 @@
 import { Circle } from "./circle.js";
-import { Matrix3, Vector2 } from "./math.js";
+import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Settings } from "./settings.js";
 export class Renderer {
     constructor(gfx) {
         this.gfx = gfx;
-        this.cameraTransform = new Matrix3();
-        this.modelTransform = new Matrix3();
+    }
+    init(viewportTransform, projectionTransform, cameraTransform) {
+        this.viewportTransform = viewportTransform;
+        this.projectionTransform = projectionTransform;
+        this.cameraTransform = cameraTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+    // Mouse picking
+    pick(screenPosition) {
+        let inv_vp = this.vpc.inverted();
+        return inv_vp.mulVector2(screenPosition, 1.0);
     }
     log(content, line = 0) {
         let y = 80 + line * 20;
         this.drawText(30, y, content);
     }
-    setCamera(camera) {
-        this.camera = camera;
-        this.cameraTransform = this.camera.globalToLocal;
+    setCameraTransform(cameraTransform) {
+        this.cameraTransform = cameraTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+    setProjectionTransform(projectionTransform) {
+        this.projectionTransform = projectionTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
+    }
+    setViewportTransform(viewportTransform) {
+        this.viewportTransform = viewportTransform;
+        this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
     }
     setModelTransform(modelTransform) {
         this.modelTransform = modelTransform;
@@ -22,36 +39,16 @@ export class Renderer {
     resetModelTransform() {
         this.modelTransform.loadIdentity();
     }
-    drawRect(x, y, width, height, filled = false, centered = false) {
-        this.drawRectV(new Vector2(x, y), width, height, filled, centered);
+    drawCircle(x, y, radius = 0.05, filled = false) {
+        this.drawCircleV(new Vector2(x, y), radius, filled);
     }
-    drawRectV(v, width, height, filled = false, centered = false) {
-        let tv = v.copy();
-        if (!centered) {
-            tv.x -= width / 2.0;
-            tv.y -= height / 2.0;
-        }
-        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
-        this.gfx.lineWidth = 1;
-        this.gfx.rect(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, width, height);
-        if (filled)
-            this.gfx.fill();
-        else
-            this.gfx.stroke();
-    }
-    drawCircle(x, y, radius = 5, filled = false, centered = true) {
-        this.drawCircleV(new Vector2(x, y), radius, filled, centered);
-    }
-    drawCircleV(v, radius = 5, filled = false, centered = true) {
-        let tv = v.copy();
-        if (!centered) {
-            tv.x += radius / 2.0;
-            tv.y += radius / 2.0;
-        }
-        tv = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(tv, 1), 1);
+    drawCircleV(v, radius = 0.05, filled = false) {
+        let vpcm = this.vpc.mulMatrix(this.modelTransform);
+        let tv = vpcm.mulVector2(v, 1);
+        let tr = this.vpc.mulVector2(new Vector2(radius, 0), 0).x;
         this.gfx.lineWidth = 1;
         this.gfx.beginPath();
-        this.gfx.arc(Settings.width / 2.0 - 1 + tv.x, Settings.height / 2.0 - 1 - tv.y, radius / this.camera.scale.x, 0, 2 * Math.PI);
+        this.gfx.arc(tv.x, Settings.height - tv.y, tr, 0, 2 * Math.PI);
         if (filled)
             this.gfx.fill();
         else
@@ -61,12 +58,13 @@ export class Renderer {
         this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
     }
     drawLineV(v0, v1, lineWidth = 1) {
-        let tv0 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v0, 1), 1);
-        let tv1 = this.cameraTransform.mulVector2(this.modelTransform.mulVector2(v1, 1), 1);
+        let vpcm = this.vpc.mulMatrix(this.modelTransform);
+        let tv0 = vpcm.mulVector2(v0, 1);
+        let tv1 = vpcm.mulVector2(v1, 1);
         this.gfx.lineWidth = lineWidth;
         this.gfx.beginPath();
-        this.gfx.moveTo(Settings.width / 2.0 - 1 + tv0.x, Settings.height / 2.0 - 1 - tv0.y);
-        this.gfx.lineTo(Settings.width / 2.0 - 1 + tv1.x, Settings.height / 2.0 - 1 - tv1.y);
+        this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
+        this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
         this.gfx.stroke();
     }
     drawText(x, y, content, fontSize = 20) {
@@ -74,7 +72,7 @@ export class Renderer {
         this.gfx.fillText(content, x, y);
     }
     // Draw vector from point p toward direction v
-    drawVector(p, v, arrowSize = 3) {
+    drawVector(p, v, arrowSize = 0.03) {
         this.drawLine(p.x, p.y, p.x + v.x, p.y + v.y);
         let n = new Vector2(-v.y, v.x).normalized().mul(3 * arrowSize);
         const nv = v.normalized();
@@ -83,13 +81,13 @@ export class Renderer {
         this.drawLine(p.x + v.x - n.x - nv.x * arrowSize, p.y + v.y - n.y - nv.y * arrowSize, p.x + v.x, p.y + v.y);
     }
     // Draw p1 to p2 vector
-    drawVectorP(p1, p2, arrowSize = 3) {
+    drawVectorP(p1, p2, arrowSize = 0.03) {
         this.drawVector(p1, p2.sub(p1), arrowSize);
     }
     drawSimplex(sp) {
         switch (sp.count) {
             case 1:
-                this.drawCircleV(sp.vertices[0], 10, false, true);
+                this.drawCircleV(sp.vertices[0], 0.1, false);
                 break;
             case 2:
                 this.drawLineV(sp.vertices[0], sp.vertices[1]);
@@ -108,7 +106,7 @@ export class Renderer {
         if (b instanceof Polygon) {
             for (let i = 0; i < b.count; i++) {
                 if (drawVerticesOnly) {
-                    this.drawCircleV(b.vertices[i], 5, true);
+                    this.drawCircleV(b.vertices[i], 0.05, true);
                 }
                 else {
                     let curr = b.vertices[i];
@@ -125,7 +123,7 @@ export class Renderer {
             throw "Not supported shape";
         }
         if (drawCenterOfMass)
-            this.drawCircleV(b.centerOfMass, 1, true);
+            this.drawCircleV(b.centerOfMass, 0.01, true);
         this.resetModelTransform();
     }
     drawAABB(aabb, lineWidth = 1) {

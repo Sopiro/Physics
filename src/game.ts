@@ -21,9 +21,10 @@ import { MotorJoint } from "./motor.js";
 
 export class Game
 {
-    public cursorPos: Vector2 = new Vector2(0, 0);
+    private renderer: Renderer;
     public camera: Camera;
     private world: World;
+    public cursorPos: Vector2 = new Vector2(0, 0);
     public time: number = 0.0;
 
     private cameraPosStart!: Vector2;
@@ -37,10 +38,16 @@ export class Game
     private currentDemo = 0;
     public callback = () => { };
 
-    constructor()
+    constructor(renderer: Renderer)
     {
+        this.renderer = renderer;
         this.camera = new Camera();
-        this.camera.position = new Vector2(0, Settings.height / 2.0);
+        this.camera.position = new Vector2(0, Settings.stageHeight / 2.0);
+
+        let projectionTransform = Util.orth(-Settings.stageWidth / 2.0, Settings.stageWidth / 2.0, -Settings.stageHeight / 2.0, Settings.stageHeight / 2.0);
+        let viewportTransform = Util.viewport(Settings.width, Settings.height);
+
+        this.renderer.init(viewportTransform, projectionTransform, this.camera.cameraTransform);
 
         this.world = new World();
 
@@ -87,11 +94,9 @@ export class Game
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
 
-        this.camera.translate(new Vector2(mx, my).mul(delta * 500 * this.camera.scale.x));
-        // this.camera.translate(new Vector2(-this.width / 2.0, -this.height / 2.0));
+        this.camera.translate(new Vector2(mx, my).mul(delta * 10 * this.camera.scale.x));
 
-        let tmpCursorPos = new Vector2(-Settings.width / 2.0 + Input.mousePosition.x, Settings.height / 2.0 - Input.mousePosition.y - 1);
-        tmpCursorPos = this.camera.transform.mulVector2(tmpCursorPos, 1);
+        let tmpCursorPos = this.renderer.pick(Input.mousePosition);
 
         this.cursorPos.x = tmpCursorPos.x;
         this.cursorPos.y = tmpCursorPos.y;
@@ -124,8 +129,8 @@ export class Game
         if (this.cameraMove)
         {
             let dist = Input.mousePosition.sub(this.cursorStart);
-            dist.x *= -1;
-            dist = dist.mul(this.camera.scale.x);
+            dist.x *= -(Settings.stageWidth / Settings.width) * this.camera.scale.x;
+            dist.y *= -(Settings.stageHeight / Settings.height) * this.camera.scale.y;
             this.camera.position = this.cameraPosStart.add(dist);
         }
 
@@ -243,7 +248,7 @@ export class Game
 
     render(r: Renderer): void
     {
-        r.setCamera(this.camera);
+        r.setCameraTransform(this.camera.cameraTransform);
 
         if (Settings.showInfo)
         {
@@ -261,7 +266,7 @@ export class Game
                 let line = 0;
                 r.log("Type: " + String(Type[target.type]), line++);
                 r.log("Mass: " + String(target.mass) + "kg", line++);
-                r.log("Moment of inertia: " + String((target.inertia / 10000).toFixed(4)) + "kg⋅m²", line++);
+                r.log("Moment of inertia: " + String((target.inertia).toFixed(4)) + "kg⋅m²", line++);
                 r.log("Friction: " + String(target.friction), line++);
                 r.log("Restitution: " + String(target.restitution), line++);
                 r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
@@ -280,17 +285,17 @@ export class Game
                 for (; i < m.numContacts; i++)
                 {
                     mid = mid.add(m.contactPoints[i]);
-                    r.drawCircleV(m.contactPoints[i], 4);
+                    r.drawCircleV(m.contactPoints[i], 0.04);
                 }
                 mid = mid.div(i);
-                r.drawVectorP(mid, mid.add(m.contactNormal.mul(20)), 1.5)
+                r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015)
             });
         }
 
         if (this.grabBody && (Settings.mode == MouseMode.Force))
         {
             let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
-            r.drawCircleV(bindInGlobal, 3);
+            r.drawCircleV(bindInGlobal, 0.03);
             r.drawVectorP(bindInGlobal, this.cursorPos);
         }
 
@@ -319,7 +324,7 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA, 3);
+                    r.drawCircleV(anchorA, 0.03);
                 }
             }
             else if (j instanceof DistanceJoint)
@@ -333,8 +338,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA, 3);
-                    r.drawCircleV(anchorB, 3);
+                    r.drawCircleV(anchorA, 0.03);
+                    r.drawCircleV(anchorB, 0.03);
                 }
             } else if (j instanceof MaxDistanceJoint)
             {
@@ -350,8 +355,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA, 3);
-                    r.drawCircleV(anchorB, 3);
+                    r.drawCircleV(anchorA, 0.03);
+                    r.drawCircleV(anchorB, 0.03);
                 }
             }
             else if (j instanceof GrabJoint)
@@ -364,8 +369,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchor, 3);
-                    r.drawCircleV(j.target, 3);
+                    r.drawCircleV(anchor, 0.03);
+                    r.drawCircleV(j.target, 0.03);
                 }
             }
             else if (j instanceof WeldJoint)
@@ -378,7 +383,7 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchor, 3);
+                    r.drawCircleV(anchor, 0.03);
                 }
             } else if (j instanceof LineJoint)
             {
@@ -391,8 +396,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA, 3);
-                    r.drawCircleV(anchorB, 3);
+                    r.drawCircleV(anchorA, 0.03);
+                    r.drawCircleV(anchorB, 0.03);
                 }
             }
             else if (j instanceof PrismaticJoint)
@@ -406,8 +411,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA, 3);
-                    r.drawCircleV(anchorB, 3);
+                    r.drawCircleV(anchorA, 0.03);
+                    r.drawCircleV(anchorB, 0.03);
                 }
             }
             else if (j instanceof MotorJoint)
@@ -421,8 +426,8 @@ export class Game
                 }
                 if (j.drawAnchor)
                 {
-                    r.drawCircleV(anchorA.add(j.linearOffset), 3);
-                    r.drawCircleV(anchorB, 3);
+                    r.drawCircleV(anchorA.add(j.linearOffset), 0.03);
+                    r.drawCircleV(anchorB, 0.03);
                 }
             }
         });

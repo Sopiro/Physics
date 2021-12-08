@@ -18,8 +18,12 @@ export class LineJoint extends Joint
     private bias!: number;
     private impulseSum: number = 0.0;
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
-        dir?: Vector2, frequency = 20000, dampingRatio = 1.0, mass = 10000)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
+        dir?: Vector2,
+        frequency = 30, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
 

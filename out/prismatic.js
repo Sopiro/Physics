@@ -5,7 +5,7 @@ import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 // Line joint + Angle joint
 export class PrismaticJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, dir, frequency = 20000, dampingRatio = 1.0, mass = 10000) {
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, dir, frequency = 30, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.impulseSum = new Vector2();
         if (bodyA.type == Type.Static && bodyB.type == Type.Static)

@@ -25,8 +25,12 @@ export class MotorJoint extends Joint
     private linearImpulseSum: Vector2 = new Vector2();
     private angularImpulseSum: number = 0.0;
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2 = bodyB.position, maxForce = 100000.0, maxTorque = 100000.0,
-        frequency = 60, dampingRatio = 1.0, mass = -1)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchor: Vector2 = bodyB.position,
+        maxForce = 1000.0, maxTorque = 1000.0,
+        frequency = 60, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
         this.linearOffset = new Vector2();

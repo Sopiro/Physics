@@ -4,7 +4,7 @@ import * as Util from "./util.js";
 import { Joint } from "./joint.js";
 // Revolute joint + Angle joint + limited force (torque)
 export class MotorJoint extends Joint {
-    constructor(bodyA, bodyB, anchor = bodyB.position, maxForce = 100000.0, maxTorque = 100000.0, frequency = 60, dampingRatio = 1.0, mass = -1) {
+    constructor(bodyA, bodyB, anchor = bodyB.position, maxForce = 1000.0, maxTorque = 1000.0, frequency = 60, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.linearImpulseSum = new Vector2();
         this.angularImpulseSum = 0.0;

@@ -20,8 +20,12 @@ export class PrismaticJoint extends Joint
     private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2();
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
-        dir?: Vector2, frequency = 20000, dampingRatio = 1.0, mass = 10000)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
+        dir?: Vector2,
+        frequency = 30, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
 

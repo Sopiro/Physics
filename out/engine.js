@@ -10,7 +10,7 @@ export class Engine {
         this.gfx = this.cvs.getContext("2d");
         this.frameCounter = document.querySelector(".frame_counter");
         this.renderer = new Renderer(this.gfx);
-        this.game = new Game();
+        this.game = new Game(this.renderer);
         this.time = 0;
         Input.init(this);
     }

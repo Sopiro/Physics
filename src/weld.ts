@@ -18,8 +18,11 @@ export class WeldJoint extends Joint
     private bias!: Vector3;
     private impulseSum: Vector3 = new Vector3();
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
-        frequency = 240, dampingRatio = 1.0, mass = -1)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
+        frequency = 240, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
         this.initialAngle = bodyB.rotation - bodyA.rotation;

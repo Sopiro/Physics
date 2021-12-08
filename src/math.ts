@@ -22,7 +22,7 @@ export class Vector2
         return new Vector2(this.x, this.y);
     }
 
-    toFixed(limit = 1e-13): void
+    fix(limit = 1e-13): void
     {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);
@@ -145,7 +145,7 @@ export class Vector3
         return new Vector3(this.x, this.y, this.z);
     }
 
-    toFixed(limit = 1e-13): void
+    fix(limit = 1e-13): void
     {
         this.x = Util.toFixed(this.x, limit);
         this.y = Util.toFixed(this.y, limit);

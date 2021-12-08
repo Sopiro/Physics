@@ -1,7 +1,7 @@
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { RigidBody, Type } from "./rigidbody.js";
-import { Vector2 } from "./math.js";
+import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Settings } from "./settings.js";
 
@@ -208,4 +208,36 @@ export function lerp(left: number, right: number, per: number): number
 export function mid(a: Vector2, b: Vector2): Vector2
 {
     return new Vector2((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
+}
+
+// Create a 2D orthographic projection matrix
+export function orth(left: number, right: number, bottom: number, top: number): Matrix3
+{
+    let res = new Matrix3();
+
+    // Scale
+    res.m00 = 2.0 / (right - left);
+    res.m11 = 2.0 / (top - bottom);
+
+    // Translation
+    res.m02 = -(right + left) / (right - left);
+    res.m12 = -(top + bottom) / (top - bottom);
+
+    return res;
+}
+
+// Create viewport transform matrix
+export function viewport(width: number, height: number, xStart = 0, yStart = 0): Matrix3
+{
+    let res = new Matrix3();
+
+    // Scale
+    res.m00 = width / 2.0;
+    res.m11 = height / 2.0;
+
+    // Translation
+    res.m02 = xStart + width / 2.0;
+    res.m12 = yStart + height / 2.0;
+
+    return res;
 }

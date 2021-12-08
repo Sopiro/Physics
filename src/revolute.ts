@@ -15,8 +15,11 @@ export class RevoluteJoint extends Joint
     private bias!: Vector2;
     private impulseSum: Vector2 = new Vector2();
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, anchor: Vector2,
-        frequency = 15, dampingRatio = 1.0, mass = -1)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        anchor: Vector2,
+        frequency = 15, dampingRatio = 1.0, mass = -1
+    )
     {
         super(bodyA, bodyB);
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);

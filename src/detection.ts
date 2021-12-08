@@ -137,7 +137,7 @@ function gjk(c1: RigidBody, c2: RigidBody): GJKResult
     {
         let closest = simplex.getClosest(origin);
 
-        if (closest.result.fixed().equals(origin))
+        if (Util.squared_distance(closest.result, origin) < Settings.GJK_TOLERANCE)
         {
             result.collide = true;
             break;
@@ -157,8 +157,8 @@ function gjk(c1: RigidBody, c2: RigidBody): GJKResult
         supportPoint = csoSupport(c1, c2, dir);
 
         // If the new support point is not further along the search direction than the closest point,
-        // the two objects are not colliding so you can early return here.
-        if (Util.toFixed(dir.length - dir.normalized().dot(supportPoint.support.sub(closest.result))) > 0)
+        // two objects are not colliding so you can early return here.
+        if (dir.length > dir.normalized().dot(supportPoint.support.sub(closest.result)))
         {
             result.collide = false;
             break;
@@ -228,7 +228,7 @@ function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
     if (b instanceof Circle)
     {
         curr = localToGlobal.mulVector2(curr, 1);
-        let tangent = Util.cross(1, dir);
+        let tangent = Util.cross(1, dir).mul(0.01);
 
         return new Edge(curr, curr.add(tangent));
     }
@@ -279,9 +279,9 @@ function clipEdge(edge: Edge, p: Vector2, dir: Vector2, remove: boolean = false)
     }
 }
 
-// Since the findFarthestEdge function returns a edge with a minimum length of 1.0 for circle,
+// Since the findFarthestEdge function returns a edge with a minimum length of 0.01 for circle,
 // merging threshold should be greater than sqrt(2) * minimum edge length
-const CONTACT_MERGE_THRESHOLD = 1.4143;
+const CONTACT_MERGE_THRESHOLD = 1.415 * 0.01;
 
 function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
 {
@@ -296,7 +296,7 @@ function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
     let aPerp = Math.abs(edgeA.dir.dot(n));
     let bPerp = Math.abs(edgeB.dir.dot(n));
 
-    if (aPerp > bPerp)
+    if (aPerp >= bPerp)
     {
         ref = edgeB;
         inc = edgeA;
@@ -328,7 +328,9 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
         let r2 = (a as Circle).radius + (b as Circle).radius;
 
         if (d > r2 * r2)
+        {
             return null;
+        }
         else
         {
             d = Math.sqrt(d);
@@ -397,6 +399,9 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
             b = tmp;
             epaResult.contactNormal.invert();
         }
+
+        // Remove floating point error
+        epaResult.contactNormal.fix(Settings.EPA_TOLERANCE);
 
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
 

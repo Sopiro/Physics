@@ -1,6 +1,6 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./math.js";
-import { updateSetting } from "./settings.js";
+import { Settings, updateSetting } from "./settings.js";
 
 interface Key
 {
@@ -54,7 +54,7 @@ export function init(engine: Engine)
         let rect = engine.cvs.getBoundingClientRect();
 
         mousePosition.x = e.clientX - rect.left;
-        mousePosition.y = e.clientY - rect.top;
+        mousePosition.y = Settings.height - (e.clientY - rect.top);
     });
 
     engine.cvs.addEventListener("wheel", (e) =>

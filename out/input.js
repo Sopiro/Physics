@@ -1,5 +1,5 @@
 import { Vector2 } from "./math.js";
-import { updateSetting } from "./settings.js";
+import { Settings, updateSetting } from "./settings.js";
 const last_keys = {};
 const curr_keys = {};
 const mouses = [];
@@ -33,7 +33,7 @@ export function init(engine) {
     window.addEventListener("mousemove", (e) => {
         let rect = engine.cvs.getBoundingClientRect();
         mousePosition.x = e.clientX - rect.left;
-        mousePosition.y = e.clientY - rect.top;
+        mousePosition.y = Settings.height - (e.clientY - rect.top);
     });
     engine.cvs.addEventListener("wheel", (e) => {
         mouseScroll.x = e.deltaX / 100;

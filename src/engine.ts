@@ -22,7 +22,7 @@ export class Engine
         this.frameCounter = document.querySelector(".frame_counter") as HTMLDivElement;
 
         this.renderer = new Renderer(this.gfx);
-        this.game = new Game();
+        this.game = new Game(this.renderer);
         this.time = 0;
 
         Input.init(this);

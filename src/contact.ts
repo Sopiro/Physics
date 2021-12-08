@@ -170,7 +170,10 @@ export class ContactManifold extends Constraint
 
     public persistent = false;
 
-    constructor(bodyA: RigidBody, bodyB: RigidBody, contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2)
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2
+    )
     {
         super(bodyA, bodyB);
         this.contactPoints = contactPoints;

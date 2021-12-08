@@ -14,7 +14,7 @@ export var MouseMode;
 const frequencyRange = { p1: 10, p2: 240 };
 const iterationRange = { p1: 0, p2: 50 };
 const massRange = { p1: 1, p2: 100 };
-const sizeRange = { p1: 10, p2: 300 };
+const sizeRange = { p1: 0.1, p2: 3 };
 const gravityForceRange = { p1: -20, p2: 20 };
 const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
@@ -25,13 +25,16 @@ const strengthRange = { p1: 0.2, p2: 3.0 };
 export const Settings = {
     width: 1280,
     height: 720,
+    stageWidth: 12.8,
+    stageHeight: 7.2,
     paused: false,
     frequency: 60,
     dt: 1.0 / 60.0,
     inv_dt: 60.0,
     GJK_MAX_ITERATION: 20,
+    GJK_TOLERANCE: 1e-13 * 1e-13,
     EPA_MAX_ITERATION: 20,
-    EPA_TOLERANCE: 1e-9,
+    EPA_TOLERANCE: 1e-13,
     applyGravity: true,
     positionCorrection: true,
     impulseAccumulation: true,
@@ -45,18 +48,18 @@ export const Settings = {
     newBodySettings: {
         shape: GenerationShape.Box,
         mass: 2,
-        size: 50,
+        size: 0.5,
         friction: 0.7,
         restitution: 0.001,
         numVertices: 5
     },
     gravity: -10,
-    gravityScale: 25,
-    penetrationSlop: 0.2,
-    restitutionSlop: 8,
+    gravityScale: 0.25,
+    penetrationSlop: 0.002,
+    restitutionSlop: 0.5,
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.08,
-    deadBottom: -1000,
+    warmStartingThreshold: 0.0005,
+    deadBottom: -10,
     grabCenter: false,
     showInfo: false,
     randonConvexMaxVertices: 8,
@@ -153,11 +156,11 @@ mass.addEventListener("input", () => {
 const size = document.querySelector("#size");
 size.value = String(Util.map(Settings.newBodySettings.size, sizeRange.p1, sizeRange.p2, 0, 100));
 const sizeLabel = document.querySelector("#size_label");
-sizeLabel.innerHTML = String(Settings.newBodySettings.size) + "cm";
+sizeLabel.innerHTML = String(Settings.newBodySettings.size) + "m";
 size.addEventListener("input", () => {
     let mappedValue = Util.map(Number(size.value), 0, 100, sizeRange.p1, sizeRange.p2);
-    mappedValue = Math.trunc(mappedValue);
-    sizeLabel.innerHTML = String(mappedValue) + "cm";
+    mappedValue = Number(mappedValue.toFixed(2));
+    sizeLabel.innerHTML = String(mappedValue) + "m";
     updateSetting("size", mappedValue);
 });
 const friction = document.querySelector("#friction");
