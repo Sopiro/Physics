@@ -279,18 +279,20 @@ export class Game
 
         if (Settings.indicateCP)
         {
-            this.world.manifolds.forEach(m =>
+            for (let i = 0; i < this.world.manifolds.length; i++)
             {
-                let i = 0;
+                let m = this.world.manifolds[i];
+
+                let j = 0;
                 let mid = new Vector2();
-                for (; i < m.numContacts; i++)
+                for (; j < m.numContacts; j++)
                 {
-                    mid = mid.add(m.contactPoints[i]);
-                    r.drawCircleV(m.contactPoints[i], 0.04);
+                    mid = mid.add(m.contactPoints[j]);
+                    r.drawCircleV(m.contactPoints[j], 0.04);
                 }
-                mid = mid.div(i);
+                mid = mid.div(j);
                 r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015)
-            });
+            }
         }
 
         if (this.grabBody && (Settings.mode == MouseMode.Force))
@@ -300,8 +302,10 @@ export class Game
             r.drawVectorP(bindInGlobal, this.cursorPos);
         }
 
-        this.world.bodies.forEach(b =>
+        for (let i = 0; i < this.world.bodies.length; i++)
         {
+            let b = this.world.bodies[i];
+
             r.drawBody(b, Settings.indicateCoM);
 
             if (Settings.showBoundingBox)
@@ -309,10 +313,12 @@ export class Game
                 let aabb = createAABB(b);
                 r.drawAABB(aabb);
             }
-        });
+        }
 
-        this.world.joints.forEach(j =>
+        for (let i = 0; i < this.world.joints.length; i++)
         {
+            let j = this.world.joints[i];
+
             if (j instanceof RevoluteJoint)
             {
                 let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
@@ -431,6 +437,6 @@ export class Game
                     r.drawCircleV(anchorB, 0.03);
                 }
             }
-        });
+        }
     }
 }
