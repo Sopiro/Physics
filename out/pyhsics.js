@@ -183,13 +183,14 @@ function clipEdge(edge, p, dir, remove = false) {
             edge.p2 = edge.p2.addV(edge.p1.subV(edge.p2).mulS(-d2 / per));
     }
 }
+let flip = false;
 function findContactPoints(n, a, b) {
     // collision normal in the world space
     let edgeA = findFarthestEdge(a, n);
     let edgeB = findFarthestEdge(b, n.mulS(-1));
     let ref = edgeA;
     let inc = edgeB;
-    let flip = false;
+    flip = false;
     if (Math.abs(edgeA.dir.dot(n)) > Math.abs(edgeB.dir.dot(n))) {
         ref = edgeB;
         inc = edgeA;
@@ -233,10 +234,38 @@ export function detectCollision(a, b) {
                     simplex.addVertex(newVertex);
         }
         const epaResult = epa(a, b, simplex);
+        // // Apply axis weight to improve coherence
+        // if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0)
+        // {
+        //     let tmp = a;
+        //     a = b;
+        //     b = tmp;
+        //     epaResult.contactNormal.invert();
+        // }
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
+        let penetrationDepths = [];
+        if (contactPoints.length > 1) {
+            let ab = contactPoints[1].subV(contactPoints[0]);
+            let c = epaResult.contactNormal.dot(ab);
+            if (c < 0) {
+                if (flip)
+                    penetrationDepths = [epaResult.penetrationDepth, epaResult.penetrationDepth + c];
+                else
+                    penetrationDepths = [epaResult.penetrationDepth + c, epaResult.penetrationDepth];
+            }
+            else {
+                if (flip)
+                    penetrationDepths = [epaResult.penetrationDepth - c, epaResult.penetrationDepth];
+                else
+                    penetrationDepths = [epaResult.penetrationDepth, epaResult.penetrationDepth - c];
+            }
+        }
+        else {
+            penetrationDepths = [epaResult.penetrationDepth];
+        }
         return {
             collide: true,
-            penetrationDepth: epaResult.penetrationDepth,
+            penetrationDepths: penetrationDepths,
             contactNormal: epaResult.contactNormal,
             contactPonits: contactPoints
         };

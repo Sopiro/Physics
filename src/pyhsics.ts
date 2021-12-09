@@ -283,6 +283,8 @@ function clipEdge(edge: Edge, p: Vector2, dir: Vector2, remove: boolean = false)
     }
 }
 
+let flip = false;
+
 function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
 {
     // collision normal in the world space
@@ -291,7 +293,7 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
 
     let ref = edgeA;
     let inc = edgeB;
-    let flip = false;
+    flip = false;
 
     if (Math.abs(edgeA.dir.dot(n)) > Math.abs(edgeB.dir.dot(n)))
     {
@@ -316,7 +318,7 @@ function findContactPoints(n: Vector2, a: Collider, b: Collider): Vector2[]
 export interface CollisionResult
 {
     collide: boolean;
-    penetrationDepth?: number;
+    penetrationDepths?: number[];
     contactNormal?: Vector2;
     contactPonits?: Vector2[];
 }
@@ -359,11 +361,47 @@ export function detectCollision(a: Collider, b: Collider): CollisionResult
 
         const epaResult: EPAResult = epa(a, b, simplex);
 
+        // // Apply axis weight to improve coherence
+        // if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0)
+        // {
+        //     let tmp = a;
+        //     a = b;
+        //     b = tmp;
+        //     epaResult.contactNormal.invert();
+        // }
+
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
+
+        let penetrationDepths: number[] = [];
+
+        if (contactPoints.length > 1)
+        {
+            let ab = contactPoints[1].subV(contactPoints[0]);
+            let c = epaResult.contactNormal.dot(ab);
+
+            if (c < 0)
+            {
+                if (flip)
+                    penetrationDepths = [epaResult.penetrationDepth, epaResult.penetrationDepth + c];
+                else
+                    penetrationDepths = [epaResult.penetrationDepth + c, epaResult.penetrationDepth];
+            }
+            else
+            {
+                if (flip)
+                    penetrationDepths = [epaResult.penetrationDepth - c, epaResult.penetrationDepth];
+                else
+                    penetrationDepths = [epaResult.penetrationDepth, epaResult.penetrationDepth - c];
+            }
+        }
+        else
+        {
+            penetrationDepths = [epaResult.penetrationDepth];
+        }
 
         return {
             collide: true,
-            penetrationDepth: epaResult.penetrationDepth,
+            penetrationDepths: penetrationDepths,
             contactNormal: epaResult.contactNormal,
             contactPonits: contactPoints
         };

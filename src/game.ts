@@ -103,20 +103,20 @@ export class Game
                 this.r.log("collide!");
                 this.r.resetCameraTransform();
                 this.r.drawText(630, 150, "collision vector");
-                this.r.drawVector(new Vector2(700, 500), res.contactNormal!.mulS(res.penetrationDepth!), 2);
+                this.r.drawVector(new Vector2(700, 500), res.contactNormal!.mulS(res.penetrationDepths![0]), 2);
                 this.r.setCameraTransform(this.camera.getCameraTransform());
                 // this.r.drawVector(res.contactPonintA!, res.contactNormal!.mulS(-res.penetrationDepth!), 2);
 
-                res.contactPonits!.forEach(cp =>
+                res.contactPonits!.forEach((cp, index) =>
                 {
                     this.r.drawCircleV(cp);
-                    this.r.drawVectorP(cp, cp.addV(res.contactNormal!.mulS(-res.penetrationDepth!)));
+                    this.r.drawVectorP(cp, cp.addV(res.contactNormal!.mulS(-res.penetrationDepths![index])));
                 });
 
                 if (this.static_resolution)
                 {
-                    this.p.translate(res.contactNormal!.mulS(-(res.penetrationDepth! + 0.01)));
-                    this.camera.translate(res.contactNormal!.mulS(-(res.penetrationDepth! + 0.01)));
+                    this.p.translate(res.contactNormal!.mulS(-(res.penetrationDepths![0] + 0.01)));
+                    this.camera.translate(res.contactNormal!.mulS(-(res.penetrationDepths![0] + 0.01)));
                 }
             }
             this.r.drawCollider(collider);
