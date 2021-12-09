@@ -11,6 +11,8 @@ export class Engine
     public renderer: Renderer;
     public game: Game;
     public time: number;
+    private lastTime: number = 0.0;
+    private frames: number = 0.0;
 
     constructor()
     {
@@ -37,9 +39,15 @@ export class Engine
     {
         let delta = (t - this.time) / 1000.0;
         this.time = t;
-        let fps = Math.round(1.0 / delta);
 
-        this.frameCounter.innerHTML = fps + "fps";
+        if (this.time - this.lastTime >= 1000.0)
+        {
+            this.frameCounter.innerHTML = this.frames + "fps";
+            this.lastTime += 1000.0;
+            this.frames = 0;
+        }
+
+        this.frames++;
 
         if (!Settings.paused)
         {

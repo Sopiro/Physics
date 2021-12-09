@@ -4,6 +4,8 @@ import * as Input from "./input.js";
 import { Settings } from "./settings.js";
 export class Engine {
     constructor() {
+        this.lastTime = 0.0;
+        this.frames = 0.0;
         this.cvs = document.querySelector("#canvas");
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
@@ -20,8 +22,12 @@ export class Engine {
     run(t) {
         let delta = (t - this.time) / 1000.0;
         this.time = t;
-        let fps = Math.round(1.0 / delta);
-        this.frameCounter.innerHTML = fps + "fps";
+        if (this.time - this.lastTime >= 1000.0) {
+            this.frameCounter.innerHTML = this.frames + "fps";
+            this.lastTime += 1000.0;
+            this.frames = 0;
+        }
+        this.frames++;
         if (!Settings.paused) {
             this.update(delta);
             this.render();
