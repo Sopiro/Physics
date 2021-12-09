@@ -11,7 +11,8 @@ export class RigidBody extends Entity {
     constructor(type, friction = 0.7, restitution = 0.001) {
         super();
         this.id = -1;
-        this.jointIDs = []; // id of the joints containing this body
+        this.contactIDs = new Set(); // ids of contact manifold containing this body
+        this.jointIDs = new Set(); // ids of the joint containing this body
         this._force = new Vector2(0, 0);
         this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);

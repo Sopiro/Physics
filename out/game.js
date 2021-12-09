@@ -102,7 +102,7 @@ export class Game {
                     this.targetBody.addTorque(torque);
                 }
                 else if (Settings.mode == MouseMode.Grab) {
-                    this.world.unregister(this.grabJoint.id);
+                    this.world.unregister(this.grabJoint.id, false);
                 }
                 this.grabBody = false;
             }
@@ -162,8 +162,7 @@ export class Game {
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos)) {
-                    this.world.bodies.splice(i, 1);
-                    b.jointIDs.forEach(jointID => this.world.unregister(jointID));
+                    this.world.unregister(b.id, true);
                     break;
                 }
             }
@@ -208,6 +207,8 @@ export class Game {
                 r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
                 r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
                 r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
+                r.log("Contacts: " + target.contactIDs.size, line++);
+                r.log("Joints: " + target.jointIDs.size, line++);
             }
         }
         if (Settings.indicateCP) {

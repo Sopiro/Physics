@@ -53,7 +53,6 @@ export class MotorJoint extends Joint
 
         this.beta = h * k / (d + h * k);
         this.gamma = 1 / ((d + h * k) * h);
-        console.log(this.beta, this.gamma);
 
         this.drawConnectionLine = false;
     }

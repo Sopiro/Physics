@@ -13,9 +13,13 @@ export class World
     private uid = 0;
 
     public bodies: RigidBody[] = [];
-    public joints: Joint[] = [];
+
     public manifolds: ContactManifold[] = [];
+    public joints: Joint[] = [];
+
     public manifoldMap: Map<number, ContactManifold> = new Map();
+    public jointMap: Map<number, Joint> = new Map();
+    
     public passTestSet: Set<number> = new Set();
 
     update(): void
@@ -53,6 +57,9 @@ export class World
 
                 if (newManifold != null)
                 {
+                    a.contactIDs.add(key);
+                    b.contactIDs.add(key);
+
                     if (Settings.warmStarting && this.manifoldMap.has(key))
                     {
                         let oldManifold = this.manifoldMap.get(key)!;
@@ -64,6 +71,9 @@ export class World
                 }
                 else
                 {
+                    a.contactIDs.delete(key);
+                    b.contactIDs.delete(key);
+
                     this.manifoldMap.delete(key);
                 }
             }
@@ -121,23 +131,27 @@ export class World
             if (passTest)
                 this.addPassTestPair(r.bodyA, r.bodyB);
 
-            r.bodyA.jointIDs.push(r.id);
-            r.bodyB.jointIDs.push(r.id);
+            r.bodyA.jointIDs.add(r.id);
+            r.bodyB.jointIDs.add(r.id);
 
-            this.joints.push(r);
+            this.jointMap.set(r.id, r);
+            this.joints = Array.from(this.jointMap.values());
         }
     }
 
-    unregister(id: number): boolean
+    unregister(id: number, isBody?: boolean): boolean
     {
-        for (let i = 0; i < this.joints.length; i++)
+        if (!isBody && this.jointMap.has(id))
         {
-            let j = this.joints[i];
-            if (j.id == id)
-            {
-                this.joints.splice(i, 1);
-                return true;
-            }
+            let j = this.jointMap.get(id)!;
+
+            j.bodyA.jointIDs.delete(id);
+            j.bodyB.jointIDs.delete(id);
+
+            this.jointMap.delete(id);
+
+            this.joints = Array.from(this.jointMap.values());
+            return true;
         }
 
         for (let i = 0; i < this.bodies.length; i++)
@@ -147,8 +161,7 @@ export class World
             if (b.id == id)
             {
                 this.bodies.splice(i, 1);
-                for (let i = 0; i < b.jointIDs.length; i++)
-                    this.unregister(b.jointIDs[i]);
+                b.jointIDs.forEach(id => this.unregister(id, false));
                 return true;
             }
         }
@@ -169,6 +182,7 @@ export class World
         this.manifolds = [];
         this.passTestSet.clear();
         this.manifoldMap.clear();
+        this.jointMap.clear();
         this.uid = 0;
     }
 
@@ -179,6 +193,6 @@ export class World
 
     get numJoints(): number
     {
-        return this.joints.length;
+        return this.jointMap.size;
     }
 }

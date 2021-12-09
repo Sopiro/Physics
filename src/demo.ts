@@ -10,7 +10,6 @@ import { DistanceJoint } from "./distance.js";
 import { Joint } from "./joint.js";
 import { Game } from "./game.js";
 import * as Input from "./input.js";
-import { Polygon } from "./polygon.js";
 import { AngleJoint } from "./angle.js";
 import { WeldJoint } from "./weld.js";
 import { LineJoint } from "./line.js";
@@ -18,14 +17,15 @@ import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
 
-const ground = new Box(Settings.width * 5, 0.4, Type.Static);
-ground.restitution = 0.45;
 
 Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
+
     let b = new Box(0.4);
     b.position = new Vector2(0, 5);
     b.restitution = 0.7;
@@ -37,6 +37,9 @@ Reflect.set(demo2, "SimulationName", "Box stacking");
 function demo2(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+
     world.register(ground);
 
     let start = 0.5;
@@ -55,6 +58,8 @@ Reflect.set(demo3, "SimulationName", "Pyramid");
 function demo3(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     const rows = 12;
@@ -79,6 +84,8 @@ Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo4(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let seesaw = new Box(6, 0.1);
@@ -155,6 +162,8 @@ Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
 function demo6(game: Game, world: World): void
 {
     updateSetting("g", false);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     const center = new Vector2(3, Settings.stageHeight / 2.0);
@@ -186,6 +195,8 @@ Reflect.set(demo7, "SimulationName", "Friction test");
 function demo7(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let b = new Box(6, 0.1, Type.Static);
@@ -257,6 +268,8 @@ Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let b = new Box(0.3);
@@ -271,6 +284,8 @@ Reflect.set(demo10, "SimulationName", "Multi pendulum");
 function demo10(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let xStart = 0;
@@ -303,6 +318,8 @@ Reflect.set(demo11, "SimulationName", "Suspension bridge");
 function demo11(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let revoluteBridge = true;
@@ -395,7 +412,8 @@ Reflect.set(demo12, "SimulationName", "Circle stacking");
 function demo12(game: Game, world: World): void
 {
     updateSetting("g", true);
-
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let xStart = -4.0;
@@ -483,7 +501,8 @@ Reflect.set(demo14, "SimulationName", "Weld joint test");
 function demo14(game: Game, world: World): void
 {
     updateSetting("g", true);
-
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     for (let i = 0; i < 30; i++)
@@ -520,7 +539,8 @@ Reflect.set(demo15, "SimulationName", "Line joint test");
 function demo15(game: Game, world: World): void
 {
     updateSetting("g", true);
-
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let b1 = new Box(0.3);
@@ -570,7 +590,8 @@ Reflect.set(demo16, "SimulationName", "Max distance joint test");
 function demo16(game: Game, world: World): void
 {
     updateSetting("g", true);
-
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let c = new Box(0.3, 0.3, Type.Static);
@@ -606,7 +627,8 @@ Reflect.set(demo17, "SimulationName", "Prismatic joint test");
 function demo17(game: Game, world: World): void
 {
     updateSetting("g", true);
-
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
     world.register(ground);
 
     let b0: RigidBody = new Box(0.3);
