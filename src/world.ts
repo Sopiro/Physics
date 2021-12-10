@@ -109,7 +109,10 @@ export class World
             b.rotation += b.angularVelocity * Settings.dt;
 
             if (b.position.y < Settings.deadBottom)
+            {
                 this.bodies.splice(i, 1);
+                b.jointIDs.forEach(jid=>this.unregister(jid, false));
+            }
 
             b.force.clear();
             b.torque = 0;

@@ -74,8 +74,10 @@ export class World {
             b.position.x += b.linearVelocity.x * Settings.dt;
             b.position.y += b.linearVelocity.y * Settings.dt;
             b.rotation += b.angularVelocity * Settings.dt;
-            if (b.position.y < Settings.deadBottom)
+            if (b.position.y < Settings.deadBottom) {
                 this.bodies.splice(i, 1);
+                b.jointIDs.forEach(jid => this.unregister(jid, false));
+            }
             b.force.clear();
             b.torque = 0;
         }

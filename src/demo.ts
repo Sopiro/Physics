@@ -412,9 +412,6 @@ Reflect.set(demo12, "SimulationName", "Circle stacking");
 function demo12(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
-    ground.restitution = 0.45;
-    world.register(ground);
 
     let xStart = -4.0;
     let yStart = 1.0;
@@ -428,12 +425,16 @@ function demo12(game: Game, world: World): void
         for (let j = i; j < rows; j++)
         {
             let c = new Circle(size);
-            c.mass = (1 + i) + (1 + i) * j;
+            c.mass = (1 + i) + (1 + i) * j + 1;
             c.position.x = xStart + (gap + size * 2) * i;
             c.position.y = yStart + (gap + size * 2) * j;
             world.register(c);
         }
     }
+
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+    world.register(ground);
 }
 
 Reflect.set(demo13, "SimulationName", "Spring test");
