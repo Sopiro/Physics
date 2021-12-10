@@ -58,12 +58,14 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5,
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.0005,
-    deadBottom: -10,
+    warmStartingThreshold: 0.05 * 0.05,
+    deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
     randonConvexMaxVertices: 8,
-    regularPolygonMaxVertices: 11
+    regularPolygonMaxVertices: 11,
+    defaultMass: 2.0,
+    defaultSize: 0.5,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");

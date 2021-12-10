@@ -134,24 +134,29 @@ export class Game {
                     case GenerationShape.Box:
                         {
                             nb = new Box(nbs.size, nbs.size);
+                            nb.inertia = Util.calculateBoxInertia(nbs.size, nbs.size, nbs.mass);
                             break;
                         }
                     case GenerationShape.Circle:
                         {
-                            nb = new Circle(nbs.size / 2);
+                            nb = new Circle(nbs.size / 2.0);
+                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
                             break;
                         }
                     case GenerationShape.Regular:
                         {
                             nb = Util.createRegularPolygon(nbs.size / 2, nbs.numVertices);
+                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
                             break;
                         }
                     case GenerationShape.Random:
                         {
                             nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2);
+                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
                             break;
                         }
                 }
+                nb.mass = nbs.mass;
                 nb.position = this.cursorPos;
                 nb.friction = nbs.friction;
                 nb.restitution = nbs.restitution;

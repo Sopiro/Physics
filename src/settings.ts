@@ -48,7 +48,7 @@ export const Settings = {
     showBoundingBox: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
-    numIterations: 15, // Number of resolution iterations
+    numIterations: 15, // Number of resolution(sequential impulses) iterations
     newBodySettings: {
         shape: GenerationShape.Box,
         mass: 2,
@@ -62,12 +62,14 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5, // This has to be greater than (gravity * gravityScale * deltaTime)
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.0005,
-    deadBottom: -10,
+    warmStartingThreshold: 0.05 * 0.05,
+    deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
     randonConvexMaxVertices: 8,
-    regularPolygonMaxVertices: 11
+    regularPolygonMaxVertices: 11,
+    defaultMass: 2.0,
+    defaultSize: 0.5,
 }
 
 // Remove the default pop-up context menu

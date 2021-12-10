@@ -2,11 +2,11 @@ import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 import { Constraint } from "./constraint.js";
-var ConstraintType;
-(function (ConstraintType) {
-    ConstraintType[ConstraintType["Normal"] = 0] = "Normal";
-    ConstraintType[ConstraintType["Tangent"] = 1] = "Tangent";
-})(ConstraintType || (ConstraintType = {}));
+var ContactType;
+(function (ContactType) {
+    ContactType[ContactType["Normal"] = 0] = "Normal";
+    ContactType[ContactType["Tangent"] = 1] = "Tangent";
+})(ContactType || (ContactType = {}));
 class ContactConstraintSolver {
     constructor(manifold, contactPoint) {
         this.impulseSum = 0.0; // For accumulated impulse
@@ -18,11 +18,11 @@ class ContactConstraintSolver {
         this.restitution = this.bodyA.restitution * this.bodyB.restitution;
         this.friction = this.bodyA.friction * this.bodyB.friction;
     }
-    prepare(dir, constraintType) {
+    prepare(dir, contactType) {
         // Calculate Jacobian J and effective mass M
         // J = [-dir, -ra × dir, dir, rb × dir] (dir: Contact vector, normal or tangent)
         // M = (J · M^-1 · J^t)^-1
-        this.constraintType = constraintType;
+        this.contactType = contactType;
         this.ra = this.contactPoint.sub(this.bodyA.localToGlobal.mulVector2(this.bodyA.centerOfMass, 1));
         this.rb = this.contactPoint.sub(this.bodyB.localToGlobal.mulVector2(this.bodyB.centerOfMass, 1));
         this.jacobian =
@@ -33,22 +33,21 @@ class ContactConstraintSolver {
                 wb: this.rb.cross(dir),
             };
         this.bias = 0.0;
-        if (this.constraintType == ConstraintType.Normal) {
+        if (this.contactType == ContactType.Normal) {
             // Relative velocity at contact point
             let relativeVelocity = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
                 .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra)));
-            let approachingVelocity = relativeVelocity.dot(this.manifold.contactNormal);
+            let normalVelocity = relativeVelocity.dot(this.manifold.contactNormal);
             if (Settings.positionCorrection)
                 this.bias = -(this.beta * Settings.inv_dt) * Math.max(this.manifold.penetrationDepth - Settings.penetrationSlop, 0.0);
-            this.bias += this.restitution * Math.min(approachingVelocity + Settings.restitutionSlop, 0.0);
-            // if (approachingVelocity + Settings.restitutionSlop < 0)
-            //     this.bias += this.restitution * approachingVelocity;
+            this.bias += this.restitution * Math.min(normalVelocity + Settings.restitutionSlop, 0.0);
+            // if (approachingVelocity + Settings.restitutionSlop < 0) this.bias += this.restitution * approachingVelocity;
         }
         let k = +this.bodyA.inverseMass
             + this.jacobian.wa * this.bodyA.inverseInertia * this.jacobian.wa
             + this.bodyB.inverseMass
             + this.jacobian.wb * this.bodyB.inverseInertia * this.jacobian.wb;
-        this.effectiveMass = 1.0 / k;
+        this.effectiveMass = k > 0.0 ? 1.0 / k : 0.0;
         // Apply the old impulse calculated in the previous time step
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);
@@ -64,8 +63,8 @@ class ContactConstraintSolver {
             + this.jacobian.wb * this.bodyB.angularVelocity;
         let lambda = this.effectiveMass * -(jv + this.bias);
         let oldImpulseSum = this.impulseSum;
-        switch (this.constraintType) {
-            case ConstraintType.Normal:
+        switch (this.contactType) {
+            case ContactType.Normal:
                 {
                     if (Settings.impulseAccumulation)
                         this.impulseSum = Math.max(0.0, this.impulseSum + lambda);
@@ -73,7 +72,7 @@ class ContactConstraintSolver {
                         this.impulseSum = Math.max(0.0, lambda);
                     break;
                 }
-            case ConstraintType.Tangent:
+            case ContactType.Tangent:
                 {
                     let maxFriction = this.friction * normalContact.impulseSum;
                     if (Settings.impulseAccumulation)
@@ -116,8 +115,8 @@ export class ContactManifold extends Constraint {
     }
     prepare() {
         for (let i = 0; i < this.numContacts; i++) {
-            this.solversN[i].prepare(this.contactNormal, ConstraintType.Normal);
-            this.solversT[i].prepare(this.contactTangent, ConstraintType.Tangent);
+            this.solversN[i].prepare(this.contactNormal, ContactType.Normal);
+            this.solversT[i].prepare(this.contactTangent, ContactType.Tangent);
         }
     }
     solve() {
@@ -133,7 +132,8 @@ export class ContactManifold extends Constraint {
             let o = 0;
             for (; o < oldManifold.numContacts; o++) {
                 let dist = Util.squared_distance(this.contactPoints[n], oldManifold.contactPoints[o]);
-                if (dist < Settings.warmStartingThreshold) // If contact points are close enough, warm start.
+                // If contact points are close enough, warm start.
+                if (dist < Settings.warmStartingThreshold)
                     break;
             }
             if (o < oldManifold.numContacts) {

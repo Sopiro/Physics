@@ -51,9 +51,9 @@ export class RigidBody extends Entity
                 this._invInertia = 0;
                 break;
             case Type.Dynamic:
-                this._mass = Settings.newBodySettings.mass;
+                this._mass = Settings.defaultMass;
                 this._invMass = 1 / this._mass;
-                this._inertia = Util.calculateCircleInertia(Settings.newBodySettings.size, this.mass);
+                this._inertia = Util.calculateCircleInertia(Settings.defaultMass, Settings.defaultSize);
                 this._invInertia = 1 / this._inertia;
                 break;
         }

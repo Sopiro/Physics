@@ -16,6 +16,19 @@ export class Engine
 
     constructor()
     {
+        // Block drag event
+        let body = document.querySelector("body") as HTMLBodyElement;
+        body.oncontextmenu = () => { return false };
+        body.ondragstart = () => { return false };
+        body.onselectstart = () => { return false };
+
+        // Disable spacebar scrolling
+        window.addEventListener('keydown', e =>
+        {
+            if (e.key == " " && e.target == document.body)
+                e.preventDefault();
+        });
+
         this.cvs = document.querySelector("#canvas") as HTMLCanvasElement;
         this.cvs.setAttribute("width", Settings.width.toString());
         this.cvs.setAttribute("height", Settings.height.toString());
