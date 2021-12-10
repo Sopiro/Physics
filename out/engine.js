@@ -8,7 +8,7 @@ export class Engine {
         this.frames = 0.0;
         // Block drag event
         let body = document.querySelector("body");
-        body.oncontextmenu = () => { return false; };
+        body.addEventListener("contextmenu", e => e.stopPropagation(), false);
         body.ondragstart = () => { return false; };
         body.onselectstart = () => { return false; };
         // Disable spacebar scrolling

@@ -567,5 +567,73 @@ function demo18(game, world) {
         }
     };
 }
+Reflect.set(demo19, "SimulationName", "Conveyor belt");
+function demo19(game, world) {
+    updateSetting("g", true);
+    let b1 = new Box(3, 0.2, Type.Static);
+    b1.restitution = 0.5;
+    b1.surfaceSpeed = 1.0;
+    b1.position.x = -4.0;
+    b1.position.y = 5.0;
+    world.register(b1);
+    let b2 = new Box(5.5, 0.2, Type.Static);
+    b2.restitution = 0.5;
+    b2.surfaceSpeed = 1.0;
+    b2.rotation = 0.2;
+    b2.position.x = 0.5;
+    b2.position.y = 4.0;
+    world.register(b2);
+    let b3 = new Box(3.5, 0.2, Type.Static);
+    b3.restitution = 0.5;
+    b3.surfaceSpeed = -1.0;
+    b3.position.x = 4.55;
+    b3.position.y = 2.0;
+    world.register(b3);
+    let b4 = new Box(2.0, 0.2, Type.Static);
+    b4.restitution = 0.5;
+    b4.surfaceSpeed = -1.0;
+    b4.position.x = -4.55;
+    b4.position.y = 2.0;
+    world.register(b4);
+    let xStart = -3.3;
+    let yStart = 2.05;
+    let sizeX = 0.4;
+    let gap = 0.05;
+    let b0 = new Box(sizeX, 0.1);
+    b0.surfaceSpeed = -1.5;
+    b0.position.x = xStart;
+    b0.position.y = yStart;
+    world.register(b0);
+    let j = new RevoluteJoint(b4, b0, b4.position.add(new Vector2(1.0, 0.0)));
+    j.drawConnectionLine = false;
+    j.drawAnchor = false;
+    world.register(j);
+    for (let i = 1; i < 14; i++) {
+        let b1 = new Box(sizeX, 0.1);
+        b1.surfaceSpeed = -1.5;
+        b1.position.x = xStart + (sizeX + gap) * i;
+        b1.position.y = yStart;
+        world.register(b1);
+        j = new RevoluteJoint(b0, b1, b0.position.add(b1.position).div(2.0));
+        j.drawAnchor = false;
+        world.register(j);
+        b0 = b1;
+    }
+    j = new RevoluteJoint(b3, b0, b0.position.add(new Vector2(0.2, 0.0)));
+    j.drawConnectionLine = false;
+    j.drawAnchor = false;
+    world.register(j);
+    let last_spawn = 0;
+    game.callback = () => {
+        if (game.time - last_spawn > 0.3) {
+            let c = Util.createRegularPolygon(0.15);
+            c.restitution = 0.3;
+            c.position.x = Util.random(-5.5, -3.0);
+            c.position.y = 7.0;
+            world.register(c);
+            last_spawn = game.time;
+        }
+    };
+}
 export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
-    demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18];
+    demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18, demo19];

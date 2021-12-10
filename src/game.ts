@@ -113,15 +113,13 @@ export class Game
             }
         }
 
-        let spaceDown = Input.isKeyDown(" ");
-
-        if (!this.cameraMove && spaceDown && Input.isMousePressed())
+        if (!this.cameraMove && Input.isMousePressed(2))
         {
             this.cameraMove = true;
             this.cursorStart = Input.mousePosition.copy();
             this.cameraPosStart = this.camera.position.copy();
         }
-        else if (!spaceDown || Input.isMouseReleased())
+        else if (Input.isMouseReleased(2))
         {
             this.cameraMove = false;
         }
@@ -277,6 +275,7 @@ export class Game
                 r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
                 r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
                 r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
+                r.log("Surface velocity: " + String(target.surfaceSpeed.toFixed(4)) + "m/s", line++);
                 r.log("Contacts: " + target.contactIDs.size, line++);
                 r.log("Joints: " + target.jointIDs.size, line++);
             }
@@ -296,7 +295,7 @@ export class Game
                     r.drawCircleV(m.contactPoints[j], 0.04);
                 }
                 mid = mid.div(j);
-                r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015)
+                r.drawVectorP(mid, mid.add(m.contactNormal.mul(-0.2)), 0.015)
             }
         }
 

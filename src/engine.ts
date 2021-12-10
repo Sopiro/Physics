@@ -18,7 +18,7 @@ export class Engine
     {
         // Block drag event
         let body = document.querySelector("body") as HTMLBodyElement;
-        body.oncontextmenu = () => { return false };
+        body.addEventListener("contextmenu", e => e.stopPropagation(), false);
         body.ondragstart = () => { return false };
         body.onselectstart = () => { return false };
 

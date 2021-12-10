@@ -8,7 +8,7 @@ export var Type;
     Type[Type["Dynamic"] = 1] = "Dynamic";
 })(Type || (Type = {}));
 export class RigidBody extends Entity {
-    constructor(type, friction = 0.7, restitution = 0.001) {
+    constructor(type) {
         super();
         this.id = -1;
         this.contactIDs = new Set(); // ids of contact manifold containing this body
@@ -18,8 +18,9 @@ export class RigidBody extends Entity {
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this._centerOfMass = new Vector2(0, 0);
-        this._friction = friction;
-        this._restitution = restitution;
+        this._friction = Settings.defaultFriction;
+        this._restitution = Settings.defaultRestitution;
+        this._surfaceSpeed = 0.0;
         this.type = type;
         switch (this.type) {
             case Type.Static:
@@ -73,6 +74,12 @@ export class RigidBody extends Entity {
     }
     set restitution(r) {
         this._restitution = Util.clamp(r, 0.0, 1.0);
+    }
+    get surfaceSpeed() {
+        return this._surfaceSpeed;
+    }
+    set surfaceSpeed(s) {
+        this._surfaceSpeed = s;
     }
     get linearVelocity() {
         return this._linearVelocity;

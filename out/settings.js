@@ -66,6 +66,8 @@ export const Settings = {
     regularPolygonMaxVertices: 11,
     defaultMass: 2.0,
     defaultSize: 0.5,
+    defaultFriction: 0.7,
+    defaultRestitution: 0.001,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");

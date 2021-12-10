@@ -22,6 +22,7 @@ export class RigidBody extends Entity
     private _angularVelocity: number; // rad/s
     private _friction: number;
     private _restitution: number;
+    private _surfaceSpeed: number; // m/s (Tangential speed)
 
     public readonly type: Type;
 
@@ -29,7 +30,7 @@ export class RigidBody extends Entity
     public contactIDs: Set<number> = new Set(); // ids of contact manifold containing this body
     public jointIDs: Set<number> = new Set(); // ids of the joint containing this body
 
-    constructor(type: Type, friction = 0.7, restitution = 0.001)
+    constructor(type: Type)
     {
         super();
 
@@ -38,8 +39,9 @@ export class RigidBody extends Entity
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
         this._centerOfMass = new Vector2(0, 0);
-        this._friction = friction;
-        this._restitution = restitution;
+        this._friction = Settings.defaultFriction;
+        this._restitution = Settings.defaultRestitution;
+        this._surfaceSpeed = 0.0;
         this.type = type;
 
         switch (this.type)
@@ -119,6 +121,16 @@ export class RigidBody extends Entity
     set restitution(r: number)
     {
         this._restitution = Util.clamp(r, 0.0, 1.0);
+    }
+
+    get surfaceSpeed(): number
+    {
+        return this._surfaceSpeed;
+    }
+
+    set surfaceSpeed(s: number)
+    {
+        this._surfaceSpeed = s;
     }
 
     get linearVelocity(): Vector2

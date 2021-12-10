@@ -263,12 +263,13 @@ export function detectCollision(a, b) {
         }
         const epaResult = epa(a, b, gjkResult.simplex);
         // Apply axis weight to improve coherence
-        if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0) {
-            let tmp = a;
-            a = b;
-            b = tmp;
-            epaResult.contactNormal.invert();
-        }
+        // if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0)
+        // {
+        //     let tmp = a;
+        //     a = b;
+        //     b = tmp;
+        //     epaResult.contactNormal.invert();
+        // }
         // Remove floating point error
         epaResult.contactNormal.fix(Settings.EPA_TOLERANCE);
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);

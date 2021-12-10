@@ -43,6 +43,10 @@ class ContactConstraintSolver {
             this.bias += this.restitution * Math.min(normalVelocity + Settings.restitutionSlop, 0.0);
             // if (approachingVelocity + Settings.restitutionSlop < 0) this.bias += this.restitution * approachingVelocity;
         }
+        else {
+            // Bias for surface speed that enables the conveyor belt-like behavior
+            this.bias = -(this.bodyB.surfaceSpeed - this.bodyA.surfaceSpeed);
+        }
         let k = +this.bodyA.inverseMass
             + this.jacobian.wa * this.bodyA.inverseInertia * this.jacobian.wa
             + this.bodyB.inverseMass
@@ -121,7 +125,6 @@ export class ContactManifold extends Constraint {
     }
     solve() {
         for (let i = 0; i < this.numContacts; i++) {
-            // Order matters. To clamp friction's lambda range, you should get the normal impulse(lambda) value
             this.solversN[i].solve();
             this.solversT[i].solve(this.solversN[i]);
         }
