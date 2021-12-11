@@ -25,7 +25,9 @@ export class Game
     public camera: Camera;
     private world: World;
     public cursorPos: Vector2 = new Vector2(0, 0);
+    public deltaTime: number = 0.0;
     public time: number = 0.0;
+    public frame: number = 0;
 
     private cameraPosStart!: Vector2;
     private cursorStart!: Vector2;
@@ -75,6 +77,7 @@ export class Game
 
     initDemo(): void
     {
+        this.frame = 0;
         this.time = 0.0;
         this.world.clear();
         this.callback = () => { };
@@ -83,6 +86,8 @@ export class Game
 
     update(delta: number): void
     {
+        this.deltaTime = delta;
+        this.frame++;
         this.time += delta;
         this.handleInput(delta);
         this.callback();

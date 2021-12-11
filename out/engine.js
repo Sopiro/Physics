@@ -5,7 +5,7 @@ import { Settings } from "./settings.js";
 export class Engine {
     constructor() {
         this.lastTime = 0.0;
-        this.frames = 0.0;
+        this.frames = 0;
         // Block drag event
         let body = document.querySelector("body");
         body.addEventListener("contextmenu", e => e.stopPropagation(), false);
@@ -30,9 +30,13 @@ export class Engine {
         window.requestAnimationFrame(this.run.bind(this));
     }
     run(t) {
-        let delta = (t - this.time) / 1000.0;
-        this.time = t;
+        let elapsedTime = t - this.time;
+        if (elapsedTime > 500.0)
+            this.lastTime += elapsedTime;
+        let delta = elapsedTime / 1000.0;
+        this.time += elapsedTime;
         if (this.time - this.lastTime >= 1000.0) {
+            Engine.fps = this.frames;
             this.frameCounter.innerHTML = this.frames + "fps";
             this.lastTime += 1000.0;
             this.frames = 0;
@@ -58,3 +62,4 @@ export class Engine {
         this.game.render(this.renderer);
     }
 }
+Engine.fps = 0;

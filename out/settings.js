@@ -120,11 +120,11 @@ strength.addEventListener("input", () => {
 const frequency = document.querySelector("#frequency");
 frequency.value = String(Util.map(Settings.frequency, frequencyRange.p1, frequencyRange.p2, 0, 100));
 const frequencyLabel = document.querySelector("#frequency_label");
-frequencyLabel.innerHTML = String(Settings.frequency);
+frequencyLabel.innerHTML = String(Settings.frequency) + "Hz";
 frequency.addEventListener("input", () => {
     let mappedValue = Util.map(Number(frequency.value), 0, 100, frequencyRange.p1, frequencyRange.p2);
     mappedValue = Math.trunc(mappedValue);
-    frequencyLabel.innerHTML = String(mappedValue);
+    frequencyLabel.innerHTML = String(mappedValue) + "Hz";
     updateSetting("frequency", mappedValue);
 });
 const iteration = document.querySelector("#iteration");

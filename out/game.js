@@ -20,7 +20,9 @@ import { MotorJoint } from "./motor.js";
 export class Game {
     constructor(renderer) {
         this.cursorPos = new Vector2(0, 0);
+        this.deltaTime = 0.0;
         this.time = 0.0;
+        this.frame = 0;
         this.cameraMove = false;
         this.grabBody = false;
         this.currentDemo = 0;
@@ -50,12 +52,15 @@ export class Game {
         this.initDemo();
     }
     initDemo() {
+        this.frame = 0;
         this.time = 0.0;
         this.world.clear();
         this.callback = () => { };
         demos[this.currentDemo](this, this.world);
     }
     update(delta) {
+        this.deltaTime = delta;
+        this.frame++;
         this.time += delta;
         this.handleInput(delta);
         this.callback();

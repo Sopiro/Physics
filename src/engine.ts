@@ -12,7 +12,8 @@ export class Engine
     public game: Game;
     public time: number;
     private lastTime: number = 0.0;
-    private frames: number = 0.0;
+    private frames: number = 0;
+    public static fps: number = 0;
 
     constructor()
     {
@@ -50,11 +51,17 @@ export class Engine
 
     run(t: number): void // Gameloop
     {
-        let delta = (t - this.time) / 1000.0;
-        this.time = t;
+        let elapsedTime = t - this.time;
+
+        if (elapsedTime > 500.0)
+            this.lastTime += elapsedTime;
+
+        let delta = elapsedTime / 1000.0;
+        this.time += elapsedTime;
 
         if (this.time - this.lastTime >= 1000.0)
         {
+            Engine.fps = this.frames;
             this.frameCounter.innerHTML = this.frames + "fps";
             this.lastTime += 1000.0;
             this.frames = 0;

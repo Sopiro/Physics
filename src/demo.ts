@@ -16,6 +16,7 @@ import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
+import { Engine } from "./engine.js";
 
 
 Reflect.set(demo1, "SimulationName", "Single box");
@@ -536,59 +537,8 @@ function demo14(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo15, "SimulationName", "Line joint test");
+Reflect.set(demo15, "SimulationName", "Max distance joint test");
 function demo15(game: Game, world: World): void
-{
-    updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
-    ground.restitution = 0.45;
-    world.register(ground);
-
-    let b1 = new Box(0.3);
-    b1.position.y = 5;
-    b1.angularVelocity = 10;
-    world.register(b1);
-
-    let j: Joint = new LineJoint(ground, b1);
-    world.register(j);
-
-    let b2 = new Box(1, 0.2, Type.Static);
-    b2.position.x = -3;
-    b2.position.y = 3;
-    world.register(b2);
-
-    let c: RigidBody = Util.createRegularPolygon(0.25, 3);
-    c.position.x = -1;
-    c.position.y = 3;
-    c.angularVelocity = 3;
-    world.register(c);
-
-    j = new MaxDistanceJoint(b2, c, 5, undefined, undefined, 1, 0.1);
-    j.drawConnectionLine = false;
-    world.register(j);
-
-    j = new LineJoint(b2, c);
-    world.register(j);
-
-    c = new Circle(0.15);
-    c.position = b2.position.add(new Vector2(-1, 1));
-    world.register(c);
-
-    j = new LineJoint(b2, c);
-    world.register(j);
-
-    let b3 = new Box(0.3);
-    b3.position = b2.position.add(new Vector2(0, -1));
-    world.register(b3);
-
-    j = new LineJoint(b2, b3, b2.position.add(new Vector2(0.15, 0)), b3.position.add(new Vector2(0.15, 0)));
-    world.register(j);
-    j = new AngleJoint(b2, b3, 240);
-    world.register(j);
-}
-
-Reflect.set(demo16, "SimulationName", "Max distance joint test");
-function demo16(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
@@ -624,8 +574,8 @@ function demo16(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo17, "SimulationName", "Prismatic joint test");
-function demo17(game: Game, world: World): void
+Reflect.set(demo16, "SimulationName", "Prismatic joint test");
+function demo16(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
@@ -709,8 +659,8 @@ function demo17(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo18, "SimulationName", "Motor joint test");
-function demo18(game: Game, world: World): void
+Reflect.set(demo17, "SimulationName", "Windmill");
+function demo17(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -731,19 +681,19 @@ function demo18(game: Game, world: World): void
     {
         j.angularOffset = b2.rotation + 0.05;
 
-        if (game.time - last_spawn > 0.2)
+        if ((game.frame - last_spawn) > 0.2 * Engine.fps)
         {
             let c = Util.createRegularPolygon(0.15);
-            c.position.x = Util.random(-2.0, 2.0);
+            c.position.x = Util.random(-1.8, 1.8);
             c.position.y = 6.0;
             world.register(c);
-            last_spawn = game.time;
+            last_spawn = game.frame;
         }
     }
 }
 
-Reflect.set(demo19, "SimulationName", "Conveyor belt");
-function demo19(game: Game, world: World): void
+Reflect.set(demo18, "SimulationName", "Conveyor belt");
+function demo18(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -815,15 +765,68 @@ function demo19(game: Game, world: World): void
 
     game.callback = () =>
     {
-        if (game.time - last_spawn > 0.3)
+        if ((game.frame - last_spawn) > 0.3 * Engine.fps)
         {
             let c = Util.createRegularPolygon(0.15);
             c.restitution = 0.3;
             c.position.x = Util.random(-5.5, -3.0);
             c.position.y = 7.0;
             world.register(c);
-            last_spawn = game.time;
+            last_spawn = game.frame;
         }
+    }
+}
+
+Reflect.set(demo19, "SimulationName", "Crankshaft");
+function demo19(game: Game, world: World): void
+{
+    updateSetting("g", true);
+    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+    world.register(ground);
+
+    let b0 = new Box(0.5)
+    b0.position.y = 5.5;
+    world.register(b0);
+
+    let c1 = new Circle(0.7);
+    c1.position.y = 1.5;
+    world.register(c1);
+
+    let j: Joint = new RevoluteJoint(ground, c1, c1.position);
+    j.drawAnchor = false;
+    j.drawConnectionLine = false;
+    world.register(j);
+
+    let b1 = new Box(1.2, 0.2);
+    b1.position.y = 3.3;
+    world.register(b1);
+
+    let b2 = new Box(0.2, 2.0);
+    b2.rotation = Math.atan2(0.7, b1.position.y - c1.position.y);
+    b2.position.x = 0.35;
+    b2.position.y = (c1.position.y + b1.position.y) / 2.0;
+    world.register(b2);
+
+    j = new RevoluteJoint(c1, b2, c1.position.add(new Vector2(0.7, 0)));
+    j.drawConnectionLine = false;
+    world.register(j, true);
+    world.addPassTestPair(b1, b2);
+
+    j = new RevoluteJoint(b1, b2, b1.position);
+    j.drawConnectionLine = false;
+    world.register(j, true);
+
+    j = new PrismaticJoint(ground, b1, ground.position.add(new Vector2(0, 0)));
+    j.drawAnchor = false; j
+    j.drawConnectionLine = false;
+    world.register(j);
+
+    let m = new MotorJoint(ground, c1, c1.position, 1000, 30.0);
+    world.register(m, true);
+    game.callback = () =>
+    {
+        m.angularOffset = c1.rotation + 0.05;
     }
 }
 
