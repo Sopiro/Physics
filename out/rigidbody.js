@@ -17,7 +17,6 @@ export class RigidBody extends Entity {
         this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._centerOfMass = new Vector2(0, 0);
         this._friction = Settings.defaultFriction;
         this._restitution = Settings.defaultRestitution;
         this._surfaceSpeed = 0.0;
@@ -56,12 +55,6 @@ export class RigidBody extends Entity {
     }
     get inverseInertia() {
         return this._invInertia;
-    }
-    get centerOfMass() {
-        return this._centerOfMass;
-    }
-    set centerOfMass(cm) {
-        this._centerOfMass = cm.copy();
     }
     get friction() {
         return this._friction;

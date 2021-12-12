@@ -341,7 +341,7 @@ function demo12(game, world) {
     ground.restitution = 0.45;
     world.register(ground);
 }
-Reflect.set(demo13, "SimulationName", "Spring test");
+Reflect.set(demo13, "SimulationName", "Springs");
 function demo13(game, world) {
     updateSetting("g", false);
     let b1 = new Box(0.3, 6, Type.Static);
@@ -386,7 +386,7 @@ function demo13(game, world) {
     j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -2)), b2.position, 2, 2, 0.01);
     world.register(j);
 }
-Reflect.set(demo14, "SimulationName", "Weld joint test");
+Reflect.set(demo14, "SimulationName", "Weld joint: Dumbbells");
 function demo14(game, world) {
     updateSetting("g", true);
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
@@ -414,7 +414,7 @@ function demo14(game, world) {
         b2.addVelocity(new Vector2(-b2.position.x, 0));
     }
 }
-Reflect.set(demo15, "SimulationName", "Max distance joint test");
+Reflect.set(demo15, "SimulationName", "Max distance joint");
 function demo15(game, world) {
     updateSetting("g", true);
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
@@ -442,7 +442,7 @@ function demo15(game, world) {
     j = new MaxDistanceJoint(c, b, 1.2, undefined, undefined, 0.7, 0.1);
     world.register(j);
 }
-Reflect.set(demo16, "SimulationName", "Prismatic joint test");
+Reflect.set(demo16, "SimulationName", "Prismatic joint");
 function demo16(game, world) {
     updateSetting("g", true);
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
@@ -506,7 +506,7 @@ function demo16(game, world) {
     j = new AngleJoint(ground, j1.bodyB);
     world.register(j);
 }
-Reflect.set(demo17, "SimulationName", "Windmill");
+Reflect.set(demo17, "SimulationName", "Motor joint: Windmill");
 function demo17(game, world) {
     updateSetting("g", true);
     let b1 = new Box(0.2, 3.2, Type.Static);
@@ -603,40 +603,88 @@ function demo19(game, world) {
     let ground = new Box(Settings.width * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
-    let b0 = new Box(0.5);
-    b0.position.y = 5.5;
-    world.register(b0);
-    let c1 = new Circle(0.7);
-    c1.position.y = 1.5;
-    world.register(c1);
-    let j = new RevoluteJoint(ground, c1, c1.position);
-    j.drawAnchor = false;
-    j.drawConnectionLine = false;
-    world.register(j);
-    let b1 = new Box(1.2, 0.2);
-    b1.position.y = 3.3;
-    world.register(b1);
-    let b2 = new Box(0.2, 2.0);
-    b2.rotation = Math.atan2(0.7, b1.position.y - c1.position.y);
-    b2.position.x = 0.35;
-    b2.position.y = (c1.position.y + b1.position.y) / 2.0;
-    world.register(b2);
-    j = new RevoluteJoint(c1, b2, c1.position.add(new Vector2(0.7, 0)));
-    j.drawConnectionLine = false;
-    world.register(j, true);
-    world.addPassTestPair(b1, b2);
-    j = new RevoluteJoint(b1, b2, b1.position);
-    j.drawConnectionLine = false;
-    world.register(j, true);
-    j = new PrismaticJoint(ground, b1, ground.position.add(new Vector2(0, 0)));
-    j.drawAnchor = false;
-    j;
-    j.drawConnectionLine = false;
-    world.register(j);
-    let m = new MotorJoint(ground, c1, c1.position, 1000, 30.0);
-    world.register(m, true);
+    let m1;
+    let c1;
+    {
+        let xStart = -3.0;
+        let b0 = new Box(0.5);
+        b0.position.x = xStart;
+        b0.position.y = 4.0;
+        world.register(b0);
+        let sizeX = 1.0;
+        let sizeY = 0.2;
+        c1 = new Box(sizeX, sizeY);
+        c1.repositionCenter(new Vector2(-sizeX / 2.0, 0.0));
+        c1.position.x = xStart;
+        c1.position.y = 1.5;
+        world.register(c1);
+        let j = new RevoluteJoint(ground, c1, c1.position);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j);
+        let b1 = new Box(1.2, sizeY);
+        b1.position.x = xStart;
+        b1.position.y = 3.3;
+        world.register(b1);
+        let b2 = new Box(0.2, 2.0);
+        b2.rotation = Math.atan2(sizeX, b1.position.y - c1.position.y);
+        b2.position.x = xStart + sizeX / 2.0;
+        b2.position.y = (c1.position.y + b1.position.y) / 2.0;
+        world.register(b2);
+        j = new RevoluteJoint(c1, b2, c1.position.add(new Vector2(sizeX, 0)));
+        j.drawConnectionLine = false;
+        world.register(j, true);
+        world.addPassTestPair(b1, b2);
+        j = new RevoluteJoint(b1, b2, b1.position);
+        j.drawConnectionLine = false;
+        world.register(j, true);
+        j = new PrismaticJoint(ground, b1, ground.position.add(new Vector2(xStart, 0)));
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j);
+        m1 = new MotorJoint(ground, c1, c1.position, 1000, 30.0);
+        world.register(m1, true);
+    }
+    let m2;
+    let c2;
+    {
+        let xStart = 1.0;
+        let yStart = 2.0;
+        c2 = new Circle(0.7);
+        c2.position.x = xStart;
+        c2.position.y = yStart;
+        world.register(c2);
+        let j = new RevoluteJoint(ground, c2, c2.position);
+        j.drawConnectionLine = false;
+        world.register(j);
+        let b = new Box(1.5, 0.2);
+        b.position.x = xStart + 1.5 / 2.0 + 0.7;
+        b.position.y = yStart;
+        world.register(b);
+        j = new RevoluteJoint(c2, b, c2.position.add(new Vector2(0.7, 0)));
+        j.drawConnectionLine = false;
+        world.register(j, true);
+        let b1 = new Box(2.0, 0.2);
+        b1.position.x = xStart + 0.7 + 1.5 + 1.0;
+        b1.position.y = yStart;
+        world.register(b1);
+        j = new RevoluteJoint(b, b1, b.position.add(new Vector2(1.5 / 2.0, 0)));
+        j.drawConnectionLine = false;
+        world.register(j, true);
+        j = new PrismaticJoint(ground, b1, c2.position, b1.position);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j);
+        m2 = new MotorJoint(ground, c2, c2.position);
+        world.register(m2);
+        b = new Box(0.4);
+        b.position = new Vector2(3.0, 5.0);
+        b.friction = 0.8;
+        world.register(b);
+    }
     game.callback = () => {
-        m.angularOffset = c1.rotation + 0.05;
+        m1.angularOffset = c1.rotation + 0.04;
+        m2.angularOffset = c2.rotation - 0.03;
     };
 }
 export const demos = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,

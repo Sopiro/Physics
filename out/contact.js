@@ -23,8 +23,8 @@ class ContactConstraintSolver {
         // J = [-dir, -ra × dir, dir, rb × dir] (dir: Contact vector, normal or tangent)
         // M = (J · M^-1 · J^t)^-1
         this.contactType = contactType;
-        this.ra = this.contactPoint.sub(this.bodyA.localToGlobal.mulVector2(this.bodyA.centerOfMass, 1));
-        this.rb = this.contactPoint.sub(this.bodyB.localToGlobal.mulVector2(this.bodyB.centerOfMass, 1));
+        this.ra = this.contactPoint.sub(this.bodyA.position);
+        this.rb = this.contactPoint.sub(this.bodyB.position);
         this.jacobian =
             {
                 va: dir.inverted(),

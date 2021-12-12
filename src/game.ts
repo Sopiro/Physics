@@ -145,8 +145,7 @@ export class Game
                 {
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
                     let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
-                    let torque = bindInGlobal.sub(this.targetBody.localToGlobal.
-                        mulVector2(this.targetBody.centerOfMass, 1)).cross(force);
+                    let torque = bindInGlobal.sub(this.targetBody.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
                     this.targetBody.addForce(force);
                     this.targetBody.addTorque(torque)
                 }
@@ -170,7 +169,7 @@ export class Game
                 {
                     this.grabBody = true;
                     if (Settings.grabCenter)
-                        this.bindPosition = b.centerOfMass;
+                        this.bindPosition = new Vector2(0, 0);
                     else
                         this.bindPosition = b.globalToLocal.mulVector2(this.cursorPos, 1);
                     this.targetBody = b;

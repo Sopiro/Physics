@@ -11,13 +11,13 @@ export enum Type
 
 export class RigidBody extends Entity
 {
+    // Center of mass in local = (0, 0)
     private _force: Vector2;
     private _torque: number;
     private _mass: number; // kg
     private _invMass: number;
     private _inertia: number; // kg⋅cm²
     private _invInertia: number;
-    private _centerOfMass: Vector2;
     private _linearVelocity: Vector2; // cm/s
     private _angularVelocity: number; // rad/s
     private _friction: number;
@@ -38,7 +38,6 @@ export class RigidBody extends Entity
         this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);
         this._angularVelocity = 0;
-        this._centerOfMass = new Vector2(0, 0);
         this._friction = Settings.defaultFriction;
         this._restitution = Settings.defaultRestitution;
         this._surfaceSpeed = 0.0;
@@ -91,16 +90,6 @@ export class RigidBody extends Entity
     get inverseInertia(): number
     {
         return this._invInertia;
-    }
-
-    get centerOfMass(): Vector2
-    {
-        return this._centerOfMass;
-    }
-
-    protected set centerOfMass(cm: Vector2)
-    {
-        this._centerOfMass = cm.copy();
     }
 
     get friction(): number

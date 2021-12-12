@@ -11,25 +11,35 @@ export class Polygon extends RigidBody
 
         this.vertices = vertices;
 
+        let centerOfMass = new Vector2(0, 0);
+
         for (let i = 0; i < this.count; i++)
         {
-            this.centerOfMass.x += this.vertices[i].x;
-            this.centerOfMass.y += this.vertices[i].y;
+            centerOfMass.x += this.vertices[i].x;
+            centerOfMass.y += this.vertices[i].y;
         }
 
-        this.centerOfMass.x /= this.count;
-        this.centerOfMass.y /= this.count;
+        centerOfMass.x /= this.count;
+        centerOfMass.y /= this.count;
 
         for (let i = 0; i < this.count; i++)
         {
-            this.vertices[i].x -= this.centerOfMass.x;
-            this.vertices[i].y -= this.centerOfMass.y;
+            this.vertices[i].x -= centerOfMass.x;
+            this.vertices[i].y -= centerOfMass.y;
         }
 
         if (!resetPosition)
-            this.translate(this.centerOfMass);
+            this.translate(centerOfMass);
+    }
 
-        this.centerOfMass.clear();
+    repositionCenter(p: Vector2)
+    {
+        for(let i = 0; i < this.vertices.length; i++)
+        {
+            let vertex = this.vertices[i];
+            vertex.x -= p.x;
+            vertex.y -= p.y;
+        }
     }
 
     get count(): number

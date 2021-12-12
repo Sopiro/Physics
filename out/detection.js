@@ -9,10 +9,9 @@ import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 export function createAABB(b) {
     if (b instanceof Circle) {
-        let cmInGlobal = b.localToGlobal.mulVector2(b.centerOfMass, 1);
         return {
-            min: new Vector2(cmInGlobal.x - b.radius, cmInGlobal.y - b.radius),
-            max: new Vector2(cmInGlobal.x + b.radius, cmInGlobal.y + b.radius)
+            min: new Vector2(b.position.x - b.radius, b.position.y - b.radius),
+            max: new Vector2(b.position.x + b.radius, b.position.y + b.radius)
         };
     }
     else if (b instanceof Polygon) {

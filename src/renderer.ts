@@ -49,7 +49,6 @@ export class Renderer
         this.vpc = this.viewportTransform.mulMatrix(this.projectionTransform).mulMatrix(this.cameraTransform);
     }
 
-
     setProjectionTransform(projectionTransform: Matrix3): void
     {
         this.projectionTransform = projectionTransform;
@@ -161,6 +160,8 @@ export class Renderer
     {
         this.setModelTransform(b.localToGlobal);
 
+        let center = new Vector2(0, 0)
+
         if (b instanceof Polygon)
         {
             for (let i = 0; i < b.count; i++)
@@ -179,8 +180,8 @@ export class Renderer
         }
         else if (b instanceof Circle)
         {
-            this.drawCircleV(b.centerOfMass, b.radius);
-            this.drawLineV(b.centerOfMass, b.centerOfMass.add(new Vector2(b.radius, 0)));
+            this.drawCircleV(center, b.radius);
+            this.drawLineV(center, new Vector2(b.radius, 0));
         }
         else
         {
@@ -188,7 +189,7 @@ export class Renderer
         }
 
         if (drawCenterOfMass)
-            this.drawCircleV(b.centerOfMass, 0.01, true);
+            this.drawCircleV(center, 0.01, true);
 
         this.resetModelTransform();
     }
