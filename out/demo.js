@@ -756,7 +756,8 @@ function demo20(game, world) {
     world.register(j, true);
     j = new WeldJoint(body2, body3, undefined, 5, 1.0);
     world.register(j, true);
-    j = new RevoluteJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), 5, 0.1);
+    j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), 1000, 1, 3, 1);
+    j.initialAngle = -Math.PI / 2.0 + 0.3;
     j.drawConnectionLine = false;
     world.register(j, false);
     let b1 = Util.createRegularPolygon(0.09, 5);
@@ -769,7 +770,8 @@ function demo20(game, world) {
     j = new RevoluteJoint(lower_arm_r, b1, b1.position, 5, 0.1);
     j.drawConnectionLine = false;
     world.register(j, true);
-    j = new RevoluteJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), 5, 0.1);
+    j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), 1000, 1, 3, 1);
+    j.initialAngle = Math.PI / 2.0 - 0.3;
     j.drawConnectionLine = false;
     world.register(j, true);
     let b2 = Util.createRegularPolygon(0.09, 5);
@@ -782,7 +784,7 @@ function demo20(game, world) {
     j = new RevoluteJoint(lower_arm_l, b2, b2.position, 5, 0.1);
     j.drawConnectionLine = false;
     world.register(j, true);
-    j = new MotorJoint(body1, upper_leg_r, upper_leg_r.position.add(new Vector2(0, 0.5)), 1000, 1, 5, 1);
+    j = new MotorJoint(body1, upper_leg_r, upper_leg_r.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
     j.drawConnectionLine = false;
     world.register(j, false);
     let b3 = Util.createRegularPolygon(0.125, 5);
@@ -795,7 +797,7 @@ function demo20(game, world) {
     j = new RevoluteJoint(lower_leg_r, b3, b3.position, 5, 1.0);
     j.drawConnectionLine = false;
     world.register(j, true);
-    j = new MotorJoint(body1, upper_leg_l, upper_leg_l.position.add(new Vector2(0, 0.5)), 1000, 1, 5, 1);
+    j = new MotorJoint(body1, upper_leg_l, upper_leg_l.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
     j.drawConnectionLine = false;
     world.register(j, false);
     let b4 = Util.createRegularPolygon(0.125, 5);

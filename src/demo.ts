@@ -986,7 +986,8 @@ function demo20(game: Game, world: World): void
     j = new WeldJoint(body2, body3, undefined, 5, 1.0);
     world.register(j, true);
 
-    j = new RevoluteJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), 5, 0.1);
+    j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), 1000, 1, 3, 1);
+    (j as MotorJoint).initialAngle = -Math.PI / 2.0 + 0.3;
     j.drawConnectionLine = false;
     world.register(j, false);
 
@@ -1003,7 +1004,8 @@ function demo20(game: Game, world: World): void
     j.drawConnectionLine = false;
     world.register(j, true);
 
-    j = new RevoluteJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), 5, 0.1);
+    j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), 1000, 1, 3, 1);
+    (j as MotorJoint).initialAngle = Math.PI / 2.0 - 0.3;
     j.drawConnectionLine = false;
     world.register(j, true);
 
@@ -1020,7 +1022,7 @@ function demo20(game: Game, world: World): void
     j.drawConnectionLine = false;
     world.register(j, true);
 
-    j = new MotorJoint(body1, upper_leg_r, upper_leg_r.position.add(new Vector2(0, 0.5)), 1000, 1, 5, 1);
+    j = new MotorJoint(body1, upper_leg_r, upper_leg_r.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
     j.drawConnectionLine = false;
     world.register(j, false);
 
@@ -1037,7 +1039,7 @@ function demo20(game: Game, world: World): void
     j.drawConnectionLine = false;
     world.register(j, true);
 
-    j = new MotorJoint(body1, upper_leg_l, upper_leg_l.position.add(new Vector2(0, 0.5)), 1000, 1, 5, 1);
+    j = new MotorJoint(body1, upper_leg_l, upper_leg_l.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
     j.drawConnectionLine = false;
     world.register(j, false);
 
