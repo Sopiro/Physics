@@ -49,7 +49,8 @@ export const Settings = {
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
     numIterations: 15, // Number of resolution(sequential impulses) iterations
-    newBodySettings: {
+    newBodySettings:
+    {
         shape: GenerationShape.Box,
         mass: 2,
         size: 0.5,

@@ -53,6 +53,7 @@ export class Engine
     {
         let elapsedTime = t - this.time;
 
+        // Time feedback for focus losing
         if (elapsedTime > 500.0)
             this.lastTime += elapsedTime;
 

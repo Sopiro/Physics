@@ -173,11 +173,11 @@ export class Vector4 {
     copy() {
         return new Vector4(this.x, this.y, this.z, this.w);
     }
-    toFixed() {
-        this.x = Math.round(this.x * 1e9) / 1e9;
-        this.y = Math.round(this.y * 1e9) / 1e9;
-        this.z = Math.round(this.z * 1e9) / 1e9;
-        this.w = Math.round(this.w * 1e9) / 1e9;
+    toFixed(limit = 1e-13) {
+        this.x = Util.toFixed(this.x, limit);
+        this.y = Util.toFixed(this.y, limit);
+        this.z = Util.toFixed(this.z, limit);
+        this.w = Util.toFixed(this.w, limit);
     }
     fixed() {
         return new Vector4(Math.round(this.x * 1e9) / 1e9, Math.round(this.y * 1e9) / 1e9, Math.round(this.z * 1e9) / 1e9, Math.round(this.w * 1e9) / 1e9);

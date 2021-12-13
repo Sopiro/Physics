@@ -17,11 +17,11 @@ const last_keys: Key = {};
 const curr_keys: Key = {};
 const mouses: Mouse[] = [];
 const maxMouseButtons = 5;
+let last_scroll: boolean = false;
+let curr_scroll: boolean = false;
 
 export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
-export let last_scroll: boolean = false;
-export let curr_scroll: boolean = false;
 export const mouseScroll: Vector2 = new Vector2(0, 0);
 export const mouseAcceleration = new Vector2(0, 0);
 

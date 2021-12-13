@@ -31,7 +31,7 @@ export function createAABB(b) {
         return res;
     }
     else {
-        throw "Not supported shape";
+        throw "Not a supported shape";
     }
 }
 export function testCollideAABB(a, b) {
@@ -59,7 +59,7 @@ function support(b, dir) {
         return { vertex: dir.normalized().mul(b.radius), index: -1 };
     }
     else {
-        throw "Not supported shape";
+        throw "Not a supported shape";
     }
 }
 function csoSupport(c1, c2, dir) {
@@ -69,11 +69,7 @@ function csoSupport(c1, c2, dir) {
     let supportP2 = support(c2, localDirP2).vertex;
     supportP1 = c1.localToGlobal.mulVector2(supportP1, 1);
     supportP2 = c2.localToGlobal.mulVector2(supportP2, 1);
-    return {
-        support: supportP1.sub(supportP2),
-        supportA: supportP1,
-        supportB: supportP2
-    };
+    return supportP1.sub(supportP2);
 }
 function gjk(c1, c2) {
     const origin = new Vector2(0, 0);
@@ -81,7 +77,7 @@ function gjk(c1, c2) {
     let dir = new Vector2(1, 0); // Random initial direction
     let result = { collide: false, simplex: simplex };
     let supportPoint = csoSupport(c1, c2, dir);
-    simplex.addVertex(supportPoint.support, { p1: supportPoint.supportA, p2: supportPoint.supportB });
+    simplex.addVertex(supportPoint);
     for (let k = 0; k < Settings.GJK_MAX_ITERATION; k++) {
         let closest = simplex.getClosest(origin);
         if (Util.squared_distance(closest.result, origin) < Settings.GJK_TOLERANCE) {
@@ -90,25 +86,22 @@ function gjk(c1, c2) {
         }
         if (simplex.count != 1) {
             // Rebuild the simplex with vertices that are used(involved) to calculate closest distance
-            let newSimplex = new Simplex();
-            for (let i = 0; i < closest.info.length; i++)
-                newSimplex.addVertex(simplex.vertices[closest.info[i]]);
-            simplex = newSimplex;
+            simplex.shrink(closest.contributors);
         }
         dir = origin.sub(closest.result);
         supportPoint = csoSupport(c1, c2, dir);
         // If the new support point is not further along the search direction than the closest point,
         // two objects are not colliding so you can early return here.
-        if (dir.length > dir.normalized().dot(supportPoint.support.sub(closest.result))) {
+        if (dir.length > dir.normalized().dot(supportPoint.sub(closest.result))) {
             result.collide = false;
             break;
         }
-        if (simplex.containsVertex(supportPoint.support)) {
+        if (simplex.containsVertex(supportPoint)) {
             result.collide = false;
             break;
         }
         else {
-            simplex.addVertex(supportPoint.support, { p1: supportPoint.supportA, p2: supportPoint.supportB });
+            simplex.addVertex(supportPoint);
         }
     }
     result.simplex = simplex;
@@ -120,10 +113,10 @@ function epa(c1, c2, gjkResult) {
     for (let i = 0; i < Settings.EPA_MAX_ITERATION; i++) {
         closestEdge = polytope.getClosestEdge();
         let supportPoint = csoSupport(c1, c2, closestEdge.normal);
-        let newDistance = closestEdge.normal.dot(supportPoint.support);
+        let newDistance = closestEdge.normal.dot(supportPoint);
         if (Math.abs(closestEdge.distance - newDistance) > Settings.EPA_TOLERANCE) {
             // Insert the support vertex so that it expands our polytope
-            polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint.support);
+            polytope.vertices.splice(closestEdge.index + 1, 0, supportPoint);
         }
         else {
             // If you didn't expand edge, it means you reached the closest outer edge
@@ -157,7 +150,7 @@ function findFarthestEdge(b, dir) {
         return w ? new Edge(localToGlobal.mulVector2(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector2(next, 1));
     }
     else {
-        throw "Not supported shape";
+        throw "Not a supported shape";
     }
 }
 function clipEdge(edge, p, dir, remove = false) {
@@ -221,13 +214,15 @@ export function detectCollision(a, b) {
             let contactNormal = b.position.sub(a.position).normalized();
             let contactPoint = a.position.add(contactNormal.mul(a.radius));
             let penetrationDepth = (r2 - d);
+            let flipped = false;
             if (contactNormal.dot(new Vector2(0, -1)) < 0) {
                 let tmp = a;
                 a = b;
                 b = tmp;
                 contactNormal.invert();
+                flipped = true;
             }
-            let contact = new ContactManifold(a, b, [contactPoint], penetrationDepth, contactNormal);
+            let contact = new ContactManifold(a, b, [contactPoint], penetrationDepth, contactNormal, flipped);
             return contact;
         }
     }
@@ -248,31 +243,32 @@ export function detectCollision(a, b) {
         switch (simplex.count) {
             case 1:
                 let v = simplex.vertices[0];
-                let randomSupport = csoSupport(a, b, new Vector2(1, 0)).support;
+                let randomSupport = csoSupport(a, b, new Vector2(1, 0));
                 if (randomSupport.equals(v))
-                    randomSupport = csoSupport(a, b, new Vector2(-1, 0)).support;
+                    randomSupport = csoSupport(a, b, new Vector2(-1, 0));
                 simplex.addVertex(randomSupport);
             case 2:
                 let e = new Edge(simplex.vertices[0], simplex.vertices[1]);
-                let normalSupport = csoSupport(a, b, e.normal).support;
+                let normalSupport = csoSupport(a, b, e.normal);
                 if (simplex.containsVertex(normalSupport))
-                    simplex.addVertex(csoSupport(a, b, e.normal.inverted()).support);
+                    simplex.addVertex(csoSupport(a, b, e.normal.inverted()));
                 else
                     simplex.addVertex(normalSupport);
         }
         const epaResult = epa(a, b, gjkResult.simplex);
+        let flipped = false;
         // Apply axis weight to improve coherence
-        // if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0)
-        // {
-        //     let tmp = a;
-        //     a = b;
-        //     b = tmp;
-        //     epaResult.contactNormal.invert();
-        // }
+        if (epaResult.contactNormal.dot(new Vector2(0, -1)) < 0) {
+            let tmp = a;
+            a = b;
+            b = tmp;
+            epaResult.contactNormal.invert();
+            flipped = true;
+        }
         // Remove floating point error
         epaResult.contactNormal.fix(Settings.EPA_TOLERANCE);
         let contactPoints = findContactPoints(epaResult.contactNormal, a, b);
-        let contact = new ContactManifold(a, b, contactPoints, epaResult.penetrationDepth, epaResult.contactNormal);
+        let contact = new ContactManifold(a, b, contactPoints, epaResult.penetrationDepth, epaResult.contactNormal, flipped);
         return contact;
     }
 }

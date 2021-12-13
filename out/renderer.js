@@ -3,6 +3,7 @@ import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Settings } from "./settings.js";
 export class Renderer {
+    // Call init function before you start using renderer
     constructor(gfx) {
         this.gfx = gfx;
     }
@@ -121,7 +122,7 @@ export class Renderer {
             this.drawLineV(center, new Vector2(b.radius, 0));
         }
         else {
-            throw "Not supported shape";
+            throw "Not a supported shape";
         }
         if (drawCenterOfMass)
             this.drawCircleV(center, 0.01, true);

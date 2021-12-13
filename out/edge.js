@@ -15,7 +15,4 @@ export class Edge {
     get normal() {
         return Util.cross(1, this.dir);
     }
-    get midPoint() {
-        return Util.mid(this.p1, this.p2);
-    }
 }

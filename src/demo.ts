@@ -24,7 +24,7 @@ Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -39,7 +39,7 @@ Reflect.set(demo2, "SimulationName", "Box stacking");
 function demo2(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
 
     world.register(ground);
@@ -60,7 +60,7 @@ Reflect.set(demo3, "SimulationName", "Pyramid");
 function demo3(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -86,14 +86,13 @@ Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo4(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
     let seesaw = new Box(6, 0.1);
     seesaw.position = new Vector2(0, 0.45);
     seesaw.mass = 10;
-    seesaw.inertia = Util.calculateBoxInertia(6, 0.1, 10);
     world.register(seesaw);
 
     let j = new RevoluteJoint(ground, seesaw, seesaw.position, 45, 1.0);
@@ -105,12 +104,10 @@ function demo4(game: Game, world: World): void
     b = new Box(0.2);
     b.position = new Vector2(-2.8, 1);
     b.mass = 1;
-    b.inertia = Util.calculateBoxInertia(0.2, 0.2, 1);
     world.register(b);
     b = new Box(0.5);
     b.position = new Vector2(2.6, 5);
     b.mass = 30;
-    b.inertia = Util.calculateBoxInertia(0.5, 0.5, 30);
     world.register(b);
 }
 
@@ -164,7 +161,7 @@ Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
 function demo6(game: Game, world: World): void
 {
     updateSetting("g", false);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -178,14 +175,12 @@ function demo6(game: Game, world: World): void
         let c = Util.createRandomConvexBody(0.09);
         c.position = center.add(p);
         c.mass = 1;
-        c.inertia = Util.calculateCircleInertia(0.09, 1);
         world.register(c);
     }
 
     let b = new Box(0.1, 2);
     b.position = new Vector2(-5, Settings.stageHeight / 2.0);
     b.mass = 30;
-    b.inertia = Util.calculateBoxInertia(0.1, 2, 30);
 
     b.linearVelocity.x = 3;
     b.angularVelocity = 10;
@@ -197,7 +192,7 @@ Reflect.set(demo7, "SimulationName", "Friction test");
 function demo7(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -270,7 +265,7 @@ Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -286,7 +281,7 @@ Reflect.set(demo10, "SimulationName", "Multi pendulum");
 function demo10(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -320,7 +315,7 @@ Reflect.set(demo11, "SimulationName", "Suspension bridge");
 function demo11(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -414,6 +409,9 @@ Reflect.set(demo12, "SimulationName", "Circle stacking");
 function demo12(game: Game, world: World): void
 {
     updateSetting("g", true);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+    world.register(ground);
 
     let xStart = -4.0;
     let yStart = 1.0;
@@ -427,16 +425,12 @@ function demo12(game: Game, world: World): void
         for (let j = i; j < rows; j++)
         {
             let c = new Circle(size);
-            c.mass = (1 + i) + (1 + i) * j + 1;
+            c.mass = (1 + i) + (1 + i) * j;
             c.position.x = xStart + (gap + size * 2) * i;
             c.position.y = yStart + (gap + size * 2) * j;
             world.register(c);
         }
     }
-
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
-    ground.restitution = 0.45;
-    world.register(ground);
 }
 
 Reflect.set(demo13, "SimulationName", "Springs");
@@ -504,7 +498,7 @@ Reflect.set(demo14, "SimulationName", "Weld joint: Dumbbells");
 function demo14(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -534,7 +528,7 @@ function demo14(game: Game, world: World): void
         j = new WeldJoint(b2, b3);
         world.register(j, true);
 
-        b2.addVelocity(new Vector2(-b2.position.x, 0));
+        b2.linearVelocity.x += -b2.position.x;
     }
 }
 
@@ -542,7 +536,7 @@ Reflect.set(demo15, "SimulationName", "Max distance joint");
 function demo15(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -579,7 +573,7 @@ Reflect.set(demo16, "SimulationName", "Prismatic joint");
 function demo16(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -682,7 +676,7 @@ function demo17(game: Game, world: World): void
     {
         j.angularOffset = b2.rotation + 0.05;
 
-        if ((game.frame - last_spawn) > 0.2 * Engine.fps)
+        if ((game.frame - last_spawn) / Engine.fps > 0.2 * 144 * game.deltaTime)
         {
             let c = Util.createRegularPolygon(0.15);
             c.position.x = Util.random(-1.8, 1.8);
@@ -766,9 +760,9 @@ function demo18(game: Game, world: World): void
 
     game.callback = () =>
     {
-        if ((game.frame - last_spawn) > 0.3 * Engine.fps)
+        if ((game.frame - last_spawn) / Engine.fps > 0.3 * 144 * game.deltaTime)
         {
-            let c = Util.createRegularPolygon(0.15);
+            let c = Util.createRegularPolygon(Util.random(0.1, 0.25));
             c.restitution = 0.3;
             c.position.x = Util.random(-5.5, -3.0);
             c.position.y = 7.0;
@@ -782,7 +776,7 @@ Reflect.set(demo19, "SimulationName", "Crankshaft");
 function demo19(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
@@ -802,7 +796,7 @@ function demo19(game: Game, world: World): void
         let sizeY = 0.2;
 
         c1 = new Box(sizeX, sizeY);
-        (c1 as Polygon).repositionCenter(new Vector2(-sizeX / 2.0, 0.0));
+        (c1 as Polygon).repositionCenterOfMass(new Vector2(-sizeX / 2.0, 0.0));
         c1.position.x = xStart;
         c1.position.y = 1.5;
         world.register(c1);
@@ -900,13 +894,15 @@ Reflect.set(demo20, "SimulationName", "Ragdoll");
 function demo20(game: Game, world: World): void
 {
     updateSetting("g", true);
-    let ground = new Box(Settings.width * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
 
+    let density = 15;
     let body_start_y = 3.0;
 
     let head = new Box(0.4, 0.4)
+    head.density = density;
     head.position.y = body_start_y + 1.25;
     world.register(head);
 
@@ -914,16 +910,23 @@ function demo20(game: Game, world: World): void
     let body_height = 0.4;
 
     let body1 = new Box(body_width, body_height);
+    body1.density = density;
     body1.position.y = body_start_y;
     world.register(body1);
     let body2 = new Box(body_width - 0.1, body_height);
+    body2.density = density;
     body2.position.y = body_start_y + body_height;
     world.register(body2);
     let body3 = new Box(body_width, body_height);
+    body3.density = density;
     body3.position.y = body_start_y + body_height * 2;
     world.register(body3);
+    let body0 = new Box(body_width, 0.2);
+    body0.density = density;
+    body0.position.y = body1.position.y - (body_height + 0.2) / 2.0;
+    world.register(body0);
 
-    body2.angularVelocity = Util.random(-300, 300);
+    // body2.angularVelocity = Util.random(-200, 200);
     body2.linearVelocity = new Vector2(0, 0);
 
     let arm_start_x = 0.7;
@@ -934,21 +937,25 @@ function demo20(game: Game, world: World): void
     let arm_height = 0.25;
 
     let upper_arm_r = new Box(arm_width, arm_height);
+    upper_arm_r.density = density;
     upper_arm_r.position.x = arm_start_x;
     upper_arm_r.position.y = arm_start_y;
     world.register(upper_arm_r);
 
     let lower_arm_r = new Box(arm_width, arm_height);
+    lower_arm_r.density = density;
     lower_arm_r.position.x = arm_start_x + arm_width + arm_gap;
     lower_arm_r.position.y = arm_start_y;
     world.register(lower_arm_r);
 
     let upper_arm_l = new Box(arm_width, arm_height);
+    upper_arm_l.density = density;
     upper_arm_l.position.x = -arm_start_x;
     upper_arm_l.position.y = arm_start_y;
     world.register(upper_arm_l);
 
     let lower_arm_l = new Box(arm_width, arm_height);
+    lower_arm_l.density = density;
     lower_arm_l.position.x = -(arm_start_x + arm_width + arm_gap);
     lower_arm_l.position.y = arm_start_y;
     world.register(lower_arm_l);
@@ -961,120 +968,157 @@ function demo20(game: Game, world: World): void
     let leg_gap = 0.3;
 
     let upper_leg_r = new Box(leg_width, leg_height);
+    upper_leg_r.density = density;
     upper_leg_r.position.x = leg_start_x;
     upper_leg_r.position.y = leg_start_y;
     world.register(upper_leg_r);
 
     let lower_leg_r = new Box(leg_width, leg_height);
+    lower_leg_r.density = density;
     lower_leg_r.position.x = leg_start_x;
     lower_leg_r.position.y = leg_start_y - leg_height - leg_gap;
     world.register(lower_leg_r);
 
     let upper_leg_l = new Box(leg_width, leg_height);
+    upper_leg_l.density = density;
     upper_leg_l.position.x = -leg_start_x;
     upper_leg_l.position.y = leg_start_y;
     world.register(upper_leg_l);
 
     let lower_leg_l = new Box(leg_width, leg_height);
+    lower_leg_l.density = density;
     lower_leg_l.position.x = -leg_start_x;
     lower_leg_l.position.y = leg_start_y - leg_height - leg_gap;
     world.register(lower_leg_l);
 
-    let j: Joint = new WeldJoint(body1, body2, undefined, 5, 1.0);
-    world.register(j, true);
+    let force = 8000;
+    let torque_upper = 1.75;
+    let torque_lower = 1.5;
+    let frequency = 5;
 
-    j = new WeldJoint(body2, body3, undefined, 5, 1.0);
-    world.register(j, true);
+    let j: Joint;
+    // Body
+    {
+        j = new WeldJoint(body1, body2, undefined, 10, 1.0);
+        world.register(j, true);
 
-    j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), 1000, 1, 3, 1);
-    (j as MotorJoint).initialAngle = -Math.PI / 2.0 + 0.3;
-    j.drawConnectionLine = false;
-    world.register(j, false);
+        j = new WeldJoint(body2, body3, undefined, 10, 1.0);
+        world.register(j, true);
 
-    let b1 = Util.createRegularPolygon(0.09, 5);
-    b1.position = Util.mid(upper_arm_r.position, lower_arm_r.position);
-    world.register(b1);
+        j = new WeldJoint(body1, body0, undefined, 10, 1.0);
+        world.register(j, true);
+    }
 
-    j = new RevoluteJoint(upper_arm_r, b1, b1.position, 5, 0.1);
-    j.drawAnchor = false;
-    j.drawConnectionLine = false;
-    world.register(j, true);
+    // Right arm
+    {
+        j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), force, torque_upper, frequency, 1);
+        (j as MotorJoint).initialAngle = -Math.PI / 2.0 + 0.3;
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, false);
 
-    j = new RevoluteJoint(lower_arm_r, b1, b1.position, 5, 0.1);
-    j.drawConnectionLine = false;
-    world.register(j, true);
+        let b1 = Util.createRegularPolygon(0.08, 5);
+        b1.density = density;
+        b1.position = Util.mid(upper_arm_r.position, lower_arm_r.position);
+        world.register(b1);
 
-    j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), 1000, 1, 3, 1);
-    (j as MotorJoint).initialAngle = Math.PI / 2.0 - 0.3;
-    j.drawConnectionLine = false;
-    world.register(j, true);
+        j = new WeldJoint(upper_arm_r, b1, b1.position, 10, 1, upper_arm_r.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
 
-    let b2 = Util.createRegularPolygon(0.09, 5);
-    b2.position = Util.mid(upper_arm_l.position, lower_arm_l.position);
-    world.register(b2);
+        j = new MotorJoint(lower_arm_r, b1, b1.position, force, torque_lower, frequency, 1, lower_arm_r.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
+    }
 
-    j = new RevoluteJoint(upper_arm_l, b2, b2.position, 5, 0.1);
-    j.drawConnectionLine = false;
-    j.drawAnchor = false;
-    world.register(j, true);
+    // Left arm
+    {
+        j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), force, torque_upper, frequency, 1);
+        (j as MotorJoint).initialAngle = Math.PI / 2.0 - 0.3;
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, false);
 
-    j = new RevoluteJoint(lower_arm_l, b2, b2.position, 5, 0.1);
-    j.drawConnectionLine = false;
-    world.register(j, true);
+        let b2 = Util.createRegularPolygon(0.08, 5);
+        b2.density = density;
+        b2.position = Util.mid(upper_arm_l.position, lower_arm_l.position);
+        world.register(b2);
 
-    j = new MotorJoint(body1, upper_leg_r, upper_leg_r.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
-    j.drawConnectionLine = false;
-    world.register(j, false);
+        j = new WeldJoint(upper_arm_l, b2, b2.position, 10, 1, upper_arm_l.mass);
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j, true);
 
-    let b3 = Util.createRegularPolygon(0.125, 5);
-    b3.position = Util.mid(upper_leg_r.position, lower_leg_r.position);
-    world.register(b3);
+        j = new MotorJoint(lower_arm_l, b2, b2.position, force, torque_lower, frequency, 1, lower_arm_l.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
+    }
 
-    j = new RevoluteJoint(upper_leg_r, b3, b3.position, 5, 1.0);
-    j.drawConnectionLine = false;
-    j.drawAnchor = false;
-    world.register(j, false);
+    // Right leg
+    {
+        j = new MotorJoint(body0, upper_leg_r, body0.position.add(new Vector2(0.2, 0)), force, torque_upper, frequency, 1);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
 
-    j = new RevoluteJoint(lower_leg_r, b3, b3.position, 5, 1.0);
-    j.drawConnectionLine = false;
-    world.register(j, true);
+        let b3 = Util.createRegularPolygon(0.125, 5);
+        b3.density = density;
+        b3.position = Util.mid(upper_leg_r.position, lower_leg_r.position);
+        world.register(b3);
 
-    j = new MotorJoint(body1, upper_leg_l, upper_leg_l.position.add(new Vector2(0, 0.5)), 1000, 1, 3, 1);
-    j.drawConnectionLine = false;
-    world.register(j, false);
+        j = new WeldJoint(upper_leg_r, b3, b3.position, 10, 1, upper_leg_r.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j, true);
 
-    let b4 = Util.createRegularPolygon(0.125, 5);
-    b4.position = Util.mid(upper_leg_l.position, lower_leg_l.position);
-    world.register(b4);
+        j = new MotorJoint(lower_leg_r, b3, b3.position, force, torque_lower, frequency, 1, lower_leg_r.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
 
-    j = new RevoluteJoint(upper_leg_l, b4, b4.position, 5, 1.0);
-    j.drawConnectionLine = false;
-    j.drawAnchor = false;
-    world.register(j, false);
+    }
 
-    j = new RevoluteJoint(lower_leg_l, b4, b4.position, 5, 1.0);
-    j.drawConnectionLine = false;
-    world.register(j, true);
+    // Left leg
+    {
+        j = new MotorJoint(body0, upper_leg_l, body0.position.add(new Vector2(-0.2, 0)), force, torque_upper, frequency, 1);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
 
-    j = new WeldJoint(body3, head, Util.mid(body3.position, head.position), 5, 1.0);
-    j.drawConnectionLine = false;
-    world.register(j, false);
+        let b4 = Util.createRegularPolygon(0.125, 5);
+        b4.density = density;
+        b4.position = Util.mid(upper_leg_l.position, lower_leg_l.position);
+        world.register(b4);
 
-    let body4 = new Box(body_width, 0.2);
-    body4.position.y = upper_leg_r.position.y + 0.5 - 0.01;
-    world.register(body4);
+        j = new WeldJoint(upper_leg_l, b4, b4.position, 10, 1, upper_leg_l.mass);
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j, true);
 
-    j = new WeldJoint(body1, body4, undefined, 4, 0.1);
-    world.addPassTestPair(body4, upper_leg_l);
-    world.addPassTestPair(body4, upper_leg_r);
-    world.register(j);
+        j = new MotorJoint(lower_leg_l, b4, b4.position, force, torque_lower, 2, 1, lower_leg_l.mass);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, true);
+    }
+
+    // Head
+    {
+        j = new WeldJoint(body3, head, Util.mid(body3.position, head.position), 5, 1.0);
+        j.drawAnchor = false;
+        j.drawConnectionLine = false;
+        world.register(j, false);
+    }
 
     let c = new Circle(0.5);
     c.mass = 10;
     let angle = Util.random(0, Math.PI);
     c.position = new Vector2(Math.cos(angle), Math.sin(angle)).mul(5);
-    c.linearVelocity = c.position.inverted().mul(2.0);
-    c.position.y += 2.0;
+    c.linearVelocity = c.position.inverted().mul(Util.random(1.5, 3.5));
+    c.position.y += 2.5;
     world.register(c);
 }
 

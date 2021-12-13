@@ -19,7 +19,8 @@ export class Polytope
         this.vertices = [
             simplex.vertices[0].copy(),
             simplex.vertices[1].copy(),
-            simplex.vertices[2].copy()];
+            simplex.vertices[2].copy()
+        ];
     }
 
     public get count(): number

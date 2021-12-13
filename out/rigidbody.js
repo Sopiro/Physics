@@ -7,6 +7,7 @@ export var Type;
     Type[Type["Static"] = 0] = "Static";
     Type[Type["Dynamic"] = 1] = "Dynamic";
 })(Type || (Type = {}));
+// Children: Circle, Polygon
 export class RigidBody extends Entity {
     constructor(type) {
         super();
@@ -90,25 +91,13 @@ export class RigidBody extends Entity {
         return this._force;
     }
     set force(f) {
-        this._force = f.copy();
+        this._force.x = f.x;
+        this._force.y = f.y;
     }
     get torque() {
         return this._torque;
     }
     set torque(t) {
         this._torque = t;
-    }
-    addForce(f) {
-        this._force = this._force.add(f);
-    }
-    addTorque(t) {
-        this._torque += t;
-    }
-    addVelocity(vt) {
-        this._linearVelocity.x += vt.x;
-        this._linearVelocity.y += vt.y;
-    }
-    addAngularVelocity(wt) {
-        this._angularVelocity += wt;
     }
 }

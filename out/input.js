@@ -4,10 +4,10 @@ const last_keys = {};
 const curr_keys = {};
 const mouses = [];
 const maxMouseButtons = 5;
+let last_scroll = false;
+let curr_scroll = false;
 export const mousePosition = new Vector2(0, 0);
 export const mouseLastPosition = new Vector2(0, 0);
-export let last_scroll = false;
-export let curr_scroll = false;
 export const mouseScroll = new Vector2(0, 0);
 export const mouseAcceleration = new Vector2(0, 0);
 export function init(engine) {

@@ -16,6 +16,7 @@ export class Renderer
     private viewportTransform!: Matrix3;
     private vpc!: Matrix3;
 
+    // Call init function before you start using renderer
     constructor(gfx: CanvasRenderingContext2D)
     {
         this.gfx = gfx;
@@ -185,7 +186,7 @@ export class Renderer
         }
         else
         {
-            throw "Not supported shape";
+            throw "Not a supported shape";
         }
 
         if (drawCenterOfMass)

@@ -30,7 +30,7 @@ export function getUV(a, b, p) {
 export function lerpVector(a, b, uv) {
     return a.mul(uv.u).add(b.mul(uv.v));
 }
-export function createRandomConvexBody(radius = 50, numVertices = -1) {
+export function createRandomConvexBody(radius, numVertices = -1) {
     if (numVertices < 0)
         numVertices = Math.trunc(Math.random() * Settings.randonConvexMaxVertices);
     if (numVertices == 0)
@@ -50,10 +50,10 @@ export function createRandomConvexBody(radius = 50, numVertices = -1) {
 export function createRegularPolygon(radius, numVertices = -1) {
     if (numVertices < 3)
         numVertices = Math.trunc(random(3, Settings.regularPolygonMaxVertices));
-    let angleStart = Math.PI / 2;
+    let angleStart = Math.PI / 2.0;
     let angle = Math.PI * 2 / numVertices;
     if ((numVertices % 2) == 0)
-        angleStart += angle / 2;
+        angleStart += angle / 2.0;
     let vertices = [];
     for (let i = 0; i < numVertices; i++) {
         let currentAngle = angleStart + angle * i;
@@ -144,7 +144,7 @@ export function orth(left, right, bottom, top) {
     res.m12 = -(top + bottom) / (top - bottom);
     return res;
 }
-// Create viewport transform matrix
+// Create a viewport transform matrix
 export function viewport(width, height, xStart = 0, yStart = 0) {
     let res = new Matrix3();
     // Scale

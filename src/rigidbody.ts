@@ -9,16 +9,18 @@ export enum Type
     Dynamic
 }
 
+
+// Children: Circle, Polygon
 export class RigidBody extends Entity
 {
-    // Center of mass in local = (0, 0)
+    // Center of mass in local space = (0, 0)
     private _force: Vector2;
     private _torque: number;
     private _mass: number; // kg
     private _invMass: number;
-    private _inertia: number; // kg⋅cm²
+    private _inertia: number; // kg⋅m²
     private _invInertia: number;
-    private _linearVelocity: Vector2; // cm/s
+    private _linearVelocity: Vector2; // m/s
     private _angularVelocity: number; // rad/s
     private _friction: number;
     private _restitution: number;
@@ -81,7 +83,7 @@ export class RigidBody extends Entity
         return this._inertia;
     }
 
-    set inertia(i: number)
+    protected set inertia(i: number)
     {
         this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
         this._invInertia = this._inertia == Number.MAX_VALUE ? 0 : 1.0 / this._inertia;
@@ -149,7 +151,8 @@ export class RigidBody extends Entity
 
     set force(f: Vector2)
     {
-        this._force = f.copy();
+        this._force.x = f.x;
+        this._force.y = f.y;
     }
 
     get torque(): number
@@ -160,26 +163,5 @@ export class RigidBody extends Entity
     set torque(t)
     {
         this._torque = t;
-    }
-
-    addForce(f: Vector2): void
-    {
-        this._force = this._force.add(f);
-    }
-
-    addTorque(t: number): void
-    {
-        this._torque += t;
-    }
-
-    addVelocity(vt: Vector2): void //accelerate
-    {
-        this._linearVelocity.x += vt.x;
-        this._linearVelocity.y += vt.y;
-    }
-
-    addAngularVelocity(wt: number): void
-    {
-        this._angularVelocity += wt;
     }
 }

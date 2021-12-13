@@ -87,6 +87,7 @@ class ContactConstraintSolver
         {
             // Bias for surface speed that enables the conveyor belt-like behavior
             this.bias = -(this.bodyB.surfaceSpeed - this.bodyA.surfaceSpeed);
+            if (this.manifold.featureFlipped) this.bias *= -1;
         }
 
         let k: number =
@@ -171,11 +172,13 @@ export class ContactManifold extends Constraint
     public readonly solversN: ContactConstraintSolver[] = [];
     public readonly solversT: ContactConstraintSolver[] = [];
 
+    public featureFlipped;
     public persistent = false;
 
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
-        contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2
+        contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2,
+        featureFlipped: boolean
     )
     {
         super(bodyA, bodyB);
@@ -183,6 +186,7 @@ export class ContactManifold extends Constraint
         this.penetrationDepth = penetrationDepth;
         this.contactNormal = contactNormal;
         this.contactTangent = new Vector2(-contactNormal.y, contactNormal.x);
+        this.featureFlipped = featureFlipped;
 
         for (let i = 0; i < this.numContacts; i++)
         {

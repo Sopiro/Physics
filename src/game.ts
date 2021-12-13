@@ -18,6 +18,7 @@ import { LineJoint } from "./line.js";
 import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
+import { Polygon } from "./polygon.js";
 
 export class Game
 {
@@ -79,7 +80,7 @@ export class Game
     {
         this.frame = 0;
         this.time = 0.0;
-        this.world.clear();
+        this.world.reset();
         this.callback = () => { };
         demos[this.currentDemo](this, this.world);
     }
@@ -146,8 +147,10 @@ export class Game
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
                     let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
                     let torque = bindInGlobal.sub(this.targetBody.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
-                    this.targetBody.addForce(force);
-                    this.targetBody.addTorque(torque)
+                    
+                    this.targetBody.force.x += force.x;
+                    this.targetBody.force.y += force.y;
+                    this.targetBody.torque += torque;
                 }
                 else if (Settings.mode == MouseMode.Grab)
                 {
@@ -196,30 +199,29 @@ export class Game
                     case GenerationShape.Box:
                         {
                             nb = new Box(nbs.size, nbs.size);
-                            nb.inertia = Util.calculateBoxInertia(nbs.size, nbs.size, nbs.mass);
+                            (nb as Box).mass = nbs.mass;
                             break;
                         }
                     case GenerationShape.Circle:
                         {
                             nb = new Circle(nbs.size / 2.0);
-                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
+                            (nb as Circle).mass = nbs.mass;
                             break;
                         }
                     case GenerationShape.Regular:
                         {
                             nb = Util.createRegularPolygon(nbs.size / 2, nbs.numVertices);
-                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
+                            (nb as Polygon).mass = nbs.mass;
                             break;
                         }
                     case GenerationShape.Random:
                         {
                             nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2);
-                            nb.inertia = Util.calculateCircleInertia(nbs.size / 2.0, nbs.mass);
+                            (nb as Polygon).mass = nbs.mass;
                             break;
                         }
                 }
 
-                nb.mass = nbs.mass;
                 nb.position = this.cursorPos;
                 nb.friction = nbs.friction;
                 nb.restitution = nbs.restitution;
@@ -256,6 +258,7 @@ export class Game
     {
         r.setCameraTransform(this.camera.cameraTransform);
 
+        // Log rigid body information
         if (Settings.showInfo)
         {
             let target!: RigidBody;
@@ -263,8 +266,8 @@ export class Game
             for (; i < this.world.bodies.length; i++)
             {
                 target = this.world.bodies[i];
-                if (Util.checkInside(target, this.cursorPos))
-                    break;
+
+                if (Util.checkInside(target, this.cursorPos)) break;
             }
 
             if (this.world.bodies.length > 0 && i != this.world.bodies.length)
@@ -273,6 +276,25 @@ export class Game
                 r.log("Type: " + String(Type[target.type]), line++);
                 r.log("Mass: " + String(target.mass) + "kg", line++);
                 r.log("Moment of inertia: " + String((target.inertia).toFixed(4)) + "kg⋅m²", line++);
+
+                if (target instanceof Polygon)
+                {
+                    if (target instanceof Box)
+                    {
+                        r.log("Density: " + String((target as Box).density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String((target as Box).area.toFixed(4)) + "m²", line++);
+                    }
+                    else
+                    {
+                        r.log("Density: " + String((target as Polygon).density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String((target as Polygon).area.toFixed(4)) + "m²", line++);
+                    }
+                } else if (target instanceof Circle)
+                {
+                    r.log("Density: " + String((target as Circle).density.toFixed(4)) + "kg/m²", line++);
+                    r.log("Area: " + String((target as Circle).area.toFixed(4)) + "m²", line++);
+                }
+
                 r.log("Friction: " + String(target.friction), line++);
                 r.log("Restitution: " + String(target.restitution), line++);
                 r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
@@ -285,6 +307,7 @@ export class Game
             }
         }
 
+        // Rendering contact manifold
         if (Settings.indicateCP)
         {
             for (let i = 0; i < this.world.manifolds.length; i++)
@@ -299,10 +322,11 @@ export class Game
                     r.drawCircleV(m.contactPoints[j], 0.04);
                 }
                 mid = mid.div(j);
-                r.drawVectorP(mid, mid.add(m.contactNormal.mul(-0.2)), 0.015)
+                r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015)
             }
         }
 
+        // Rendering for mouse forcing 
         if (this.grabBody && (Settings.mode == MouseMode.Force))
         {
             let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
@@ -310,6 +334,7 @@ export class Game
             r.drawVectorP(bindInGlobal, this.cursorPos);
         }
 
+        // Bounding box, Center of Mass rendering
         for (let i = 0; i < this.world.bodies.length; i++)
         {
             let b = this.world.bodies[i];
@@ -323,6 +348,7 @@ export class Game
             }
         }
 
+        // Joint rendering
         for (let i = 0; i < this.world.joints.length; i++)
         {
             let j = this.world.joints[i];

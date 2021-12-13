@@ -14,12 +14,13 @@ export class World
 
     public bodies: RigidBody[] = [];
 
+    // Constraints to be solved
     public manifolds: ContactManifold[] = [];
     public joints: Joint[] = [];
 
     public manifoldMap: Map<number, ContactManifold> = new Map();
     public jointMap: Map<number, Joint> = new Map();
-    
+
     public passTestSet: Set<number> = new Set();
 
     update(): void
@@ -29,12 +30,20 @@ export class World
         {
             let b = this.bodies[i];
 
-            b.addVelocity(b.force.mul(b.inverseMass * Settings.dt));
-            b.addAngularVelocity(b.torque * b.inverseInertia * Settings.dt);
+            let linear_a = b.force.mul(b.inverseMass * Settings.dt); // Force / mass * dt
+            b.linearVelocity.x += linear_a.x;
+            b.linearVelocity.y += linear_a.y;
+
+            let angular_a = b.torque * b.inverseInertia * Settings.dt // Torque / Inertia * dt
+            b.angularVelocity += angular_a;
 
             // Apply gravity 
             if (b.type != Type.Static && Settings.applyGravity)
-                b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt));
+            {
+                let gravity = new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt);
+                b.linearVelocity.x += gravity.x;
+                b.linearVelocity.y += gravity.y;
+            }
         }
 
         let newManifolds: ContactManifold[] = [];
@@ -99,6 +108,7 @@ export class World
         }
 
         // Update positions using corrected velocities
+        // Semi-implicit euler integration
         for (let i = 0; i < this.bodies.length; i++)
         {
             let b = this.bodies[i];
@@ -111,7 +121,7 @@ export class World
             if (b.position.y < Settings.deadBottom)
             {
                 this.bodies.splice(i, 1);
-                b.jointIDs.forEach(jid=>this.unregister(jid, false));
+                b.jointIDs.forEach(jid => this.unregister(jid, false));
             }
 
             b.force.clear();
@@ -126,7 +136,8 @@ export class World
         if (r instanceof RigidBody)
         {
             this.bodies.push(r);
-        } else if (r instanceof Joint)
+        }
+        else if (r instanceof Joint)
         {
             if (r.bodyA.id == -1 || r.bodyB.id == -1)
                 throw "You should register the rigid bodies before registering the joint";
@@ -178,7 +189,7 @@ export class World
         this.passTestSet.add(Util.make_pair_natural(bodyB.id, bodyA.id));
     }
 
-    clear(): void
+    reset(): void
     {
         this.bodies = [];
         this.joints = [];

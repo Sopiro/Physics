@@ -35,7 +35,7 @@ export class RevoluteJoint extends Joint
         let h = Settings.dt;
 
         this.beta = h * k / (d + h * k);
-        this.gamma = 1 / ((d + h * k) * h);
+        this.gamma = 1.0 / ((d + h * k) * h);
     }
 
     override prepare()

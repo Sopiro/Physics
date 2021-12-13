@@ -21,7 +21,7 @@ export class WeldJoint extends Joint
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
         anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
-        frequency = 240, dampingRatio = 1.0, mass = -1
+        frequency = 60, dampingRatio = 1.0, mass = -1
     )
     {
         super(bodyA, bodyB);
@@ -39,7 +39,7 @@ export class WeldJoint extends Joint
         let h = Settings.dt;
 
         this.beta = h * k / (d + h * k);
-        this.gamma = 1 / ((d + h * k) * h);
+        this.gamma = 1.0 / ((d + h * k) * h);
 
         this.drawAnchor = false;
         this.drawConnectionLine = false;

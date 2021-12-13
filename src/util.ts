@@ -52,7 +52,7 @@ export function lerpVector(a: Vector2, b: Vector2, uv: UV): Vector2
     return a.mul(uv.u).add(b.mul(uv.v));
 }
 
-export function createRandomConvexBody(radius: number = 50, numVertices: number = -1): RigidBody
+export function createRandomConvexBody(radius: number, numVertices: number = -1): RigidBody
 {
     if (numVertices < 0)
         numVertices = Math.trunc(Math.random() * Settings.randonConvexMaxVertices);
@@ -80,14 +80,14 @@ export function createRandomConvexBody(radius: number = 50, numVertices: number 
     return res;
 }
 
-export function createRegularPolygon(radius: number, numVertices: number = -1): RigidBody
+export function createRegularPolygon(radius: number, numVertices: number = -1): Polygon
 {
     if (numVertices < 3) numVertices = Math.trunc(random(3, Settings.regularPolygonMaxVertices));
 
-    let angleStart = Math.PI / 2;
+    let angleStart = Math.PI / 2.0;
     let angle = Math.PI * 2 / numVertices;
     if ((numVertices % 2) == 0)
-        angleStart += angle / 2;
+        angleStart += angle / 2.0;
 
     let vertices: Vector2[] = [];
 
@@ -226,7 +226,7 @@ export function orth(left: number, right: number, bottom: number, top: number): 
     return res;
 }
 
-// Create viewport transform matrix
+// Create a viewport transform matrix
 export function viewport(width: number, height: number, xStart = 0, yStart = 0): Matrix3
 {
     let res = new Matrix3();

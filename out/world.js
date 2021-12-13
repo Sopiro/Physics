@@ -8,6 +8,7 @@ export class World {
     constructor() {
         this.uid = 0;
         this.bodies = [];
+        // Constraints to be solved
         this.manifolds = [];
         this.joints = [];
         this.manifoldMap = new Map();
@@ -18,11 +19,17 @@ export class World {
         // Integrate forces, yield tentative velocities that possibly violate the constraint
         for (let i = 0; i < this.bodies.length; i++) {
             let b = this.bodies[i];
-            b.addVelocity(b.force.mul(b.inverseMass * Settings.dt));
-            b.addAngularVelocity(b.torque * b.inverseInertia * Settings.dt);
+            let linear_a = b.force.mul(b.inverseMass * Settings.dt); // Force / mass * dt
+            b.linearVelocity.x += linear_a.x;
+            b.linearVelocity.y += linear_a.y;
+            let angular_a = b.torque * b.inverseInertia * Settings.dt; // Torque / Inertia * dt
+            b.angularVelocity += angular_a;
             // Apply gravity 
-            if (b.type != Type.Static && Settings.applyGravity)
-                b.addVelocity(new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt));
+            if (b.type != Type.Static && Settings.applyGravity) {
+                let gravity = new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt);
+                b.linearVelocity.x += gravity.x;
+                b.linearVelocity.y += gravity.y;
+            }
         }
         let newManifolds = [];
         // Detect collisions, generate contact manifolds, try warm starting
@@ -67,6 +74,7 @@ export class World {
                 this.joints[i].solve();
         }
         // Update positions using corrected velocities
+        // Semi-implicit euler integration
         for (let i = 0; i < this.bodies.length; i++) {
             let b = this.bodies[i];
             if (b.type == Type.Static)
@@ -121,7 +129,7 @@ export class World {
         this.passTestSet.add(Util.make_pair_natural(bodyA.id, bodyB.id));
         this.passTestSet.add(Util.make_pair_natural(bodyB.id, bodyA.id));
     }
-    clear() {
+    reset() {
         this.bodies = [];
         this.joints = [];
         this.manifolds = [];

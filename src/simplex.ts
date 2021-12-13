@@ -1,22 +1,19 @@
 import { Vector2 } from "./math.js";
-import { Pair, getUV, lerpVector } from "./util.js";
+import { getUV, lerpVector } from "./util.js";
 
-export interface ClosestWithInfo
+interface ClosestResult
 {
     result: Vector2;
-    info: number[]; // Vertex indices that are contributed to calculate the closest point
+    contributors: number[]; // Vertex indices that contributed to calculating the closest point
 }
 
 export class Simplex
 {
-    // assert(supports.p1 - support.p2 == vertex)
     public vertices: Vector2[];
-    public supports: Pair<Vector2, Vector2>[];
 
     constructor()
     {
         this.vertices = [];
-        this.supports = [];
     }
 
     get count(): number
@@ -27,16 +24,15 @@ export class Simplex
     clear(): void
     {
         this.vertices = [];
-        this.supports = [];
     }
 
     // Returns the closest point to the input q
-    getClosest(q: Vector2): ClosestWithInfo
+    getClosest(q: Vector2): ClosestResult
     {
         switch (this.count)
         {
             case 1: // 0-Simplex: Point
-                return { result: this.vertices[0], info: [0] };
+                return { result: this.vertices[0], contributors: [0] };
             case 2: // 1-Simplex: Line segment
                 {
                     const a = this.vertices[0];
@@ -44,11 +40,11 @@ export class Simplex
                     const w = getUV(a, b, q);
 
                     if (w.v <= 0)
-                        return { result: a, info: [0] };
+                        return { result: a, contributors: [0] };
                     else if (w.v >= 1)
-                        return { result: b, info: [1] };
+                        return { result: b, contributors: [1] };
                     else
-                        return { result: lerpVector(a, b, w), info: [0, 1] };
+                        return { result: lerpVector(a, b, w), contributors: [0, 1] };
                 }
             case 3: // 2-Simplex: Triangle
                 {
@@ -61,11 +57,11 @@ export class Simplex
                     const wca = getUV(c, a, q);
 
                     if (wca.u <= 0 && wab.v <= 0) // A area
-                        return { result: a, info: [0] };
+                        return { result: a, contributors: [0] };
                     else if (wab.u <= 0 && wbc.v <= 0) // B area
-                        return { result: b, info: [1] };
+                        return { result: b, contributors: [1] };
                     else if (wbc.u <= 0 && wca.v <= 0) // C area
-                        return { result: c, info: [2] };
+                        return { result: c, contributors: [2] };
 
                     const area = b.sub(a).cross(c.sub(a));
 
@@ -79,26 +75,26 @@ export class Simplex
                     {
                         return {
                             result: lerpVector(a, b, wab),
-                            info: area != 0 ? [0, 1] : [0, 1, 2]
+                            contributors: area != 0 ? [0, 1] : [0, 1, 2]
                         };
                     }
                     else if (wbc.u > 0 && wbc.v > 0 && u * area <= 0) // On the BC edge
                     {
                         return {
                             result: lerpVector(b, c, wbc),
-                            info: area != 0 ? [1, 2] : [0, 1, 2]
+                            contributors: area != 0 ? [1, 2] : [0, 1, 2]
                         };
                     }
                     else if (wca.u > 0 && wca.u > 0 && v * area <= 0) // On the CA edge
                     {
                         return {
                             result: lerpVector(c, a, wca),
-                            info: area != 0 ? [2, 0] : [0, 1, 2]
+                            contributors: area != 0 ? [2, 0] : [0, 1, 2]
                         };
                     }
                     else // Inside the triangle
                     {
-                        return { result: q, info: [] };
+                        return { result: q, contributors: [] };
                     }
                 }
 
@@ -107,13 +103,11 @@ export class Simplex
         }
     }
 
-    addVertex(vertex: Vector2, supportPoints?: Pair<Vector2, Vector2>): void
+    addVertex(vertex: Vector2): void
     {
         if (this.count >= 3) throw "2-simplex can have verticies less than 4";
 
         this.vertices.push(vertex);
-        if (supportPoints != undefined)
-            this.supports.push(supportPoints);
     }
 
     // Return true if this simplex contains input vertex
@@ -126,5 +120,15 @@ export class Simplex
         }
 
         return false;
+    }
+
+    shrink(indices: number[])
+    {
+        let res: Vector2[] = [];
+
+        for (let i = 0; i < indices.length; i++)
+            res.push(this.vertices[indices[i]]);
+
+        this.vertices = res;
     }
 }
