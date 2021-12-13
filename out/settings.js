@@ -58,7 +58,7 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5,
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.05 * 0.05,
+    warmStartingThreshold: 0.025 * 0.025,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
@@ -216,16 +216,20 @@ grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.gra
 const showInfo = document.querySelector("#showInfo");
 showInfo.checked = Settings.showInfo;
 showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
-const beta = document.querySelector("#beta");
+/*
+const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
-const betaLabel = document.querySelector("#beta_label");
+const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
 betaLabel.innerHTML = String(Settings.positionCorrectionBeta);
-beta.addEventListener("input", () => {
+beta.addEventListener("input", () =>
+{
     let mappedValue = Util.map(Number(beta.value), 0, 100, betaRange.p1, betaRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2));
+    mappedValue = Number(mappedValue.toPrecision(2))
     betaLabel.innerHTML = String(mappedValue);
+
     updateSetting("beta", mappedValue);
 });
+ */
 export function updateSetting(id, content) {
     switch (id) {
         case "pause":

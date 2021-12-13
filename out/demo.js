@@ -764,7 +764,7 @@ function demo20(game, world) {
     lower_leg_l.position.x = -leg_start_x;
     lower_leg_l.position.y = leg_start_y - leg_height - leg_gap;
     world.register(lower_leg_l);
-    let force = 8000;
+    let force = 10000;
     let torque_upper = 1.75;
     let torque_lower = 1.5;
     let frequency = 5;

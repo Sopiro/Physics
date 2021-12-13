@@ -63,7 +63,7 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5, // This has to be greater than (gravity * gravityScale * deltaTime)
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.05 * 0.05,
+    warmStartingThreshold: 0.025 * 0.025,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
@@ -268,6 +268,7 @@ const showInfo = document.querySelector("#showInfo")! as HTMLInputElement;
 showInfo.checked = Settings.showInfo;
 showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
 
+/*
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
 const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
@@ -280,6 +281,7 @@ beta.addEventListener("input", () =>
 
     updateSetting("beta", mappedValue);
 });
+ */
 
 export function updateSetting(id: string, content?: any)
 {
