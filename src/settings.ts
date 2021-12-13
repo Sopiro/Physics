@@ -23,7 +23,7 @@ const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const restitutionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const numVerticesRange: Util.Pair<number, number> = { p1: 2.9, p2: 17 };
-const strengthRange: Util.Pair<number, number> = { p1: 0.2, p2: 3.0 };
+const strengthRange: Util.Pair<number, number> = { p1: 0.2, p2: 2.0 };
 
 // Simulation settings
 export const Settings = {

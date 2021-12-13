@@ -852,7 +852,7 @@ function demo20(game, world) {
         j.drawConnectionLine = false;
         j.drawAnchor = false;
         world.register(j, true);
-        j = new MotorJoint(lower_leg_l, b4, b4.position, force, torque_lower, 2, 1, lower_leg_l.mass);
+        j = new MotorJoint(lower_leg_l, b4, b4.position, force, torque_lower, frequency, 1, lower_leg_l.mass);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);

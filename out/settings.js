@@ -20,7 +20,7 @@ const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
 const restitutionRange = { p1: 0, p2: 1 };
 const numVerticesRange = { p1: 2.9, p2: 17 };
-const strengthRange = { p1: 0.2, p2: 3.0 };
+const strengthRange = { p1: 0.2, p2: 2.0 };
 // Simulation settings
 export const Settings = {
     width: 1280,
