@@ -4,17 +4,6 @@ import { Type } from "./rigidbody.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Settings } from "./settings.js";
-export function subPolygon(p1, p2) {
-    let res = [];
-    for (let i = 0; i < p1.count; i++) {
-        let p1v = p1.localToGlobal.mulVector2(p1.vertices[i], 1);
-        for (let j = 0; j < p2.count; j++) {
-            let p2v = p2.localToGlobal.mulVector2(p2.vertices[j], 1);
-            res.push(p1v.sub(p2v));
-        }
-    }
-    return new Polygon(res, Type.Dynamic, false);
-}
 export function toFixed(value, limit = 1e-13) {
     return Math.round(value / limit) * limit;
 }
@@ -28,7 +17,8 @@ export function getUV(a, b, p) {
 }
 // Linearly combine(interpolate) the vector using weights u, v
 export function lerpVector(a, b, uv) {
-    return a.mul(uv.u).add(b.mul(uv.v));
+    // return a.mul(uv.u).add(b.mul(uv.v));
+    return new Vector2(a.x * uv.u + b.x * uv.v, a.y * uv.u + b.y * uv.v);
 }
 export function createRandomConvexBody(radius, numVertices = -1) {
     if (numVertices < 0)
@@ -105,7 +95,7 @@ export function checkInside(b, p) {
         return true;
     }
     else {
-        throw "Not supported shape";
+        throw "Not a supported shape";
     }
 }
 // Cantor pairing function, ((N, N) -> N) mapping function
@@ -113,6 +103,8 @@ export function checkInside(b, p) {
 export function make_pair_natural(a, b) {
     return (a + b) * (a + b + 1) / 2 + b;
 }
+// Reverse version of pairing function
+// this guarantees initial pairing order
 export function separate_pair(p) {
     let w = Math.floor((Math.sqrt(8 * p + 1) - 1) / 2.0);
     let t = (w * w + w) / 2.0;

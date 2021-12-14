@@ -9,8 +9,8 @@ export class PrismaticJoint extends Joint
 {
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
+    public initialAngle: number;
 
-    private initialAngle: number;
     private t: Vector2;
 
     private ra!: Vector2;

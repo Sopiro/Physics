@@ -8,7 +8,6 @@ export class GrabJoint extends Joint {
         this.impulseSum = new Vector2();
         this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
         this.target = target;
-        this.length = 0;
         if (mass <= 0)
             mass = body.mass;
         if (frequency <= 0)

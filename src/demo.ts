@@ -1123,6 +1123,8 @@ function demo20(game: Game, world: World): void
 }
 
 export const demos: ((game: Game, world: World) => void)[] =
-    [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
+    [
+        demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
         demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18, demo19,
-        demo20];
+        demo20
+    ];

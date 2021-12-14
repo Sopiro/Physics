@@ -7,7 +7,6 @@ import * as Util from "./util.js";
 export class GrabJoint extends Joint
 {
     public localAnchor: Vector2;
-    public length: number;
     public target: Vector2;
 
     private r!: Vector2;
@@ -24,7 +23,6 @@ export class GrabJoint extends Joint
         super(body, body);
         this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
         this.target = target;
-        this.length = 0;
 
         if (mass <= 0) mass = body.mass;
         if (frequency <= 0) frequency = 0.01;

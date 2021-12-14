@@ -97,6 +97,13 @@
                 </div>
 
                 <div class="row">
+                    <div class="form-check form-switch">
+                        <label class="form-check-label" for="showInfo">Show rigid body info</label>
+                        <input class="form-check-input" type="checkbox" role="switch" id="showInfo">
+                    </div>
+                </div>
+
+                <div class="row">
                     <label for="frequency" class="form-label col-10 p-0 m-0">Frequency</label>
                     <div class="col text-end p-0 m-0" id="frequency_label">0Hz</div>
                     <input type="range" class="form-range " id="frequency">
@@ -264,7 +271,7 @@
                 <div class="row collapse mb-2" id="collapseAdvanced">
                     <div class="card card-body py-2 px-4">
                         <div class="row">
-                            <label for="gravityForce" class="form-label col-9 p-0 m-0">Gravity force</label>
+                            <label for="gravityForce" class="form-label col-9 p-0 m-0">Gravity</label>
                             <div class="col text-end p-0 m-0" id="gravityForce_label">0</div>
                             <input type="range" class="form-range " id="gravityForce">
                         </div>
@@ -277,12 +284,6 @@
                             <div class="form-check form-switch">
                                 <label class="form-check-label" for="grabCenter">Grab center</label>
                                 <input class="form-check-input" type="checkbox" role="switch" id="grabCenter">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-check form-switch">
-                                <label class="form-check-label" for="showInfo">Show rigidbody info</label>
-                                <input class="form-check-input" type="checkbox" role="switch" id="showInfo">
                             </div>
                         </div>
                     </div>

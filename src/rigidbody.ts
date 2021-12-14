@@ -14,23 +14,23 @@ export enum Type
 export class RigidBody extends Entity
 {
     // Center of mass in local space = (0, 0)
-    private _force: Vector2;
-    private _torque: number;
-    private _mass: number; // kg
+    private _force: Vector2;            // N
+    private _torque: number;            // N⋅m
+    private _mass: number;              // kg
     private _invMass: number;
-    private _inertia: number; // kg⋅m²
+    private _inertia: number;           // kg⋅m²
     private _invInertia: number;
-    private _linearVelocity: Vector2; // m/s
-    private _angularVelocity: number; // rad/s
+    private _linearVelocity: Vector2;   // m/s
+    private _angularVelocity: number;   // rad/s
     private _friction: number;
     private _restitution: number;
-    private _surfaceSpeed: number; // m/s (Tangential speed)
+    private _surfaceSpeed: number;      // m/s (Tangential speed)
 
     public readonly type: Type;
 
     public id: number = -1;
     public contactIDs: Set<number> = new Set(); // ids of contact manifold containing this body
-    public jointIDs: Set<number> = new Set(); // ids of the joint containing this body
+    public jointIDs: Set<number> = new Set();   // ids of the joint containing this body
 
     constructor(type: Type)
     {

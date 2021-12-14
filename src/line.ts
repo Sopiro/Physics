@@ -6,8 +6,8 @@ import * as Util from "./util.js";
 
 export class LineJoint extends Joint
 {
-    public localAnchorA: Vector2;
-    public localAnchorB: Vector2;
+    public readonly localAnchorA: Vector2;
+    public readonly localAnchorB: Vector2;
 
     private t: Vector2;
 

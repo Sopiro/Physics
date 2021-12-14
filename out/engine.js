@@ -58,7 +58,6 @@ export class Engine {
         Input.update();
     }
     render() {
-        this.gfx.globalCompositeOperation;
         this.gfx.clearRect(0, 0, Settings.width, Settings.height);
         this.game.render(this.renderer);
     }

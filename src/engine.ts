@@ -92,7 +92,6 @@ export class Engine
 
     render(): void
     {
-        this.gfx.globalCompositeOperation
         this.gfx.clearRect(0, 0, Settings.width, Settings.height);
         this.game.render(this.renderer);
     }

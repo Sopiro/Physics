@@ -26,13 +26,13 @@ export function createAABB(b: RigidBody): AABB
     }
     else if (b instanceof Polygon) 
     {
-        const lTg = b.localToGlobal;
+        let localToGlobal = b.localToGlobal;
 
-        let res = { min: lTg.mulVector2(b.vertices[0], 1), max: lTg.mulVector2(b.vertices[0], 1) };
+        let res = { min: localToGlobal.mulVector2(b.vertices[0], 1), max: localToGlobal.mulVector2(b.vertices[0], 1) };
 
         for (let i = 1; i < b.count; i++)
         {
-            let gv = lTg.mulVector2(b.vertices[i], 1);
+            let gv = localToGlobal.mulVector2(b.vertices[i], 1);
             if (gv.x < res.min.x)
                 res.min.x = gv.x;
             else if (gv.x > res.max.x)
@@ -94,16 +94,22 @@ function support(b: RigidBody, dir: Vector2): SupportResult
     }
 }
 
-function csoSupport(c1: RigidBody, c2: RigidBody, dir: Vector2): Vector2
+/*
+* Returns support point in 'Minkowski Difference' set
+* Minkowski Sum: A ⊕ B = {Pa + Pb| Pa ∈ A, Pb ∈ B}
+* Minkowski Difference : A ⊖ B = {Pa - Pb| Pa ∈ A, Pb ∈ B}
+* CSO stands for Configuration Space Object
+*/
+function csoSupport(b1: RigidBody, b2: RigidBody, dir: Vector2): Vector2
 {
-    const localDirP1 = c1.globalToLocal.mulVector2(dir, 0);
-    const localDirP2 = c2.globalToLocal.mulVector2(dir.mul(-1), 0);
+    const localDirP1 = b1.globalToLocal.mulVector2(dir, 0);
+    const localDirP2 = b2.globalToLocal.mulVector2(dir.inverted(), 0);
 
-    let supportP1 = support(c1, localDirP1).vertex;
-    let supportP2 = support(c2, localDirP2).vertex;
+    let supportP1 = support(b1, localDirP1).vertex;
+    let supportP2 = support(b2, localDirP2).vertex;
 
-    supportP1 = c1.localToGlobal.mulVector2(supportP1, 1);
-    supportP2 = c2.localToGlobal.mulVector2(supportP2, 1);
+    supportP1 = b1.localToGlobal.mulVector2(supportP1, 1);
+    supportP2 = b2.localToGlobal.mulVector2(supportP2, 1);
 
     return supportP1.sub(supportP2);
 }
@@ -114,7 +120,7 @@ interface GJKResult
     simplex: Simplex;
 }
 
-function gjk(c1: RigidBody, c2: RigidBody): GJKResult
+function gjk(b1: RigidBody, b2: RigidBody): GJKResult
 {
     const origin = new Vector2(0, 0);
     let simplex: Simplex = new Simplex();
@@ -122,7 +128,7 @@ function gjk(c1: RigidBody, c2: RigidBody): GJKResult
 
     let result: GJKResult = { collide: false, simplex: simplex };
 
-    let supportPoint = csoSupport(c1, c2, dir);
+    let supportPoint = csoSupport(b1, b2, dir);
     simplex.addVertex(supportPoint);
 
     for (let k = 0; k < Settings.GJK_MAX_ITERATION; k++)
@@ -142,7 +148,7 @@ function gjk(c1: RigidBody, c2: RigidBody): GJKResult
         }
 
         dir = origin.sub(closest.result);
-        supportPoint = csoSupport(c1, c2, dir);
+        supportPoint = csoSupport(b1, b2, dir);
 
         // If the new support point is not further along the search direction than the closest point,
         // two objects are not colliding so you can early return here.
@@ -174,7 +180,7 @@ interface EPAResult
     contactNormal: Vector2;
 }
 
-function epa(c1: RigidBody, c2: RigidBody, gjkResult: Simplex): EPAResult
+function epa(b1: RigidBody, b2: RigidBody, gjkResult: Simplex): EPAResult
 {
     let polytope: Polytope = new Polytope(gjkResult);
 
@@ -183,7 +189,7 @@ function epa(c1: RigidBody, c2: RigidBody, gjkResult: Simplex): EPAResult
     for (let i = 0; i < Settings.EPA_MAX_ITERATION; i++)
     {
         closestEdge = polytope.getClosestEdge();
-        let supportPoint = csoSupport(c1, c2, closestEdge.normal);
+        let supportPoint = csoSupport(b1, b2, closestEdge.normal);
         let newDistance = closestEdge.normal.dot(supportPoint);
 
         if (Math.abs(closestEdge.distance - newDistance) > Settings.EPA_TOLERANCE)
@@ -273,18 +279,17 @@ const CONTACT_MERGE_THRESHOLD = 1.415 * 0.01;
 
 function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
 {
-    // collision normal in the world space
     let edgeA = findFarthestEdge(a, n);
-    let edgeB = findFarthestEdge(b, n.mul(-1));
+    let edgeB = findFarthestEdge(b, n.inverted());
 
-    let ref = edgeA;
-    let inc = edgeB;
+    let ref = edgeA; // Reference edge
+    let inc = edgeB; // Incidence edge
     let flip = false;
 
-    let aPerp = Math.abs(edgeA.dir.dot(n));
-    let bPerp = Math.abs(edgeB.dir.dot(n));
+    let aPerpendicularness = Math.abs(edgeA.dir.dot(n));
+    let bPerpendicularness = Math.abs(edgeB.dir.dot(n));
 
-    if (aPerp >= bPerp)
+    if (aPerpendicularness >= bPerpendicularness)
     {
         ref = edgeB;
         inc = edgeA;
@@ -292,12 +297,12 @@ function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
     }
 
     clipEdge(inc, ref.p1, ref.dir);
-    clipEdge(inc, ref.p2, ref.dir.mul(-1));
-    clipEdge(inc, ref.p1, flip ? n : n.mul(-1), true);
+    clipEdge(inc, ref.p2, ref.dir.inverted());
+    clipEdge(inc, ref.p1, flip ? n : n.inverted(), true);
 
     let contactPoints: Vector2[];
 
-    // If two points are closer than threshold, merge them into one point.
+    // If two points are closer than threshold, merge them into one point
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
         contactPoints = [inc.p1];
     else
@@ -313,7 +318,7 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
     if (a instanceof Circle && b instanceof Circle)
     {
         let d = Util.squared_distance(a.position, b.position);
-        let r2 = (a as Circle).radius + (b as Circle).radius;
+        let r2 = a.radius + b.radius;
 
         if (d > r2 * r2)
         {
@@ -360,7 +365,7 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
     else
     {
         // If the gjk termination simplex has vertices less than 3, expand to full simplex
-        // Because EPA needs a full n-simplex to start
+        // Because EPA needs a full n-simplex to get started
         let simplex = gjkResult.simplex;
         switch (simplex.count)
         {
