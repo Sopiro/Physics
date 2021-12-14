@@ -1,3 +1,4 @@
+// Children: ContactManifold, Joint
 export class Constraint {
     constructor(bodyA, bodyB) {
         this.beta = 0.0; // Coefficient of position correction (Positional error feedback factor)

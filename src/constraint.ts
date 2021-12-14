@@ -1,6 +1,7 @@
 import { Vector2, Vector3 } from "./math.js";
 import { RigidBody } from "./rigidbody.js";
 
+// Children: ContactManifold, Joint
 export abstract class Constraint
 {
     public readonly bodyA: RigidBody;

@@ -187,9 +187,9 @@ function findContactPoints(n, a, b) {
     let ref = edgeA; // Reference edge
     let inc = edgeB; // Incidence edge
     let flip = false;
-    let aPerp = Math.abs(edgeA.dir.dot(n));
-    let bPerp = Math.abs(edgeB.dir.dot(n));
-    if (aPerp >= bPerp) {
+    let aPerpendicularness = Math.abs(edgeA.dir.dot(n));
+    let bPerpendicularness = Math.abs(edgeB.dir.dot(n));
+    if (aPerpendicularness >= bPerpendicularness) {
         ref = edgeB;
         inc = edgeA;
         flip = true;

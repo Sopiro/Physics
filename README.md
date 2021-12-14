@@ -1,12 +1,15 @@
-# 2D Rigidbody Physics Engine
+# 2D Rigid Body Physics Engine
 
-2D Rigidbody physics engine implemented in HTML canvas with Typescript.
+2D Rigid body physics engine implemented in HTML canvas with Typescript.
 
 Live demo: https://sopiro.github.io/Physics/  
-Video: https://youtu.be/mHnHj9HHSBg
+Video1: https://youtu.be/mHnHj9HHSBg  
+Video2: https://youtu.be/57seMGrGWhw
 
 ## Preview
-![img](.github/rigidbody.gif)
+![img1](.github/2.gif)
+![img2](.github/3.gif)
+![img3](.github/4.gif)
 
 ## Features
 - Basic input, Rendering system
@@ -21,7 +24,7 @@ Video: https://youtu.be/mHnHj9HHSBg
   - Sequential impulses  
 - Constraint-basd simulation
   - Contact constraint
-  - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Line, Angle, Grab
+  - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
   - Soft constraints
 
 

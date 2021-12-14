@@ -1,4 +1,5 @@
 import { Constraint } from "./constraint.js";
+// Children: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
 export class Joint extends Constraint {
     /*
     * Equation of motion for the damped harmonic oscillator
@@ -40,4 +41,3 @@ export class Joint extends Constraint {
         this.id = -1;
     }
 }
-// Children: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab

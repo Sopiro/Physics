@@ -1,6 +1,7 @@
 import { Constraint } from "./constraint.js";
 import { RigidBody } from "./rigidbody.js";
 
+// Children: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
 export abstract class Joint extends Constraint
 {
     public drawAnchor = true;
@@ -45,5 +46,3 @@ export abstract class Joint extends Constraint
         super(bodyA, bodyB);
     }
 }
-
-// Children: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
