@@ -48,10 +48,13 @@ function demo2(game: Game, world: World): void
     let size = 0.3;
     let gap = 0.05;
 
-    for (let i = 0; i < 12; i++)
+    // let error = 0.015;
+    let error = 0.0;
+
+    for (let i = 0; i < 17; i++)
     {
         let b = new Box(size);
-        b.position = new Vector2(Util.random(-0.015, 0.015), start + i * (size + gap));
+        b.position = new Vector2(Util.random(-error, error), start + i * (size + gap));
         world.register(b);
     }
 }
@@ -425,7 +428,7 @@ function demo12(game: Game, world: World): void
         for (let j = i; j < rows; j++)
         {
             let c = new Circle(size);
-            c.mass = (1 + i) + (1 + i) * j;
+            c.mass = (1 + i) + (1 + i) * j + 2;
             c.position.x = xStart + (gap + size * 2) * i;
             c.position.y = yStart + (gap + size * 2) * j;
             world.register(c);

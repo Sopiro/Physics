@@ -226,3 +226,9 @@ export function viewport(width: number, height: number, xStart = 0, yStart = 0):
 
     return res;
 }
+
+export function assert(...test: boolean[]): void
+{
+    for (let i = 0; i < test.length; i++)
+        if (!test[i]) throw new Error("Assertion failed");
+}

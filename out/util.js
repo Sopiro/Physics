@@ -147,3 +147,8 @@ export function viewport(width, height, xStart = 0, yStart = 0) {
     res.m12 = yStart + height / 2.0;
     return res;
 }
+export function assert(...test) {
+    for (let i = 0; i < test.length; i++)
+        if (!test[i])
+            throw new Error("Assertion failed");
+}

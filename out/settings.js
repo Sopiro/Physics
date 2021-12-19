@@ -44,7 +44,7 @@ export const Settings = {
     showBoundingBox: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
-    numIterations: 15,
+    numIterations: 12,
     newBodySettings: {
         shape: GenerationShape.Box,
         mass: 2,
@@ -58,7 +58,7 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5,
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.025 * 0.025,
+    warmStartingThreshold: 0.01 * 0.01,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
@@ -68,6 +68,7 @@ export const Settings = {
     defaultSize: 0.5,
     defaultFriction: 0.7,
     defaultRestitution: 0.001,
+    blockSolve: true,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");

@@ -1,5 +1,5 @@
 import { RigidBody } from "./rigidbody.js";
-import { Vector2 } from "./math.js";
+import { Matrix2, Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 import { Constraint } from "./constraint.js";
@@ -18,7 +18,7 @@ interface Jacobian
     wb: number;
 }
 
-class ContactConstraintSolver
+class ContactSolver
 {
     private manifold: ContactManifold;
 
@@ -27,15 +27,16 @@ class ContactConstraintSolver
     private contactPoint: Vector2;
     private contactType!: ContactType;
 
-    private ra!: Vector2;
-    private rb!: Vector2;
-    private jacobian!: Jacobian;
-    private bias!: number;
-    private effectiveMass!: number;
-
     private beta: number;
     private restitution: number;
     private friction: number;
+
+    private ra!: Vector2;
+    private rb!: Vector2;
+
+    public jacobian!: Jacobian;
+    public bias!: number;
+    public effectiveMass!: number;
 
     public impulseSum: number = 0.0; // For accumulated impulse
 
@@ -76,7 +77,7 @@ class ContactConstraintSolver
             // Relative velocity at contact point
             let relativeVelocity = this.bodyB.linearVelocity.add(Util.cross(this.bodyB.angularVelocity, this.rb))
                 .sub(this.bodyA.linearVelocity.add(Util.cross(this.bodyA.angularVelocity, this.ra)));
-            let normalVelocity = relativeVelocity.dot(this.manifold.contactNormal!);
+            let normalVelocity = this.manifold.contactNormal.dot(relativeVelocity);
 
             if (Settings.positionCorrection)
                 this.bias = -(this.beta * Settings.inv_dt) * Math.max(this.manifold.penetrationDepth! - Settings.penetrationSlop, 0.0);
@@ -103,7 +104,7 @@ class ContactConstraintSolver
             this.applyImpulse(this.impulseSum);
     }
 
-    solve(normalContact?: ContactConstraintSolver)
+    solve(normalContact?: ContactSolver)
     {
         // Calculate corrective impulse: Pc
         // Pc = J^t * λ (λ: lagrangian multiplier)
@@ -161,6 +162,200 @@ class ContactConstraintSolver
     }
 }
 
+export class BlockSolver
+{
+    private manifold: ContactManifold;
+
+    private bodyA: RigidBody;
+    private bodyB: RigidBody;
+
+    private jacobian1!: Jacobian;
+    private jacobian2!: Jacobian;
+    private k!: Matrix2;
+    private m!: Matrix2;
+
+    constructor(manifold: ContactManifold)
+    {
+        this.manifold = manifold;
+        this.bodyA = manifold.bodyA;
+        this.bodyB = manifold.bodyB;
+    }
+
+    prepare()
+    {
+        // Calculate Jacobian J and effective mass M
+        // J = [-n, -ra1 × n, n, rb1 × n
+        //      -n, -ra2 × n, n, rb2 × n]
+        // K = (J · M^-1 · J^t)
+        // M = K^-1
+
+        this.jacobian1 = this.manifold.normalContacts[0].jacobian;
+        this.jacobian2 = this.manifold.normalContacts[1].jacobian;
+
+        this.k = new Matrix2();
+
+        this.k.m00 =
+            + this.bodyA.inverseMass
+            + this.jacobian1.wa * this.bodyA.inverseInertia * this.jacobian1.wa
+            + this.bodyB.inverseMass
+            + this.jacobian1.wb * this.bodyB.inverseInertia * this.jacobian1.wb;
+
+        this.k.m11 =
+            + this.bodyA.inverseMass
+            + this.jacobian2.wa * this.bodyA.inverseInertia * this.jacobian2.wa
+            + this.bodyB.inverseMass
+            + this.jacobian2.wb * this.bodyB.inverseInertia * this.jacobian2.wb;
+
+        this.k.m01 =
+            + this.bodyA.inverseMass
+            + this.jacobian1.wa * this.bodyA.inverseInertia * this.jacobian2.wa
+            + this.bodyB.inverseMass
+            + this.jacobian1.wb * this.bodyB.inverseInertia * this.jacobian2.wb;
+
+        this.k.m10 = this.k.m01;
+
+        Util.assert(this.k.determinant != 0);
+        this.m = this.k.inverted();
+    }
+
+    solve()
+    {
+        // This comment is copied from Box2D::b2_contact_solver.cpp
+        //
+        // Block solver developed in collaboration with Dirk Gregorius (back in 01/07 on Box2D_Lite).
+        // Build the mini LCP for this contact patch
+        //
+        // vn = A * x + b, vn >= 0, x >= 0 and vn_i * x_i = 0 with i = 1..2
+        //  
+        // A = J * W * JT and J = ( -n, -r1 x n, n, r2 x n )
+        // b = vn0 - velocityBias
+        //
+        // The system is solved using the "Total enumeration method" (s. Murty). The complementary constraint vn_i * x_i
+        // implies that we must have in any solution either vn_i = 0 or x_i = 0. So for the 2D contact problem the cases
+        // vn1 = 0 and vn2 = 0, x1 = 0 and x2 = 0, x1 = 0 and vn2 = 0, x2 = 0 and vn1 = 0 need to be tested. The first valid
+        // solution that satisfies the problem is chosen.
+        //
+        // In order to account of the accumulated impulse 'a' (because of the iterative nature of the solver which only requires
+        // that the accumulated impulse is clamped and not the incremental impulse) we change the impulse variable (x_i).
+        //
+        // Substitute:
+        //
+        // x = a + d
+        //
+        // a := old total impulse
+        // x := new total impulse
+        // d := incremental impulse 
+        //
+        // For the current iteration we extend the formula for the incremental impulse
+        // to compute the new total impulse:
+        //
+        // vn = A * d + b
+        //     = A * (x - a) + b
+        //     = A * x + b - A * a
+        //     = A * x + b'
+        // b' = b - A * a; 
+
+        let nc1 = this.manifold.normalContacts[0]; // Normal contact1
+        let nc2 = this.manifold.normalContacts[1]; // Normal contact2
+
+        let a = new Vector2(nc1.impulseSum, nc2.impulseSum); // old total impulse
+        Util.assert(a.x >= 0.0, a.y >= 0.0);
+
+        // Normal velocity == Jv
+        let vn1: number =
+            + nc1.jacobian.va.dot(this.bodyA.linearVelocity)
+            + nc1.jacobian.wa * this.bodyA.angularVelocity
+            + nc1.jacobian.vb.dot(this.bodyB.linearVelocity)
+            + nc1.jacobian.wb * this.bodyB.angularVelocity;
+
+        let vn2: number =
+            + nc2.jacobian.va.dot(this.bodyA.linearVelocity)
+            + nc2.jacobian.wa * this.bodyA.angularVelocity
+            + nc2.jacobian.vb.dot(this.bodyB.linearVelocity)
+            + nc2.jacobian.wb * this.bodyB.angularVelocity;
+
+        let b = new Vector2(vn1 + nc1.bias, vn2 + nc2.bias);
+
+        // b' = b - K * a
+        b = b.sub(this.k.mulVector(a));
+        let x: Vector2; // Lambda
+
+        while (true)
+        {
+            //
+            // Case 1: vn = 0
+            // Both constraints are violated
+            //
+            // 0 = A * x + b'
+            //
+            // Solve for x:
+            //
+            // x = - inv(A) * b'
+            //
+            x = this.m.mulVector(b).inverted();
+            if (x.x >= 0.0 && x.y >= 0.0) break;
+
+            //
+            // Case 2: vn1 = 0 and x2 = 0
+            // The first constraint is violated and the second constraint is satisfied
+            //
+            //   0 = a11 * x1 + a12 * 0 + b1' 
+            // vn2 = a21 * x1 + a22 * 0 + b2'
+            //
+            x.x = nc1.effectiveMass * -b.x;
+            x.y = 0.0;
+            vn1 = 0.0;
+            vn2 = this.k.m01 * x.x + b.y;
+            if (x.x >= 0.0 && vn2 >= 0.0) break;
+
+            //
+            // Case 3: vn2 = 0 and x1 = 0
+            // The first constraint is satisfied and the second constraint is violated
+            // vn1 = a11 * 0 + a12 * x2 + b1' 
+            //   0 = a21 * 0 + a22 * x2 + b2'
+            //
+            x.x = 0.0;
+            x.y = nc2.effectiveMass * -b.y;
+            vn1 = this.k.m10 * x.y + b.x;
+            vn2 = 0.0;
+            if (x.y >= 0.0 && vn1 >= 0.0) break;
+
+            //
+            // Case 4: x1 = 0 and x2 = 0
+            // Both constraints are satisfied 
+            //
+            // vn1 = b1
+            // vn2 = b2;
+            x.x = 0.0;
+            x.y = 0.0;
+            vn1 = b.x;
+            vn2 = b.y;
+            if (vn1 >= 0.0 && vn2 >= 0.0) break;
+
+            Util.assert(false);
+            break;
+        }
+
+        // Get the incremental impulse
+        let d = x.sub(a);
+        this.applyImpulse(d);
+        // Accumulate
+        nc1.impulseSum = x.x;
+        nc2.impulseSum = x.y;
+    }
+
+    private applyImpulse(lambda: Vector2): void
+    {
+        // V2 = V2' + M^-1 ⋅ Pc
+        // Pc = J^t ⋅ λ
+
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.add(this.jacobian1.va.mul(this.bodyA.inverseMass * (lambda.x + lambda.y)));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity + this.bodyA.inverseInertia * (this.jacobian1.wa * lambda.x + this.jacobian2.wa * lambda.y);
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.jacobian1.vb.mul(this.bodyB.inverseMass * (lambda.x + lambda.y)));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * (this.jacobian1.wb * lambda.x + this.jacobian2.wb * lambda.y);
+    }
+}
+
 export class ContactManifold extends Constraint
 {
     // Contact informations
@@ -169,8 +364,9 @@ export class ContactManifold extends Constraint
     public readonly contactTangent: Vector2;
     public readonly contactPoints: Vector2[];
 
-    public readonly solversN: ContactConstraintSolver[] = [];
-    public readonly solversT: ContactConstraintSolver[] = [];
+    public readonly normalContacts: ContactSolver[] = [];
+    public readonly tangentContacts: ContactSolver[] = [];
+    public readonly blockSolver!: BlockSolver;
 
     public featureFlipped;
     public persistent = false;
@@ -190,8 +386,13 @@ export class ContactManifold extends Constraint
 
         for (let i = 0; i < this.numContacts; i++)
         {
-            this.solversN.push(new ContactConstraintSolver(this, contactPoints[i]));
-            this.solversT.push(new ContactConstraintSolver(this, contactPoints[i]));
+            this.normalContacts.push(new ContactSolver(this, contactPoints[i]));
+            this.tangentContacts.push(new ContactSolver(this, contactPoints[i]));
+        }
+
+        if (this.numContacts == 2 && Settings.blockSolve)
+        {
+            this.blockSolver = new BlockSolver(this);
         }
     }
 
@@ -199,17 +400,35 @@ export class ContactManifold extends Constraint
     {
         for (let i = 0; i < this.numContacts; i++)
         {
-            this.solversN[i].prepare(this.contactNormal!, ContactType.Normal);
-            this.solversT[i].prepare(this.contactTangent!, ContactType.Tangent);
+            this.normalContacts[i].prepare(this.contactNormal!, ContactType.Normal);
+            this.tangentContacts[i].prepare(this.contactTangent!, ContactType.Tangent);
+        }
+
+        // If we have two contact points, then prepare the block solver.
+        if (this.numContacts == 2 && Settings.blockSolve)
+        {
+            this.blockSolver.prepare();
         }
     }
 
     override solve(): void
     {
+        // Solve tangent constraint first
         for (let i = 0; i < this.numContacts; i++)
         {
-            this.solversN[i].solve();
-            this.solversT[i].solve(this.solversN[i]);
+            this.tangentContacts[i].solve(this.normalContacts[i]);
+        }
+
+        if (this.numContacts == 1 || !Settings.blockSolve)
+        {
+            for (let i = 0; i < this.numContacts; i++)
+            {
+                this.normalContacts[i].solve();
+            }
+        }
+        else // Solve two contact constraint in one shot using block solver
+        {
+            this.blockSolver.solve();
         }
     }
 
@@ -231,8 +450,8 @@ export class ContactManifold extends Constraint
 
             if (o < oldManifold.numContacts)
             {
-                this.solversN[n].impulseSum = oldManifold.solversN[o].impulseSum;
-                this.solversT[n].impulseSum = oldManifold.solversT[o].impulseSum;
+                this.normalContacts[n].impulseSum = oldManifold.normalContacts[o].impulseSum;
+                this.tangentContacts[n].impulseSum = oldManifold.tangentContacts[o].impulseSum;
 
                 this.persistent = true;
             }

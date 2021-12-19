@@ -1,4 +1,4 @@
-import { Matrix2, Matrix3, Vector2, Vector3 } from "./math.js";
+import { Matrix2, Vector2 } from "./math.js";
 import { RigidBody } from "./rigidbody.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
@@ -119,7 +119,7 @@ export class MotorJoint extends Joint
         let jv1 = this.bodyB.angularVelocity - this.bodyA.angularVelocity;
 
         let lambda0 = this.m0.mulVector(jv0.add(this.bias0).add(this.linearImpulseSum.mul(this.gamma)).inverted());
-        let lambda1 = this.m1 * -(jv1 + this.bias1);
+        let lambda1 = this.m1 * -(jv1 + this.bias1 + this.angularImpulseSum * this.gamma);
 
         // Clamp linear impulse
         {
@@ -145,27 +145,21 @@ export class MotorJoint extends Joint
         }
 
         this.applyImpulse(lambda0, lambda1);
-
-        if (Settings.warmStarting)
-        {
-            this.linearImpulseSum = this.linearImpulseSum.add(lambda0);
-            this.angularImpulseSum = this.angularImpulseSum + lambda1;
-        }
     }
 
-    protected applyImpulse(lambda01: Vector2, lambda2: number)
+    protected applyImpulse(lambda0: Vector2, lambda1: number)
     {
         // V2 = V2' + M^-1 ⋅ Pc
         // Pc = J^t ⋅ λ
 
         // Solve for point-to-point constraint
-        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(lambda01.mul(this.bodyA.inverseMass));
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda01);
-        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(lambda01.mul(this.bodyB.inverseMass));
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(lambda01);
+        this.bodyA.linearVelocity = this.bodyA.linearVelocity.sub(lambda0.mul(this.bodyA.inverseMass));
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.bodyA.inverseInertia * this.ra.cross(lambda0);
+        this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(lambda0.mul(this.bodyB.inverseMass));
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.rb.cross(lambda0);
 
         // Solve for angle constraint
-        this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda2 * this.bodyA.inverseInertia;
-        this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda2 * this.bodyB.inverseInertia;
+        this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda1 * this.bodyA.inverseInertia;
+        this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda1 * this.bodyB.inverseInertia;
     }
 }

@@ -48,7 +48,7 @@ export const Settings = {
     showBoundingBox: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
-    numIterations: 15, // Number of resolution(sequential impulses) iterations
+    numIterations: 12, // Number of resolution(sequential impulses) iterations
     newBodySettings:
     {
         shape: GenerationShape.Box,
@@ -63,7 +63,7 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5, // This has to be greater than (gravity * gravityScale * deltaTime)
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.025 * 0.025,
+    warmStartingThreshold: 0.01 * 0.01,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
@@ -73,6 +73,7 @@ export const Settings = {
     defaultSize: 0.5,
     defaultFriction: 0.7,
     defaultRestitution: 0.001,
+    blockSolve: true,
 }
 
 // Remove the default pop-up context menu

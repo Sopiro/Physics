@@ -294,9 +294,12 @@ export class Matrix2 {
         res.m11 = this.m11;
         return res;
     }
+    get determinant() {
+        return this.m00 * this.m11 - this.m01 * this.m10;
+    }
     inverted() {
         let res = new Matrix2();
-        let det = this.m00 * this.m11 - this.m01 * this.m10;
+        let det = this.determinant;
         if (det == 0)
             throw "Determinant 0";
         det = 1.0 / det;
