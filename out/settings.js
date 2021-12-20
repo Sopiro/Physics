@@ -91,6 +91,9 @@ accumulation.addEventListener("click", () => { Settings.impulseAccumulation = ac
 const warmStarting = document.querySelector("#warmstarting");
 warmStarting.checked = Settings.warmStarting;
 warmStarting.addEventListener("click", () => { Settings.warmStarting = warmStarting.checked; });
+const blockSolve = document.querySelector("#blockSolve");
+blockSolve.checked = Settings.blockSolve;
+blockSolve.addEventListener("click", () => { Settings.blockSolve = blockSolve.checked; });
 const indicateCoM = document.querySelector("#indicateCoM");
 indicateCoM.checked = Settings.indicateCoM;
 indicateCoM.addEventListener("click", () => { Settings.indicateCoM = indicateCoM.checked; });

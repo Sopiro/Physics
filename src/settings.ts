@@ -104,6 +104,10 @@ const warmStarting = document.querySelector("#warmstarting")! as HTMLInputElemen
 warmStarting.checked = Settings.warmStarting;
 warmStarting.addEventListener("click", () => { Settings.warmStarting = warmStarting.checked; });
 
+const blockSolve = document.querySelector("#blockSolve")! as HTMLInputElement;
+blockSolve.checked = Settings.blockSolve;
+blockSolve.addEventListener("click", () => { Settings.blockSolve = blockSolve.checked; });
+
 const indicateCoM = document.querySelector("#indicateCoM")! as HTMLInputElement;
 indicateCoM.checked = Settings.indicateCoM;
 indicateCoM.addEventListener("click", () => { Settings.indicateCoM = indicateCoM.checked; });

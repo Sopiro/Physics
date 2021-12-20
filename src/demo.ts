@@ -109,7 +109,7 @@ function demo4(game: Game, world: World): void
     b.mass = 1;
     world.register(b);
     b = new Box(0.5);
-    b.position = new Vector2(2.6, 5);
+    b.position = new Vector2(2.55, 5);
     b.mass = 30;
     world.register(b);
 }
@@ -995,8 +995,10 @@ function demo20(game: Game, world: World): void
     world.register(lower_leg_l);
 
     let force = 10000;
-    let torque_upper = 1.75;
-    let torque_lower = 1.5;
+    let torque_upper_arm = 1.25;
+    let torque_lower_arm = 1.0;
+    let torque_upper_leg = 1.75;
+    let torque_lower_leg = 1.5;
     let frequency = 5;
 
     let j: Joint;
@@ -1014,7 +1016,7 @@ function demo20(game: Game, world: World): void
 
     // Right arm
     {
-        j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), force, torque_upper, frequency, 1);
+        j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), force, torque_upper_arm, frequency, 1);
         (j as MotorJoint).initialAngle = -Math.PI / 2.0 + 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
@@ -1030,7 +1032,7 @@ function demo20(game: Game, world: World): void
         j.drawConnectionLine = false;
         world.register(j, true);
 
-        j = new MotorJoint(lower_arm_r, b1, b1.position, force, torque_lower, frequency, 1, lower_arm_r.mass);
+        j = new MotorJoint(lower_arm_r, b1, b1.position, force, torque_lower_arm, frequency, 1, lower_arm_r.mass);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
@@ -1038,7 +1040,7 @@ function demo20(game: Game, world: World): void
 
     // Left arm
     {
-        j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), force, torque_upper, frequency, 1);
+        j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), force, torque_upper_arm, frequency, 1);
         (j as MotorJoint).initialAngle = Math.PI / 2.0 - 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
@@ -1054,7 +1056,7 @@ function demo20(game: Game, world: World): void
         j.drawAnchor = false;
         world.register(j, true);
 
-        j = new MotorJoint(lower_arm_l, b2, b2.position, force, torque_lower, frequency, 1, lower_arm_l.mass);
+        j = new MotorJoint(lower_arm_l, b2, b2.position, force, torque_lower_arm, frequency, 1, lower_arm_l.mass);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
@@ -1062,7 +1064,7 @@ function demo20(game: Game, world: World): void
 
     // Right leg
     {
-        j = new MotorJoint(body0, upper_leg_r, body0.position.add(new Vector2(0.2, 0)), force, torque_upper, frequency, 1);
+        j = new MotorJoint(body0, upper_leg_r, body0.position.add(new Vector2(0.2, 0)), force, torque_upper_leg, frequency, 1);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
@@ -1078,7 +1080,7 @@ function demo20(game: Game, world: World): void
         j.drawAnchor = false;
         world.register(j, true);
 
-        j = new MotorJoint(lower_leg_r, b3, b3.position, force, torque_lower, frequency, 1, lower_leg_r.mass);
+        j = new MotorJoint(lower_leg_r, b3, b3.position, force, torque_lower_leg, frequency, 1, lower_leg_r.mass);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
@@ -1087,7 +1089,7 @@ function demo20(game: Game, world: World): void
 
     // Left leg
     {
-        j = new MotorJoint(body0, upper_leg_l, body0.position.add(new Vector2(-0.2, 0)), force, torque_upper, frequency, 1);
+        j = new MotorJoint(body0, upper_leg_l, body0.position.add(new Vector2(-0.2, 0)), force, torque_upper_leg, frequency, 1);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
@@ -1102,7 +1104,7 @@ function demo20(game: Game, world: World): void
         j.drawAnchor = false;
         world.register(j, true);
 
-        j = new MotorJoint(lower_leg_l, b4, b4.position, force, torque_lower, frequency, 1, lower_leg_l.mass);
+        j = new MotorJoint(lower_leg_l, b4, b4.position, force, torque_lower_leg, frequency, 1, lower_leg_l.mass);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, true);
