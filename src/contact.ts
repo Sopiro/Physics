@@ -110,7 +110,7 @@ class ContactSolver
         // Pc = J^t * λ (λ: lagrangian multiplier)
         // λ = (J · M^-1 · J^t)^-1 ⋅ -(J·v+b)
 
-        // Jacobian * velocity vector
+        // Jacobian * velocity vector (Normal velocity)
         let jv: number =
             + this.jacobian.va.dot(this.bodyA.linearVelocity)
             + this.jacobian.wa * this.bodyA.angularVelocity
@@ -221,6 +221,7 @@ export class BlockSolver
     solve()
     {
         // This comment is copied from Box2D::b2_contact_solver.cpp
+        // Check out Box2D: https://box2d.org
         //
         // Block solver developed in collaboration with Dirk Gregorius (back in 01/07 on Box2D_Lite).
         // Build the mini LCP for this contact patch
@@ -261,7 +262,7 @@ export class BlockSolver
         let a = new Vector2(nc1.impulseSum, nc2.impulseSum); // old total impulse
         Util.assert(a.x >= 0.0, a.y >= 0.0);
 
-        // Normal velocity == Jv
+        // (Velocity constraint) Normal velocity: Jv = 0
         let vn1: number =
             + nc1.jacobian.va.dot(this.bodyA.linearVelocity)
             + nc1.jacobian.wa * this.bodyA.angularVelocity
@@ -311,6 +312,7 @@ export class BlockSolver
             //
             // Case 3: vn2 = 0 and x1 = 0
             // The first constraint is satisfied and the second constraint is violated
+            //
             // vn1 = a11 * 0 + a12 * x2 + b1' 
             //   0 = a21 * 0 + a22 * x2 + b2'
             //
@@ -326,6 +328,7 @@ export class BlockSolver
             //
             // vn1 = b1
             // vn2 = b2;
+            //
             x.x = 0.0;
             x.y = 0.0;
             vn1 = b.x;
@@ -339,6 +342,7 @@ export class BlockSolver
         // Get the incremental impulse
         let d = x.sub(a);
         this.applyImpulse(d);
+        
         // Accumulate
         nc1.impulseSum = x.x;
         nc2.impulseSum = x.y;

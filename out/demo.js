@@ -33,7 +33,7 @@ function demo2(game, world) {
     world.register(ground);
     let start = 0.5;
     let size = 0.3;
-    let gap = 0.05;
+    let gap = 0.1;
     // let error = 0.015;
     let error = 0.0;
     for (let i = 0; i < 17; i++) {
@@ -82,7 +82,7 @@ function demo4(game, world) {
     b.mass = 1;
     world.register(b);
     b = new Box(0.5);
-    b.position = new Vector2(2.55, 5);
+    b.position = new Vector2(2.5, 5);
     b.mass = 30;
     world.register(b);
 }

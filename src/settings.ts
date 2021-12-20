@@ -63,7 +63,7 @@ export const Settings = {
     penetrationSlop: 0.002,
     restitutionSlop: 0.5, // This has to be greater than (gravity * gravityScale * deltaTime)
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.01 * 0.01,
+    warmStartingThreshold: 0.0025 * 0.0025,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,

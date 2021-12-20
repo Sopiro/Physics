@@ -3,6 +3,7 @@
 2D Rigid body physics engine implemented in HTML canvas with Typescript.
 
 Live demo: https://sopiro.github.io/Physics/  
+
 Video1: https://youtu.be/mHnHj9HHSBg  
 Video2: https://youtu.be/57seMGrGWhw
 
@@ -26,6 +27,7 @@ Video2: https://youtu.be/57seMGrGWhw
   - Contact constraint
   - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
   - Soft constraints
+  - Block solver
 
 
 ## References
