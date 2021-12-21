@@ -46,6 +46,7 @@ export const Settings = {
     indicateCP: false,
     indicateCoM: false,
     showBoundingBox: false,
+    showContactLink: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
     numIterations: 12, // Number of resolution(sequential impulses) iterations
@@ -272,6 +273,10 @@ grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.gra
 const showInfo = document.querySelector("#showInfo")! as HTMLInputElement;
 showInfo.checked = Settings.showInfo;
 showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
+
+const contactLink = document.querySelector("#contactLink")! as HTMLInputElement;
+contactLink.checked = Settings.showContactLink;
+contactLink.addEventListener("click", () => { Settings.showContactLink = !Settings.showContactLink; });
 
 /*
 const beta = document.querySelector("#beta")! as HTMLInputElement;

@@ -264,6 +264,17 @@ export class Game {
                 let aabb = createAABB(b);
                 r.drawAABB(aabb);
             }
+            if (Settings.showContactLink) {
+                b.contactIDs.forEach(id => {
+                    let manifold = this.world.manifoldMap.get(id);
+                    if (manifold.bodyA.type == Type.Static || manifold.bodyB.type == Type.Static)
+                        return;
+                    if (manifold.bodyA.id == b.id)
+                        r.drawVectorP(manifold.bodyB.position, manifold.bodyA.position, 0.01);
+                    else
+                        r.drawVectorP(manifold.bodyA.position, manifold.bodyB.position, 0.01);
+                });
+            }
         }
         // Joint rendering
         for (let i = 0; i < this.world.joints.length; i++) {

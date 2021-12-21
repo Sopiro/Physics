@@ -42,6 +42,7 @@ export const Settings = {
     indicateCP: false,
     indicateCoM: false,
     showBoundingBox: false,
+    showContactLink: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
     numIterations: 12,
@@ -220,6 +221,9 @@ grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.gra
 const showInfo = document.querySelector("#showInfo");
 showInfo.checked = Settings.showInfo;
 showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });
+const contactLink = document.querySelector("#contactLink");
+contactLink.checked = Settings.showContactLink;
+contactLink.addEventListener("click", () => { Settings.showContactLink = !Settings.showContactLink; });
 /*
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));

@@ -147,7 +147,7 @@ export class Game
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
                     let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
                     let torque = bindInGlobal.sub(this.targetBody.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
-                    
+
                     this.targetBody.force.x += force.x;
                     this.targetBody.force.y += force.y;
                     this.targetBody.torque += torque;
@@ -345,6 +345,22 @@ export class Game
             {
                 let aabb = createAABB(b);
                 r.drawAABB(aabb);
+            }
+
+            if (Settings.showContactLink)
+            {
+                b.contactIDs.forEach(id =>
+                {
+                    let manifold = this.world.manifoldMap.get(id)!;
+
+                    if (manifold.bodyA.type == Type.Static || manifold.bodyB.type == Type.Static)
+                        return;
+
+                    if (manifold.bodyA.id == b.id)
+                        r.drawVectorP(manifold.bodyB.position, manifold.bodyA.position, 0.01);
+                    else
+                        r.drawVectorP(manifold.bodyA.position, manifold.bodyB.position, 0.01);
+                });
             }
         }
 

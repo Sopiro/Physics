@@ -44,6 +44,8 @@ export class World
                 b.linearVelocity.x += gravity.x;
                 b.linearVelocity.y += gravity.y;
             }
+
+            b.contactIDs.clear();
         }
 
         let newManifolds: ContactManifold[] = [];
@@ -80,9 +82,6 @@ export class World
                 }
                 else
                 {
-                    a.contactIDs.delete(key);
-                    b.contactIDs.delete(key);
-
                     this.manifoldMap.delete(key);
                 }
             }
