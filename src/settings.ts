@@ -49,7 +49,7 @@ export const Settings = {
     showContactLink: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
-    numIterations: 12, // Number of resolution(sequential impulses) iterations
+    numIterations: 10, // Number of resolution(sequential impulses) iterations
     newBodySettings:
     {
         shape: GenerationShape.Box,

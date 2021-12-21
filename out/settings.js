@@ -45,7 +45,7 @@ export const Settings = {
     showContactLink: false,
     mode: MouseMode.Grab,
     mouseStrength: 0.6,
-    numIterations: 12,
+    numIterations: 10,
     newBodySettings: {
         shape: GenerationShape.Box,
         mass: 2,

@@ -29,8 +29,9 @@ export class RigidBody extends Entity
     public readonly type: Type;
 
     public id: number = -1;
-    public contactIDs: Set<number> = new Set(); // ids of contact manifold containing this body
-    public jointIDs: Set<number> = new Set();   // ids of the joint containing this body
+    public islandID: number = 0;
+    public manifoldIDs: number[] = []; // ids of contact manifold containing this body
+    public jointIDs: number[] = [];   // ids of the joint containing this body
 
     constructor(type: Type)
     {

@@ -5,6 +5,7 @@ import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
 import { AABB } from "./detection.js";
 import { Settings } from "./settings.js";
+import * as Util from "./util.js";
 
 export class Renderer
 {
@@ -157,31 +158,57 @@ export class Renderer
         }
     }
 
-    drawBody(b: RigidBody, drawCenterOfMass: boolean = false, drawVerticesOnly: boolean = false, lineWidth: number = 1): void
+    drawBody(b: RigidBody, drawCenterOfMass: boolean = false, lineWidth: number = 1, outlined = true, filled = false,
+        outLineColor = "#000000", fillColor: string = "#f0f0f0"): void
     {
         this.setModelTransform(b.localToGlobal);
 
+        Util.assert(outlined || filled);
+
         let center = new Vector2(0, 0)
+
+        this.gfx.strokeStyle = outLineColor;
+        this.gfx.fillStyle = fillColor;
+        this.gfx.lineWidth = lineWidth;
 
         if (b instanceof Polygon)
         {
+            this.gfx.beginPath();
             for (let i = 0; i < b.count; i++)
             {
-                if (drawVerticesOnly)
-                {
-                    this.drawCircleV(b.vertices[i], 0.05, true);
-                }
-                else
-                {
-                    let curr = b.vertices[i];
-                    let next = b.vertices[(i + 1) % b.count];
-                    this.drawLineV(curr, next, lineWidth);
-                }
+                let curr = b.vertices[i];
+                let next = b.vertices[(i + 1) % b.count];
+
+                let vpcm = this.vpc.mulMatrix(this.modelTransform);
+
+                let tv0 = vpcm.mulVector2(curr, 1);
+                let tv1 = vpcm.mulVector2(next, 1);
+
+
+                if (i == 0)
+                    this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
+                this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
             }
+            this.gfx.closePath();
+
+            if (outlined) this.gfx.stroke();
+            if (filled) this.gfx.fill();
         }
         else if (b instanceof Circle)
         {
-            this.drawCircleV(center, b.radius);
+            let vpcm = this.vpc.mulMatrix(this.modelTransform);
+
+            let tv = vpcm.mulVector2(center, 1);
+            let tr = this.vpc.mulVector2(new Vector2(b.radius, 0), 0).x;
+
+            this.gfx.lineWidth = 1;
+            this.gfx.beginPath();
+            this.gfx.arc(tv.x, Settings.height - tv.y, tr, 0, 2 * Math.PI);
+            this.gfx.closePath();
+
+            if (outlined) this.gfx.stroke();
+            if (filled) this.gfx.fill();
+
             this.drawLineV(center, new Vector2(b.radius, 0));
         }
         else
@@ -192,6 +219,8 @@ export class Renderer
         if (drawCenterOfMass)
             this.drawCircleV(center, 0.01, true);
 
+        this.gfx.strokeStyle = "#000000";
+        this.gfx.fillStyle = "#000000";
         this.resetModelTransform();
     }
 

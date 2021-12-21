@@ -302,9 +302,46 @@ export class Game
                 r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
                 r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
                 r.log("Surface velocity: " + String(target.surfaceSpeed.toFixed(4)) + "m/s", line++);
-                r.log("Contacts: " + target.contactIDs.size, line++);
-                r.log("Joints: " + target.jointIDs.size, line++);
+                r.log("Contacts: " + target.manifoldIDs.length, line++);
+                r.log("Joints: " + target.jointIDs.length, line++);
+                r.log("Island: " + target.islandID, line++);
             }
+        }
+
+        // Body, Bounding box, Center of Mass rendering
+        for (let i = 0; i < this.world.bodies.length; i++)
+        {
+            let b = this.world.bodies[i];
+
+            r.drawBody(b, Settings.indicateCoM, 1.0, true, false);
+
+            if (Settings.showBoundingBox)
+            {
+                let aabb = createAABB(b);
+                r.drawAABB(aabb);
+            }
+
+            if (Settings.showContactLink)
+            {
+                b.manifoldIDs.forEach(id =>
+                {
+                    let manifold = this.world.manifoldMap.get(id)!;
+
+                    if (manifold.bodyA.type == Type.Static || manifold.bodyB.type == Type.Static)
+                        return;
+
+                    if (manifold.bodyA.id == b.id)
+                        r.drawLineV(manifold.bodyB.position, manifold.bodyA.position, 1.0);
+                });
+            }
+        }
+
+        // Rendering for mouse forcing 
+        if (this.grabBody && (Settings.mode == MouseMode.Force))
+        {
+            let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
+            r.drawCircleV(bindInGlobal, 0.03);
+            r.drawVectorP(bindInGlobal, this.cursorPos);
         }
 
         // Rendering contact manifold
@@ -323,44 +360,6 @@ export class Game
                 }
                 mid = mid.div(j);
                 r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015)
-            }
-        }
-
-        // Rendering for mouse forcing 
-        if (this.grabBody && (Settings.mode == MouseMode.Force))
-        {
-            let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
-            r.drawCircleV(bindInGlobal, 0.03);
-            r.drawVectorP(bindInGlobal, this.cursorPos);
-        }
-
-        // Bounding box, Center of Mass rendering
-        for (let i = 0; i < this.world.bodies.length; i++)
-        {
-            let b = this.world.bodies[i];
-
-            r.drawBody(b, Settings.indicateCoM);
-
-            if (Settings.showBoundingBox)
-            {
-                let aabb = createAABB(b);
-                r.drawAABB(aabb);
-            }
-
-            if (Settings.showContactLink)
-            {
-                b.contactIDs.forEach(id =>
-                {
-                    let manifold = this.world.manifoldMap.get(id)!;
-
-                    if (manifold.bodyA.type == Type.Static || manifold.bodyB.type == Type.Static)
-                        return;
-
-                    if (manifold.bodyA.id == b.id)
-                        r.drawVectorP(manifold.bodyB.position, manifold.bodyA.position, 0.01);
-                    else
-                        r.drawVectorP(manifold.bodyA.position, manifold.bodyB.position, 0.01);
-                });
             }
         }
 

@@ -5,6 +5,8 @@ import { ContactManifold } from "./contact.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 import { Joint } from "./joint.js";
+import { Island } from "./island.js";
+import { GrabJoint } from "./grab.js";
 
 type Registrable = RigidBody | Joint;
 
@@ -22,6 +24,7 @@ export class World
     public jointMap: Map<number, Joint> = new Map();
 
     public passTestSet: Set<number> = new Set();
+    public numIslands: number = 0;
 
     update(): void
     {
@@ -45,7 +48,7 @@ export class World
                 b.linearVelocity.y += gravity.y;
             }
 
-            b.contactIDs.clear();
+            b.manifoldIDs = [];
         }
 
         let newManifolds: ContactManifold[] = [];
@@ -68,8 +71,8 @@ export class World
 
                 if (newManifold != null)
                 {
-                    a.contactIDs.add(key);
-                    b.contactIDs.add(key);
+                    a.manifoldIDs.push(key);
+                    b.manifoldIDs.push(key);
 
                     if (Settings.warmStarting && this.manifoldMap.has(key))
                     {
@@ -89,25 +92,79 @@ export class World
 
         this.manifolds = newManifolds;
 
-        // Prepare for resolution step
-        for (let i = 0; i < this.manifolds.length; i++)
-            this.manifolds[i].prepare();
+        // Build the constraint island
+        let island = new Island();
+        let islandID = 0;
 
-        for (let i = 0; i < this.joints.length; i++)
-            this.joints[i].prepare();
+        let visited: Set<number> = new Set();
+        let stack: RigidBody[] = [];
 
-        // Iteratively resolve violated velocity constraint
-        for (let i = 0; i < Settings.numIterations; i++)
+        // Perform a DFS(Depth First Search) on the constraint graph
+        // After building island, each island can be solved in parallel because they are independent of each other
+        for (let i = 0; i < this.bodies.length; i++)
         {
-            for (let i = 0; i < this.manifolds.length; i++)
-                this.manifolds[i].solve();
+            let b = this.bodies[i];
 
-            for (let i = 0; i < this.joints.length; i++)
-                this.joints[i].solve();
+            if (visited.has(b.id) || b.type == Type.Static)
+                continue;
+
+            stack = [];
+            stack.push(b);
+
+            islandID++;
+            while (stack.length > 0)
+            {
+                let t = stack.pop()!;
+                if (visited.has(t.id) || t.type == Type.Static)
+                    continue;
+
+                visited.add(t.id);
+                t.islandID = islandID;
+                island.addBody(t);
+
+                for (let m = 0; m < t.manifoldIDs.length; m++)
+                {
+                    let key = t.manifoldIDs[m];
+                    let manifold = this.manifoldMap.get(key)!;
+
+                    let other = manifold.bodyB;
+                    if (other.id == t.id)
+                        other = manifold.bodyA;
+
+                    if (visited.has(other.id))
+                        continue;
+
+                    island.addManifold(manifold);
+                    stack.push(other);
+                }
+
+                for (let j = 0; j < t.jointIDs.length; j++)
+                {
+                    let key = t.jointIDs[j];
+                    let joint = this.jointMap.get(key)!;
+
+                    let other = joint.bodyB;
+                    if (other.id == t.id)
+                        other = joint.bodyA;
+
+                    if (joint instanceof GrabJoint)
+                        island.addJoint(joint);
+
+                    if (visited.has(other.id))
+                        continue;
+
+                    island.addJoint(joint);
+                    stack.push(other);
+                }
+            }
+
+            island.solve();
+            island.clear();
         }
 
-        // Update positions using corrected velocities
-        // Semi-implicit euler integration
+        this.numIslands = islandID;
+
+        // Update positions using corrected velocities using semi-implicit euler integration method
         for (let i = 0; i < this.bodies.length; i++)
         {
             let b = this.bodies[i];
@@ -144,8 +201,9 @@ export class World
             if (passTest)
                 this.addPassTestPair(r.bodyA, r.bodyB);
 
-            r.bodyA.jointIDs.add(r.id);
-            r.bodyB.jointIDs.add(r.id);
+            r.bodyA.jointIDs.push(r.id);
+            if (r.bodyA.id != r.bodyB.id) // Extra handle for grab joint
+                r.bodyB.jointIDs.push(r.id);
 
             this.jointMap.set(r.id, r);
             this.joints = Array.from(this.jointMap.values());
@@ -158,8 +216,23 @@ export class World
         {
             let j = this.jointMap.get(id)!;
 
-            j.bodyA.jointIDs.delete(id);
-            j.bodyB.jointIDs.delete(id);
+            for (let i = 0; i < j.bodyA.jointIDs.length; i++)
+            {
+                if (j.bodyA.jointIDs[i] == id)
+                {
+                    j.bodyA.jointIDs.splice(i, 1);
+                    break;
+                }
+            }
+
+            for (let i = 0; i < j.bodyB.jointIDs.length; i++)
+            {
+                if (j.bodyB.jointIDs[i] == id)
+                {
+                    j.bodyB.jointIDs.splice(i, 1);
+                    break;
+                }
+            }
 
             this.jointMap.delete(id);
 
