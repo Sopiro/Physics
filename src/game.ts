@@ -45,9 +45,9 @@ export class Game
     {
         this.renderer = renderer;
         this.camera = new Camera();
-        this.camera.position = new Vector2(0, Settings.stageHeight / 2.0);
+        this.camera.position = new Vector2(0, Settings.clipHeight / 2.0);
 
-        let projectionTransform = Util.orth(-Settings.stageWidth / 2.0, Settings.stageWidth / 2.0, -Settings.stageHeight / 2.0, Settings.stageHeight / 2.0);
+        let projectionTransform = Util.orth(-Settings.clipWidth / 2.0, Settings.clipWidth / 2.0, -Settings.clipHeight / 2.0, Settings.clipHeight / 2.0);
         let viewportTransform = Util.viewport(Settings.width, Settings.height);
 
         this.renderer.init(viewportTransform, projectionTransform, this.camera.cameraTransform);
@@ -133,8 +133,8 @@ export class Game
         if (this.cameraMove)
         {
             let dist = Input.mousePosition.sub(this.cursorStart);
-            dist.x *= -(Settings.stageWidth / Settings.width) * this.camera.scale.x;
-            dist.y *= -(Settings.stageHeight / Settings.height) * this.camera.scale.y;
+            dist.x *= -(Settings.clipWidth / Settings.width) * this.camera.scale.x;
+            dist.y *= -(Settings.clipHeight / Settings.height) * this.camera.scale.y;
             this.camera.position = this.cameraPosStart.add(dist);
         }
 
@@ -154,7 +154,7 @@ export class Game
                 }
                 else if (Settings.mode == MouseMode.Grab)
                 {
-                    this.world.unregister(this.grabJoint.id, false);
+                    this.world.unregister(this.grabJoint.id, true);
                 }
 
                 this.grabBody = false;
@@ -237,7 +237,7 @@ export class Game
                 let b = this.world.bodies[i];
                 if (Util.checkInside(b, this.cursorPos))
                 {
-                    this.world.unregister(b.id, true);
+                    this.world.unregister(b.id);
                     break;
                 }
             }
@@ -258,62 +258,33 @@ export class Game
     {
         r.setCameraTransform(this.camera.cameraTransform);
 
-        // Log rigid body information
-        if (Settings.showInfo)
-        {
-            let target!: RigidBody;
-            let i = 0;
-            for (; i < this.world.bodies.length; i++)
-            {
-                target = this.world.bodies[i];
-
-                if (Util.checkInside(target, this.cursorPos)) break;
-            }
-
-            if (this.world.bodies.length > 0 && i != this.world.bodies.length)
-            {
-                let line = 0;
-                r.log("Type: " + String(Type[target.type]), line++);
-                r.log("Mass: " + String(target.mass) + "kg", line++);
-                r.log("Moment of inertia: " + String((target.inertia).toFixed(4)) + "kg⋅m²", line++);
-
-                if (target instanceof Polygon)
-                {
-                    if (target instanceof Box)
-                    {
-                        r.log("Density: " + String((target as Box).density.toFixed(4)) + "kg/m²", line++);
-                        r.log("Area: " + String((target as Box).area.toFixed(4)) + "m²", line++);
-                    }
-                    else
-                    {
-                        r.log("Density: " + String((target as Polygon).density.toFixed(4)) + "kg/m²", line++);
-                        r.log("Area: " + String((target as Polygon).area.toFixed(4)) + "m²", line++);
-                    }
-                } else if (target instanceof Circle)
-                {
-                    r.log("Density: " + String((target as Circle).density.toFixed(4)) + "kg/m²", line++);
-                    r.log("Area: " + String((target as Circle).area.toFixed(4)) + "m²", line++);
-                }
-
-                r.log("Friction: " + String(target.friction), line++);
-                r.log("Restitution: " + String(target.restitution), line++);
-                r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
-                r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
-                r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
-                r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
-                r.log("Surface velocity: " + String(target.surfaceSpeed.toFixed(4)) + "m/s", line++);
-                r.log("Contacts: " + target.manifoldIDs.length, line++);
-                r.log("Joints: " + target.jointIDs.length, line++);
-                r.log("Island: " + target.islandID, line++);
-            }
-        }
-
         // Body, Bounding box, Center of Mass rendering
         for (let i = 0; i < this.world.bodies.length; i++)
         {
             let b = this.world.bodies[i];
 
-            r.drawBody(b, Settings.indicateCoM, 1.0, true, false);
+            if (Settings.colorize || Settings.indicateIsland)
+            {
+                let id = Settings.indicateIsland ? b.islandID : b.id;
+
+                let hStride = 17;
+                let sStride = 3;
+                let lStride = 2;
+                let period = Math.trunc(360 / hStride);
+                let cycle = Math.trunc(id / period);
+                // let dir = (cycle & 1) == 1 ? -1 : 1;
+
+                let h = (id - 1) * hStride;
+                let s = 100 - (cycle * sStride) % 17;
+                let l = 70 - (cycle * lStride) % 11;
+
+                let color = b.type == Type.Static ? "#f0f0f0" : `hsl(${h}, ${s}%, ${l}%)`;
+                r.drawBody(b, Settings.indicateCoM, 1.0, true, true, "#000000", color);
+            }
+            else
+            {
+                r.drawBody(b, Settings.indicateCoM);
+            }
 
             if (Settings.showBoundingBox)
             {
@@ -485,6 +456,59 @@ export class Game
                     r.drawCircleV(anchorA.add(j.linearOffset), 0.03);
                     r.drawCircleV(anchorB, 0.03);
                 }
+            }
+
+            // if (Settings.showContactLink)
+            //     r.drawLineV(j.bodyA.position, j.bodyB.position);
+        }
+
+        // Log rigid body information
+        if (Settings.showInfo)
+        {
+            let target!: RigidBody;
+            let i = 0;
+            for (; i < this.world.bodies.length; i++)
+            {
+                target = this.world.bodies[i];
+
+                if (Util.checkInside(target, this.cursorPos)) break;
+            }
+
+            if (this.world.bodies.length > 0 && i != this.world.bodies.length)
+            {
+                let line = 0;
+                r.log("Type: " + String(Type[target.type]), line++);
+                r.log("Mass: " + String(target.mass) + "kg", line++);
+                r.log("Moment of inertia: " + String((target.inertia).toFixed(4)) + "kg⋅m²", line++);
+
+                if (target instanceof Polygon)
+                {
+                    if (target instanceof Box)
+                    {
+                        r.log("Density: " + String((target as Box).density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String((target as Box).area.toFixed(4)) + "m²", line++);
+                    }
+                    else
+                    {
+                        r.log("Density: " + String((target as Polygon).density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String((target as Polygon).area.toFixed(4)) + "m²", line++);
+                    }
+                } else if (target instanceof Circle)
+                {
+                    r.log("Density: " + String((target as Circle).density.toFixed(4)) + "kg/m²", line++);
+                    r.log("Area: " + String((target as Circle).area.toFixed(4)) + "m²", line++);
+                }
+
+                r.log("Friction: " + String(target.friction), line++);
+                r.log("Restitution: " + String(target.restitution), line++);
+                r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
+                r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
+                r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
+                r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
+                r.log("Surface velocity: " + String(target.surfaceSpeed.toFixed(4)) + "m/s", line++);
+                r.log("Contacts: " + target.manifoldIDs.length, line++);
+                r.log("Joints: " + target.jointIDs.length, line++);
+                r.log("Island: " + target.islandID, line++);
             }
         }
     }

@@ -187,7 +187,7 @@ export class World
 
     register(r: Registrable, passTest: boolean = false): void
     {
-        r.id = ++this.uid;
+        r.id = this.uid++;
 
         if (r instanceof RigidBody)
         {
@@ -210,33 +210,33 @@ export class World
         }
     }
 
-    unregister(id: number, isBody?: boolean): boolean
+    unregister(id: number, isJoint?: boolean): boolean
     {
-        if (!isBody && this.jointMap.has(id))
+        if (isJoint)
         {
-            let j = this.jointMap.get(id)!;
+            let joint = this.jointMap.get(id)!;
 
-            for (let i = 0; i < j.bodyA.jointIDs.length; i++)
+            for (let i = 0; i < joint.bodyA.jointIDs.length; i++)
             {
-                if (j.bodyA.jointIDs[i] == id)
+                if (id == joint.bodyA.jointIDs[i])
                 {
-                    j.bodyA.jointIDs.splice(i, 1);
+                    joint.bodyA.jointIDs.splice(i, 1);
                     break;
                 }
             }
 
-            for (let i = 0; i < j.bodyB.jointIDs.length; i++)
+            for (let i = 0; i < joint.bodyB.jointIDs.length; i++)
             {
-                if (j.bodyB.jointIDs[i] == id)
+                if (id == joint.bodyB.jointIDs[i])
                 {
-                    j.bodyB.jointIDs.splice(i, 1);
+                    joint.bodyB.jointIDs.splice(i, 1);
                     break;
                 }
             }
 
             this.jointMap.delete(id);
-
             this.joints = Array.from(this.jointMap.values());
+
             return true;
         }
 
@@ -247,7 +247,27 @@ export class World
             if (b.id == id)
             {
                 this.bodies.splice(i, 1);
-                b.jointIDs.forEach(id => this.unregister(id, false));
+
+                for (let j = 0; j < b.jointIDs.length; j++)
+                {
+                    let jid = b.jointIDs[j];
+
+                    let joint = this.jointMap.get(jid)!;
+                    let other = joint.bodyA.id == id ? joint.bodyB : joint.bodyA;
+
+                    for (let k = 0; k < other.jointIDs.length; k++)
+                    {
+                        if (other.jointIDs[k] == jid)
+                        {
+                            other.jointIDs.splice(k, 1);
+                            break;
+                        }
+                    }
+
+                    this.jointMap.delete(jid);
+                }
+
+                this.joints = Array.from(this.jointMap.values());
                 return true;
             }
         }

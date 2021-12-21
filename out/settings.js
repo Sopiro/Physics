@@ -25,8 +25,8 @@ const strengthRange = { p1: 0.2, p2: 2.0 };
 export const Settings = {
     width: 1280,
     height: 720,
-    stageWidth: 12.8,
-    stageHeight: 7.2,
+    clipWidth: 12.8,
+    clipHeight: 7.2,
     paused: false,
     frequency: 60,
     dt: 1.0 / 60.0,
@@ -70,6 +70,8 @@ export const Settings = {
     defaultFriction: 0.7,
     defaultRestitution: 0.001,
     blockSolve: true,
+    colorize: false,
+    indicateIsland: false,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -224,6 +226,12 @@ showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInf
 const contactLink = document.querySelector("#contactLink");
 contactLink.checked = Settings.showContactLink;
 contactLink.addEventListener("click", () => { Settings.showContactLink = !Settings.showContactLink; });
+const colorize = document.querySelector("#colorize");
+colorize.checked = Settings.colorize;
+colorize.addEventListener("click", () => { Settings.colorize = !Settings.colorize; });
+const island = document.querySelector("#island");
+island.checked = Settings.indicateIsland;
+island.addEventListener("click", () => { Settings.indicateIsland = !Settings.indicateIsland; });
 /*
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));

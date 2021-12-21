@@ -16,7 +16,7 @@ import { Engine } from "./engine.js";
 Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let b = new Box(0.4);
@@ -28,7 +28,7 @@ function demo1(game, world) {
 Reflect.set(demo2, "SimulationName", "Box stacking");
 function demo2(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let start = 0.5;
@@ -45,13 +45,13 @@ function demo2(game, world) {
 Reflect.set(demo3, "SimulationName", "Pyramid");
 function demo3(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     const rows = 12;
     const boxSize = 0.35;
     const xGap = 0.05;
-    const yGap = 0.3;
+    const yGap = 0.33;
     const xStart = -rows * boxSize / 2.0;
     const yStart = 0.6;
     for (let y = 0; y < rows; y++) {
@@ -65,7 +65,7 @@ function demo3(game, world) {
 Reflect.set(demo4, "SimulationName", "Seesaw");
 function demo4(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let seesaw = new Box(6, 0.1);
@@ -92,43 +92,43 @@ function demo5(game, world) {
     let lstart = -4;
     let rstart = 2.5;
     let c = new Circle(0.2);
-    c.position = new Vector2(lstart, Settings.stageHeight / 2.0);
+    c.position = new Vector2(lstart, Settings.clipHeight / 2.0);
     c.linearVelocity.x = 3;
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart, Settings.stageHeight / 2.0);
+    c.position = new Vector2(rstart, Settings.clipHeight / 2.0);
     c.angularVelocity = 5;
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart + 0.6, Settings.stageHeight / 2.0 + 0.3);
+    c.position = new Vector2(rstart + 0.6, Settings.clipHeight / 2.0 + 0.3);
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart + 0.5, Settings.stageHeight / 2.0 - 0.5);
+    c.position = new Vector2(rstart + 0.5, Settings.clipHeight / 2.0 - 0.5);
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart + 1.6, Settings.stageHeight / 2.0 + 0.9);
+    c.position = new Vector2(rstart + 1.6, Settings.clipHeight / 2.0 + 0.9);
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart + 1.3, Settings.stageHeight / 2.0 + 0.1);
+    c.position = new Vector2(rstart + 1.3, Settings.clipHeight / 2.0 + 0.1);
     c.restitution = 1;
     world.register(c);
     c = new Circle(0.2);
-    c.position = new Vector2(rstart + 1.5, Settings.stageHeight / 2.0 - 0.8);
+    c.position = new Vector2(rstart + 1.5, Settings.clipHeight / 2.0 - 0.8);
     c.restitution = 1;
     world.register(c);
 }
 Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
 function demo6(game, world) {
     updateSetting("g", false);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
-    const center = new Vector2(3, Settings.stageHeight / 2.0);
+    const center = new Vector2(3, Settings.clipHeight / 2.0);
     for (let i = 0; i < 70; i++) {
         let r = Util.random(0.3, 2.8);
         let a = Util.random(0, Math.PI * 2);
@@ -139,7 +139,7 @@ function demo6(game, world) {
         world.register(c);
     }
     let b = new Box(0.1, 2);
-    b.position = new Vector2(-5, Settings.stageHeight / 2.0);
+    b.position = new Vector2(-5, Settings.clipHeight / 2.0);
     b.mass = 30;
     b.linearVelocity.x = 3;
     b.angularVelocity = 10;
@@ -148,7 +148,7 @@ function demo6(game, world) {
 Reflect.set(demo7, "SimulationName", "Friction test");
 function demo7(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let b = new Box(6, 0.1, Type.Static);
@@ -188,7 +188,7 @@ function demo7(game, world) {
 Reflect.set(demo8, "SimulationName", "Restitution test");
 function demo8(game, world) {
     updateSetting("g", true);
-    let g = new Box(Settings.stageWidth * 2, 0.4, Type.Static);
+    let g = new Box(Settings.clipWidth * 2, 0.4, Type.Static);
     g.restitution = 0.7;
     world.register(g);
     let count = 7;
@@ -207,7 +207,7 @@ function demo8(game, world) {
 Reflect.set(demo9, "SimulationName", "Single pendulum");
 function demo9(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let b = new Box(0.3);
@@ -219,7 +219,7 @@ function demo9(game, world) {
 Reflect.set(demo10, "SimulationName", "Multi pendulum");
 function demo10(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let xStart = 0;
@@ -246,7 +246,7 @@ function demo10(game, world) {
 Reflect.set(demo11, "SimulationName", "Suspension bridge");
 function demo11(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let revoluteBridge = true;
@@ -320,7 +320,7 @@ function demo11(game, world) {
 Reflect.set(demo12, "SimulationName", "Circle stacking");
 function demo12(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let xStart = -4.0;
@@ -342,35 +342,35 @@ Reflect.set(demo13, "SimulationName", "Springs");
 function demo13(game, world) {
     updateSetting("g", false);
     let b1 = new Box(0.3, 6, Type.Static);
-    b1.position.y = Settings.stageHeight / 2;
+    b1.position.y = Settings.clipHeight / 2;
     world.register(b1);
     let b2 = new Box(0.3);
     b2.position.x = 3;
-    b2.position.y = Settings.stageHeight / 2 + 2;
+    b2.position.y = Settings.clipHeight / 2 + 2;
     world.register(b2);
     let j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, 2)), b2.position, 2, 1, 0.05);
     world.register(j);
     b2 = new Box(0.3);
     b2.position.x = 3;
-    b2.position.y = Settings.stageHeight / 2;
+    b2.position.y = Settings.clipHeight / 2;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position, b2.position, 2, 1, 0.2);
     world.register(j);
     b2 = new Box(0.3);
     b2.position.x = 3;
-    b2.position.y = Settings.stageHeight / 2 - 2;
+    b2.position.y = Settings.clipHeight / 2 - 2;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -2)), b2.position, 2, 1, 0.7);
     world.register(j);
     b2 = new Box(0.3);
     b2.position.x = -3;
-    b2.position.y = Settings.stageHeight / 2 + 2;
+    b2.position.y = Settings.clipHeight / 2 + 2;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, 2)), b2.position, 2, 0.5, 0.2);
     world.register(j);
     b2 = new Box(0.3);
     b2.position.x = -3;
-    b2.position.y = Settings.stageHeight / 2;
+    b2.position.y = Settings.clipHeight / 2;
     world.register(b2);
     let halfLife = 1;
     let frequency = -Math.log(0.5) / (halfLife * Math.PI * 2);
@@ -378,7 +378,7 @@ function demo13(game, world) {
     world.register(j);
     b2 = new Box(0.3);
     b2.position.x = -3;
-    b2.position.y = Settings.stageHeight / 2 - 2;
+    b2.position.y = Settings.clipHeight / 2 - 2;
     world.register(b2);
     j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(0, -2)), b2.position, 2, 2, 0.01);
     world.register(j);
@@ -386,7 +386,7 @@ function demo13(game, world) {
 Reflect.set(demo14, "SimulationName", "Weld joint: Dumbbells");
 function demo14(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     for (let i = 0; i < 30; i++) {
@@ -414,7 +414,7 @@ function demo14(game, world) {
 Reflect.set(demo15, "SimulationName", "Max distance joint");
 function demo15(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let c = new Box(0.3, 0.3, Type.Static);
@@ -442,7 +442,7 @@ function demo15(game, world) {
 Reflect.set(demo16, "SimulationName", "Prismatic joint");
 function demo16(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let b0 = new Box(0.3);
@@ -597,7 +597,7 @@ function demo18(game, world) {
 Reflect.set(demo19, "SimulationName", "Crankshaft");
 function demo19(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let m1;
@@ -687,7 +687,7 @@ function demo19(game, world) {
 Reflect.set(demo20, "SimulationName", "Ragdoll");
 function demo20(game, world) {
     updateSetting("g", true);
-    let ground = new Box(Settings.stageWidth * 5, 0.4, Type.Static);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
     let density = 15;
