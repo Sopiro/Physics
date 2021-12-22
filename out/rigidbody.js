@@ -15,6 +15,8 @@ export class RigidBody extends Entity {
         this.islandID = 0;
         this.manifoldIDs = []; // ids of contact manifold containing this body
         this.jointIDs = []; // ids of the joint containing this body
+        this.resting = 0;
+        this.sleeping = false;
         this._force = new Vector2(0, 0);
         this._torque = 0.0;
         this._linearVelocity = new Vector2(0, 0);
@@ -29,6 +31,7 @@ export class RigidBody extends Entity {
                 this._invMass = 0;
                 this._inertia = Number.MAX_VALUE;
                 this._invInertia = 0;
+                this.sleeping = true;
                 break;
             case Type.Dynamic:
                 this._mass = Settings.defaultMass;
@@ -100,5 +103,11 @@ export class RigidBody extends Entity {
     }
     set torque(t) {
         this._torque = t;
+    }
+    awake() {
+        if (this.type == Type.Static)
+            return;
+        this.resting = 0;
+        this.sleeping = false;
     }
 }

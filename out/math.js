@@ -39,6 +39,9 @@ export class Vector2 {
         else
             return this;
     }
+    get squaredLength() {
+        return this.x * this.x + this.y * this.y;
+    }
     get length() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }

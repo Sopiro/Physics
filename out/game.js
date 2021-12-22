@@ -65,7 +65,7 @@ export class Game {
         this.time += delta;
         this.handleInput(delta);
         this.callback();
-        this.world.update();
+        this.world.update(delta);
     }
     handleInput(delta) {
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
@@ -99,6 +99,7 @@ export class Game {
         if (this.grabBody && !this.cameraMove) {
             if (Input.isMouseReleased()) {
                 if (Settings.mode == MouseMode.Force) {
+                    this.world.forceIntegration = true;
                     let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
                     let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
                     let torque = bindInGlobal.sub(this.targetBody.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
@@ -107,6 +108,7 @@ export class Game {
                     this.targetBody.torque += torque;
                 }
                 else if (Settings.mode == MouseMode.Grab) {
+                    this.world.forceIntegration = false;
                     this.world.unregister(this.grabJoint.id, true);
                 }
                 this.grabBody = false;
@@ -194,14 +196,19 @@ export class Game {
             updateSetting("a");
         if (Input.isKeyPressed("i"))
             updateSetting("i");
+        if (Input.isKeyPressed("k"))
+            this.world.surprise();
     }
     render(r) {
         r.setCameraTransform(this.camera.cameraTransform);
         // Body, Bounding box, Center of Mass rendering
         for (let i = 0; i < this.world.bodies.length; i++) {
             let b = this.world.bodies[i];
-            if (Settings.colorize || Settings.indicateIsland) {
-                let id = Settings.indicateIsland ? b.islandID : b.id;
+            let outlineWidth = 1.0;
+            if (Settings.colorizeBody || Settings.colorizeIsland || (Settings.colorizeActiveBody && !b.sleeping)) {
+                let id = Settings.colorizeIsland ? b.islandID : b.id;
+                if (!(Settings.colorizeBody || Settings.colorizeIsland))
+                    id = b.islandID;
                 let hStride = 17;
                 let sStride = 3;
                 let lStride = 2;
@@ -210,25 +217,28 @@ export class Game {
                 // let dir = (cycle & 1) == 1 ? -1 : 1;
                 let h = (id - 1) * hStride;
                 let s = 100 - (cycle * sStride) % 17;
-                let l = 70 - (cycle * lStride) % 11;
+                let l = 75 - (cycle * lStride) % 11;
+                if (!(Settings.colorizeBody || Settings.colorizeIsland))
+                    l = Util.clamp(l + 10, 0, 100);
                 let color = b.type == Type.Static ? "#f0f0f0" : `hsl(${h}, ${s}%, ${l}%)`;
-                r.drawBody(b, Settings.indicateCoM, 1.0, true, true, "#000000", color);
+                r.drawBody(b, Settings.indicateCoM, outlineWidth, true, true, "#000000", color);
             }
             else {
-                r.drawBody(b, Settings.indicateCoM);
+                r.drawBody(b, Settings.indicateCoM, outlineWidth);
             }
             if (Settings.showBoundingBox) {
                 let aabb = createAABB(b);
                 r.drawAABB(aabb);
             }
             if (Settings.showContactLink) {
-                b.manifoldIDs.forEach(id => {
+                for (let m = 0; m < b.manifoldIDs.length; m++) {
+                    let id = b.manifoldIDs[m];
                     let manifold = this.world.manifoldMap.get(id);
                     if (manifold.bodyA.type == Type.Static || manifold.bodyB.type == Type.Static)
-                        return;
+                        continue;
                     if (manifold.bodyA.id == b.id)
                         r.drawLineV(manifold.bodyB.position, manifold.bodyA.position, 1.0);
-                });
+                }
             }
         }
         // Rendering for mouse forcing 
@@ -382,6 +392,7 @@ export class Game {
                 r.log("Contacts: " + target.manifoldIDs.length, line++);
                 r.log("Joints: " + target.jointIDs.length, line++);
                 r.log("Island: " + target.islandID, line++);
+                r.log("Sleeping: " + target.sleeping, line++);
             }
         }
     }

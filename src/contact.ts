@@ -342,7 +342,7 @@ export class BlockSolver
         // Get the incremental impulse
         let d = x.sub(a);
         this.applyImpulse(d);
-        
+
         // Accumulate
         nc1.impulseSum = x.x;
         nc2.impulseSum = x.y;

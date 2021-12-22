@@ -70,8 +70,13 @@ export const Settings = {
     defaultFriction: 0.7,
     defaultRestitution: 0.001,
     blockSolve: true,
-    colorize: false,
-    indicateIsland: false,
+    colorizeBody: false,
+    colorizeIsland: false,
+    restLinearTolerance: 0.005 * 0.005,
+    restAngularTolerance: (0.5 * Math.PI / 180.0) * (0.5 * Math.PI / 180.0),
+    sleepingWait: 1.0,
+    colorizeActiveBody: true,
+    sleepEnabled: true,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -226,12 +231,18 @@ showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInf
 const contactLink = document.querySelector("#contactLink");
 contactLink.checked = Settings.showContactLink;
 contactLink.addEventListener("click", () => { Settings.showContactLink = !Settings.showContactLink; });
-const colorize = document.querySelector("#colorize");
-colorize.checked = Settings.colorize;
-colorize.addEventListener("click", () => { Settings.colorize = !Settings.colorize; });
-const island = document.querySelector("#island");
-island.checked = Settings.indicateIsland;
-island.addEventListener("click", () => { Settings.indicateIsland = !Settings.indicateIsland; });
+const colorizeBody = document.querySelector("#colorizeBody");
+colorizeBody.checked = Settings.colorizeBody;
+colorizeBody.addEventListener("click", () => { Settings.colorizeBody = !Settings.colorizeBody; });
+const colorizeIsland = document.querySelector("#colorizeIsland");
+colorizeIsland.checked = Settings.colorizeIsland;
+colorizeIsland.addEventListener("click", () => { Settings.colorizeIsland = !Settings.colorizeIsland; });
+const sleepEnabled = document.querySelector("#sleepEnabled");
+sleepEnabled.checked = Settings.sleepEnabled;
+sleepEnabled.addEventListener("click", () => { Settings.sleepEnabled = !Settings.sleepEnabled; });
+const colorizeActiveBody = document.querySelector("#colorizeActiveBody");
+colorizeActiveBody.checked = Settings.colorizeActiveBody;
+colorizeActiveBody.addEventListener("click", () => { Settings.colorizeActiveBody = !Settings.colorizeActiveBody; });
 /*
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));

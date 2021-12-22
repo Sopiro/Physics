@@ -32,6 +32,8 @@ export class RigidBody extends Entity
     public islandID: number = 0;
     public manifoldIDs: number[] = []; // ids of contact manifold containing this body
     public jointIDs: number[] = [];   // ids of the joint containing this body
+    public resting: number = 0;
+    public sleeping: boolean = false;
 
     constructor(type: Type)
     {
@@ -53,6 +55,7 @@ export class RigidBody extends Entity
                 this._invMass = 0;
                 this._inertia = Number.MAX_VALUE;
                 this._invInertia = 0;
+                this.sleeping = true;
                 break;
             case Type.Dynamic:
                 this._mass = Settings.defaultMass;
@@ -164,5 +167,13 @@ export class RigidBody extends Entity
     set torque(t)
     {
         this._torque = t;
+    }
+
+    awake(): void
+    {
+        if (this.type == Type.Static) return;
+
+        this.resting = 0;
+        this.sleeping = false;
     }
 }

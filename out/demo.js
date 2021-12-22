@@ -394,13 +394,13 @@ function demo14(game, world) {
         let rr = Util.random(-0.05, 0.05);
         let cos = Math.cos(rr);
         let sin = Math.sin(rr);
-        let b1 = Util.createRegularPolygon(0.15);
-        b1.position = start.add(new Vector2(cos, sin).mul(-0.4));
-        world.register(b1);
         let b2 = new Box(0.8, 0.03);
         b2.position = start;
         b2.rotation = rr;
         world.register(b2);
+        let b1 = Util.createRegularPolygon(0.15);
+        b1.position = start.add(new Vector2(cos, sin).mul(-0.4));
+        world.register(b1);
         let b3 = Util.createRegularPolygon(0.15);
         b3.position = start.add(new Vector2(cos, sin).mul(0.4));
         world.register(b3);

@@ -65,6 +65,11 @@ export class Vector2
             return this;
     }
 
+    get squaredLength(): number
+    {
+        return this.x * this.x + this.y * this.y;
+    }
+
     get length(): number
     {
         return Math.sqrt(this.x * this.x + this.y * this.y);

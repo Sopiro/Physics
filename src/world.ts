@@ -25,33 +25,17 @@ export class World
 
     public passTestSet: Set<number> = new Set();
     public numIslands: number = 0;
+    public sleepingIslands: number = 0;
+    public sleepingBodies: number = 0;
 
-    update(): void
+    public forceIntegration: boolean = false;
+
+    update(delta: number): void
     {
-        // Integrate forces, yield tentative velocities that possibly violate the constraint
-        for (let i = 0; i < this.bodies.length; i++)
-        {
-            let b = this.bodies[i];
-
-            let linear_a = b.force.mul(b.inverseMass * Settings.dt); // Force / mass * dt
-            b.linearVelocity.x += linear_a.x;
-            b.linearVelocity.y += linear_a.y;
-
-            let angular_a = b.torque * b.inverseInertia * Settings.dt // Torque / Inertia * dt
-            b.angularVelocity += angular_a;
-
-            // Apply gravity 
-            if (b.type != Type.Static && Settings.applyGravity)
-            {
-                let gravity = new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt);
-                b.linearVelocity.x += gravity.x;
-                b.linearVelocity.y += gravity.y;
-            }
-
-            b.manifoldIDs = [];
-        }
-
         let newManifolds: ContactManifold[] = [];
+
+        if (this.bodies.length > 0)
+            this.bodies[0].manifoldIDs = [];
 
         // Detect collisions, generate contact manifolds, try warm starting
         for (let i = 0; i < this.bodies.length; i++)
@@ -61,6 +45,7 @@ export class World
             for (let j = i + 1; j < this.bodies.length; j++)
             {
                 let b = this.bodies[j];
+                if (i == 0) b.manifoldIDs = [];
 
                 if (a.type == Type.Static && b.type == Type.Static) continue;
 
@@ -93,8 +78,11 @@ export class World
         this.manifolds = newManifolds;
 
         // Build the constraint island
-        let island = new Island();
+        let island = new Island(this);
+        let restingBodies = 0;
         let islandID = 0;
+        this.sleepingIslands = 0;
+        this.sleepingBodies = 0;
 
         let visited: Set<number> = new Set();
         let stack: RigidBody[] = [];
@@ -148,7 +136,10 @@ export class World
                         other = joint.bodyA;
 
                     if (joint instanceof GrabJoint)
+                    {
                         island.addJoint(joint);
+                        t.awake();
+                    }
 
                     if (visited.has(other.id))
                         continue;
@@ -156,33 +147,20 @@ export class World
                     island.addJoint(joint);
                     stack.push(other);
                 }
+
+                if (t.resting > Settings.sleepingWait)
+                    restingBodies++;
             }
 
-            island.solve();
+            island.sleeping = Settings.sleepEnabled && (restingBodies == island.numBodies);
+            if (island.sleeping) this.sleepingBodies += island.numBodies;
+
+            island.solve(delta);
             island.clear();
+            restingBodies = 0;
         }
 
         this.numIslands = islandID;
-
-        // Update positions using corrected velocities using semi-implicit euler integration method
-        for (let i = 0; i < this.bodies.length; i++)
-        {
-            let b = this.bodies[i];
-            if (b.type == Type.Static) continue;
-
-            b.position.x += b.linearVelocity.x * Settings.dt;
-            b.position.y += b.linearVelocity.y * Settings.dt;
-            b.rotation += b.angularVelocity * Settings.dt;
-
-            if (b.position.y < Settings.deadBottom)
-            {
-                this.bodies.splice(i, 1);
-                b.jointIDs.forEach(jid => this.unregister(jid, false));
-            }
-
-            b.force.clear();
-            b.torque = 0;
-        }
     }
 
     register(r: Registrable, passTest: boolean = false): void
@@ -210,7 +188,7 @@ export class World
         }
     }
 
-    unregister(id: number, isJoint?: boolean): boolean
+    unregister(id: number, isJoint: boolean = false): boolean
     {
         if (isJoint)
         {
@@ -247,6 +225,14 @@ export class World
             if (b.id == id)
             {
                 this.bodies.splice(i, 1);
+
+                for (let m = 0; m < b.manifoldIDs.length; m++)
+                {
+                    let manifold = this.manifoldMap.get(b.manifoldIDs[m])!;
+
+                    manifold.bodyA.awake();
+                    manifold.bodyB.awake();
+                }
 
                 for (let j = 0; j < b.jointIDs.length; j++)
                 {
@@ -290,6 +276,15 @@ export class World
         this.manifoldMap.clear();
         this.jointMap.clear();
         this.uid = 0;
+    }
+
+    surprise(): void
+    {
+        for (let i = 0; i < this.bodies.length; i++)
+        {
+            let b = this.bodies[i];
+            b.awake();
+        }
     }
 
     get numBodies(): number
