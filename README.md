@@ -28,7 +28,9 @@ Video2: https://youtu.be/57seMGrGWhw
   - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
   - Soft constraints
   - Block solver
+- Optimization
   - Constraint islanding
+  - Island sleeping
 
 
 ## References
