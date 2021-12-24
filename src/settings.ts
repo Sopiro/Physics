@@ -19,7 +19,6 @@ const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
 const massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
 const sizeRange: Util.Pair<number, number> = { p1: 0.1, p2: 3 };
 const gravityForceRange: Util.Pair<number, number> = { p1: -20, p2: 20 };
-const betaRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const restitutionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
 const numVerticesRange: Util.Pair<number, number> = { p1: 2.9, p2: 17 };
@@ -305,21 +304,6 @@ colorizeActiveBody.addEventListener("click", () => { Settings.colorizeActiveBody
 const showProfile = document.querySelector("#showProfile")! as HTMLInputElement;
 showProfile.checked = Settings.showProfile;
 showProfile.addEventListener("click", () => { Settings.showProfile = !Settings.showProfile; });
-
-/*
-const beta = document.querySelector("#beta")! as HTMLInputElement;
-beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
-const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
-betaLabel.innerHTML = String(Settings.positionCorrectionBeta);
-beta.addEventListener("input", () =>
-{
-    let mappedValue = Util.map(Number(beta.value), 0, 100, betaRange.p1, betaRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2))
-    betaLabel.innerHTML = String(mappedValue);
-
-    updateSetting("beta", mappedValue);
-});
- */
 
 export function updateSetting(id: string, content?: any)
 {

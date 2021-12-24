@@ -16,7 +16,6 @@ const iterationRange = { p1: 0, p2: 50 };
 const massRange = { p1: 1, p2: 100 };
 const sizeRange = { p1: 0.1, p2: 3 };
 const gravityForceRange = { p1: -20, p2: 20 };
-const betaRange = { p1: 0, p2: 1 };
 const frictionRange = { p1: 0, p2: 1 };
 const restitutionRange = { p1: 0, p2: 1 };
 const numVerticesRange = { p1: 2.9, p2: 17 };
@@ -247,20 +246,6 @@ colorizeActiveBody.addEventListener("click", () => { Settings.colorizeActiveBody
 const showProfile = document.querySelector("#showProfile");
 showProfile.checked = Settings.showProfile;
 showProfile.addEventListener("click", () => { Settings.showProfile = !Settings.showProfile; });
-/*
-const beta = document.querySelector("#beta")! as HTMLInputElement;
-beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
-const betaLabel = document.querySelector("#beta_label")! as HTMLLabelElement;
-betaLabel.innerHTML = String(Settings.positionCorrectionBeta);
-beta.addEventListener("input", () =>
-{
-    let mappedValue = Util.map(Number(beta.value), 0, 100, betaRange.p1, betaRange.p2);
-    mappedValue = Number(mappedValue.toPrecision(2))
-    betaLabel.innerHTML = String(mappedValue);
-
-    updateSetting("beta", mappedValue);
-});
- */
 export function updateSetting(id, content) {
     switch (id) {
         case "pause":

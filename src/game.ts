@@ -477,9 +477,7 @@ export class Game
         }
 
         // Log rigid body information
-
         let line = 0;
-
         if (Settings.showProfile)
         {
             r.log("Bodies: " + String(this.world.numBodies), line++);
