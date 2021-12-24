@@ -97,7 +97,7 @@ export class PrismaticJoint extends Joint
         if (Settings.positionCorrection)
             this.bias = new Vector2(error0, error1).mul(this.beta * Settings.inv_dt);
         else
-            this.bias = new Vector2();
+            this.bias = new Vector2(0.0, 0.0);
 
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);

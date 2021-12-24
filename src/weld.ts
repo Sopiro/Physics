@@ -90,7 +90,7 @@ export class WeldJoint extends Joint
         if (Settings.positionCorrection)
             this.bias = new Vector3(error01.x, error01.y, error2).mul(this.beta * Settings.inv_dt);
         else
-            this.bias = new Vector3(0, 0, 0);
+            this.bias = new Vector3(0.0, 0.0, 0.0);
 
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);

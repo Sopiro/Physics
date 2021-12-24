@@ -162,7 +162,7 @@ class ContactSolver
     }
 }
 
-export class BlockSolver
+class BlockSolver
 {
     private manifold: ContactManifold;
 

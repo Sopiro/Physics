@@ -48,7 +48,7 @@ export class AngleJoint extends Joint
         if (Settings.positionCorrection)
             this.bias = error * this.beta * Settings.inv_dt;
         else
-            this.bias = 0;
+            this.bias = 0.0;
 
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);

@@ -38,7 +38,7 @@ export class GrabJoint extends Joint {
         if (Settings.positionCorrection)
             this.bias = error.mul(this.beta * Settings.inv_dt);
         else
-            this.bias = new Vector2(0, 0);
+            this.bias = new Vector2(0.0, 0.0);
         if (Settings.warmStarting)
             this.applyImpulse(this.impulseSum);
     }

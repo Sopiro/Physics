@@ -25,7 +25,7 @@ export class Timer {
         else
             return this.times[this.times.length - 1];
     }
-    get total() {
+    get totalElapsedTime() {
         if (this.times.length == 0)
             return 0;
         else

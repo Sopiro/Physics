@@ -80,9 +80,7 @@ export class World {
                 for (let m = 0; m < t.manifoldIDs.length; m++) {
                     let key = t.manifoldIDs[m];
                     let manifold = this.manifoldMap.get(key);
-                    let other = manifold.bodyB;
-                    if (other.id == t.id)
-                        other = manifold.bodyA;
+                    let other = manifold.bodyB.id == t.id ? manifold.bodyA : manifold.bodyB;
                     if (visited.has(other.id))
                         continue;
                     island.addManifold(manifold);
@@ -91,9 +89,7 @@ export class World {
                 for (let j = 0; j < t.jointIDs.length; j++) {
                     let key = t.jointIDs[j];
                     let joint = this.jointMap.get(key);
-                    let other = joint.bodyB;
-                    if (other.id == t.id)
-                        other = joint.bodyA;
+                    let other = joint.bodyB.id == t.id ? joint.bodyA : joint.bodyB;
                     if (joint instanceof GrabJoint) {
                         island.addJoint(joint);
                         t.awake();

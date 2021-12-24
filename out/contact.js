@@ -104,7 +104,7 @@ class ContactSolver {
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.bodyB.inverseInertia * this.jacobian.wb * lambda;
     }
 }
-export class BlockSolver {
+class BlockSolver {
     constructor(manifold) {
         this.manifold = manifold;
         this.bodyA = manifold.bodyA;

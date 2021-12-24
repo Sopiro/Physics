@@ -35,7 +35,7 @@ export class Timer
             return this.times[this.times.length - 1];
     }
 
-    get total(): number
+    get totalElapsedTime(): number
     {
         if (this.times.length == 0)
             return 0;
