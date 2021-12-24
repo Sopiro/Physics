@@ -1,4 +1,3 @@
-import { Vector2 } from "./math.js";
 import { RigidBody, Type } from "./rigidbody.js";
 import { detectCollision } from "./detection.js";
 import { ContactManifold } from "./contact.js";
@@ -153,7 +152,12 @@ export class World
             }
 
             island.sleeping = Settings.sleepEnabled && (restingBodies == island.numBodies);
-            if (island.sleeping) this.sleepingBodies += island.numBodies;
+
+            if (island.sleeping)
+            {
+                this.sleepingBodies += island.numBodies;
+                this.sleepingIslands++;
+            }
 
             island.solve(delta);
             island.clear();

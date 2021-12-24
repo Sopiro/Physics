@@ -38,7 +38,7 @@ export class Game
     private target!: RigidBody;
     private grabJoint!: GrabJoint;
 
-    private currentDemo = 1;
+    private currentDemo = 0;
     public callback = () => { };
 
     constructor(renderer: Renderer)
@@ -255,6 +255,7 @@ export class Game
         if (Input.isKeyPressed("g")) updateSetting("g");
         if (Input.isKeyPressed("b")) updateSetting("b");
         if (Input.isKeyPressed("i")) updateSetting("i");
+        if (Input.isKeyPressed("f")) updateSetting("f");
         if (Input.isKeyPressed("s")) this.world.surprise();
     }
 
@@ -476,6 +477,20 @@ export class Game
         }
 
         // Log rigid body information
+
+        let line = 0;
+
+        if (Settings.showProfile)
+        {
+            r.log("Bodies: " + String(this.world.numBodies), line++);
+            r.log("Joints: " + String(this.world.numJoints), line++);
+            r.log("Contacts: " + String(this.world.manifolds.length), line++);
+            r.log("Islands: " + String(this.world.numIslands), line++);
+            r.log("Sleeping dynamic bodies: " + String(this.world.sleepingBodies), line++);
+            r.log("Sleeping islands: " + String(this.world.sleepingIslands), line++);
+            line++;
+        }
+
         if (Settings.showInfo)
         {
             let i = 0;
@@ -488,7 +503,6 @@ export class Game
 
             if (this.world.bodies.length > 0 && i != this.world.bodies.length)
             {
-                let line = 0;
                 r.log("Type: " + String(Type[this.target.type]), line++);
                 r.log("Mass: " + String(this.target.mass) + "kg", line++);
                 r.log("Moment of inertia: " + String((this.target.inertia).toFixed(4)) + "kg⋅m²", line++);

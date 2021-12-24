@@ -41,70 +41,77 @@
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="pause">Pause</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="pause">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="gravity">Apply gravity</label>
                         <input class="form-check-input " type="checkbox" role="switch" id="gravity" checked>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="indicateCoM">Indicate the center of mass</label>
                         <input class="form-check-input " type="checkbox" role="switch" id="indicateCoM">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="indicateContact">Indicate contact information</label>
                         <input class="form-check-input " type="checkbox" role="switch" id="indicateContact">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="showBB">Show bounding box</label>
                         <input class="form-check-input " type="checkbox" role="switch" id="showBB">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
-                        <label class="form-check-label" for="showInfo">Show rigid body info</label>
+                    <div class="form-check form-switch m-0">
+                        <label class="form-check-label" for="showInfo">Show body info</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="showInfo">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
+                        <label class="form-check-label" for="showProfile">Show profile</label>
+                        <input class="form-check-input" type="checkbox" role="switch" id="showProfile">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="contactLink">Show contact link</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="contactLink">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="colorizeBody">Colorize body</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="colorizeBody">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="colorizeIsland">Colorize island</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="colorizeIsland">
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-check form-switch">
+                    <div class="form-check form-switch m-0">
                         <label class="form-check-label" for="colorizeActiveBody">Colorize active body</label>
                         <input class="form-check-input" type="checkbox" role="switch" id="colorizeActiveBody">
                     </div>
@@ -137,7 +144,7 @@
                         </label>
                     </div>
                     <div class="row p-0 m-0">
-                        <label for="strength" class="form-label col-9 p-0 ms-2">Strength</label>
+                        <label for="strength" class="form-label col-9 p-0 ms-2 mb-0">Strength</label>
                         <div class="col text-end p-0 m-0" id="strength_label">0</div>
                         <input type="range" class="form-range ps-2" id="strength">
                     </div>
@@ -186,7 +193,7 @@
                                     - M to indicate the center of mass
                                 </div>
                                 <div class="row">
-                                    - C to indicate contact information
+                                    - P to indicate contact information
                                 </div>
                                 <div class="row">
                                     - G to toggle gravity force
@@ -195,7 +202,13 @@
                                     - B to show bounding box
                                 </div>
                                 <div class="row">
-                                    - I to show rigidbody info
+                                    - I to show body info
+                                </div>
+                                <div class="row">
+                                    - F to show profile
+                                </div>
+                                <div class="row">
+                                    - S to awake all bodies
                                 </div>
                             </div>
                             <div class="modal-footer">

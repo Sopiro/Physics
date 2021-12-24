@@ -77,6 +77,7 @@ export const Settings = {
     sleepingWait: 1.0,
     colorizeActiveBody: true,
     sleepEnabled: true,
+    showProfile: false,
 };
 // Remove the default pop-up context menu
 let cvs = document.querySelector("#canvas");
@@ -243,6 +244,9 @@ sleepEnabled.addEventListener("click", () => { Settings.sleepEnabled = !Settings
 const colorizeActiveBody = document.querySelector("#colorizeActiveBody");
 colorizeActiveBody.checked = Settings.colorizeActiveBody;
 colorizeActiveBody.addEventListener("click", () => { Settings.colorizeActiveBody = !Settings.colorizeActiveBody; });
+const showProfile = document.querySelector("#showProfile");
+showProfile.checked = Settings.showProfile;
+showProfile.addEventListener("click", () => { Settings.showProfile = !Settings.showProfile; });
 /*
 const beta = document.querySelector("#beta")! as HTMLInputElement;
 beta.value = String(Util.map(Settings.positionCorrectionBeta, betaRange.p1, betaRange.p2, 0, 100));
@@ -293,6 +297,10 @@ export function updateSetting(id, content) {
         case "p":
             Settings.indicateCP = !Settings.indicateCP;
             indicateContact.checked = Settings.indicateCP;
+            break;
+        case "f":
+            Settings.showProfile = !Settings.showProfile;
+            showProfile.checked = Settings.showProfile;
             break;
         case "b":
             Settings.showBoundingBox = !Settings.showBoundingBox;

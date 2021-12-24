@@ -20,8 +20,8 @@ export class Renderer {
         return inv_vp.mulVector2(screenPosition, 1.0);
     }
     log(content, line = 0) {
-        let y = 80 + line * 20;
-        this.drawText(30, y, content);
+        let y = 75 + line * 20;
+        this.drawText(15, y, content, 20);
     }
     setCameraTransform(cameraTransform) {
         this.cameraTransform = cameraTransform;
@@ -145,10 +145,11 @@ export class Renderer {
         else {
             throw "Not a supported shape";
         }
-        if (drawCenterOfMass)
-            this.drawCircleV(center, 0.01, true);
         this.gfx.strokeStyle = "#000000";
         this.gfx.fillStyle = "#000000";
+        if (drawCenterOfMass) {
+            this.drawCircleV(center, 0.01, true);
+        }
         this.resetModelTransform();
     }
     drawAABB(aabb, lineWidth = 1) {

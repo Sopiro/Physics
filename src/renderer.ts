@@ -41,8 +41,8 @@ export class Renderer
 
     log(content: any, line: number = 0): void
     {
-        let y = 80 + line * 20;
-        this.drawText(30, y, content);
+        let y = 75 + line * 20;
+        this.drawText(15, y, content, 20);
     }
 
     setCameraTransform(cameraTransform: Matrix3)
@@ -216,11 +216,14 @@ export class Renderer
             throw "Not a supported shape";
         }
 
-        if (drawCenterOfMass)
-            this.drawCircleV(center, 0.01, true);
-
         this.gfx.strokeStyle = "#000000";
         this.gfx.fillStyle = "#000000";
+
+        if (drawCenterOfMass)
+        {
+            this.drawCircleV(center, 0.01, true);
+        }
+
         this.resetModelTransform();
     }
 

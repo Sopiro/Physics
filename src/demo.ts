@@ -505,7 +505,7 @@ function demo14(game: Game, world: World): void
     ground.restitution = 0.45;
     world.register(ground);
 
-    for (let i = 0; i < 30; i++)
+    for (let i = 0; i < 33; i++)
     {
         let start = new Vector2(Util.random(-8, 8), Util.random(0.5, 15));
 

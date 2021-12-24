@@ -107,8 +107,10 @@ export class World {
                     restingBodies++;
             }
             island.sleeping = Settings.sleepEnabled && (restingBodies == island.numBodies);
-            if (island.sleeping)
+            if (island.sleeping) {
                 this.sleepingBodies += island.numBodies;
+                this.sleepingIslands++;
+            }
             island.solve(delta);
             island.clear();
             restingBodies = 0;

@@ -389,7 +389,7 @@ function demo14(game, world) {
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 33; i++) {
         let start = new Vector2(Util.random(-8, 8), Util.random(0.5, 15));
         let rr = Util.random(-0.05, 0.05);
         let cos = Math.cos(rr);
