@@ -11,6 +11,7 @@ export class Island {
         this.world = world;
     }
     solve(delta) {
+        let awakeIsland = false;
         // Integrate forces, yield tentative velocities that possibly violate the constraint
         for (let i = 0; i < this.bodies.length; i++) {
             let b = this.bodies[i];
@@ -25,6 +26,8 @@ export class Island {
                 b.linearVelocity.y += linear_a.y;
                 let angular_a = b.torque * b.inverseInertia * Settings.dt; // Torque / Inertia * dt
                 b.angularVelocity += angular_a;
+                if ((linear_a.squaredLength >= Settings.restLinearTolerance) || (angular_a * angular_a >= Settings.restAngularTolerance))
+                    awakeIsland = true;
             }
             if ((this.sleeping && !this.world.forceIntegration) ||
                 ((b.linearVelocity.squaredLength < Settings.restLinearTolerance) &&
@@ -36,7 +39,7 @@ export class Island {
                 this.sleeping = false;
             }
             // Apply gravity 
-            if (Settings.applyGravity && !b.sleeping) {
+            if (Settings.applyGravity && !this.sleeping) {
                 let gravity = new Vector2(0, Settings.gravity * Settings.gravityScale * Settings.dt);
                 b.linearVelocity.x += gravity.x;
                 b.linearVelocity.y += gravity.y;
@@ -45,6 +48,12 @@ export class Island {
         // If island is sleeping, skip the extra computation
         if (this.sleeping)
             return;
+        if (awakeIsland) {
+            for (let i = 0; i < this.bodies.length; i++) {
+                let b = this.bodies[i];
+                b.awake();
+            }
+        }
         // Prepare for solving
         {
             for (let i = 0; i < this.manifolds.length; i++)

@@ -25,8 +25,8 @@ export class Game {
         this.time = 0.0;
         this.frame = 0;
         this.cameraMove = false;
-        this.grabBody = false;
-        this.currentDemo = 0;
+        this.grabbing = false;
+        this.currentDemo = 1;
         this.callback = () => { };
         this.renderer = renderer;
         this.camera = new Camera();
@@ -96,22 +96,23 @@ export class Game {
             dist.y *= -(Settings.clipHeight / Settings.height) * this.camera.scale.y;
             this.camera.position = this.cameraPosStart.add(dist);
         }
-        if (this.grabBody && !this.cameraMove) {
+        if (this.grabbing && !this.cameraMove) {
             if (Input.isMouseReleased()) {
                 if (Settings.mode == MouseMode.Force) {
                     this.world.forceIntegration = true;
-                    let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
-                    let force = this.cursorPos.sub(bindInGlobal).mul(this.targetBody.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
-                    let torque = bindInGlobal.sub(this.targetBody.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
-                    this.targetBody.force.x += force.x;
-                    this.targetBody.force.y += force.y;
-                    this.targetBody.torque += torque;
+                    let bindInGlobal = this.target.localToGlobal.mulVector2(this.bindPosition, 1);
+                    let force = this.cursorPos.sub(bindInGlobal).mul(this.target.mass).mul(Settings.frequency * (0.8 + Settings.mouseStrength / 3.0));
+                    let torque = bindInGlobal.sub(this.target.localToGlobal.mulVector2(new Vector2(0, 0), 1)).cross(force);
+                    this.target.force.x += force.x;
+                    this.target.force.y += force.y;
+                    this.target.torque += torque;
+                    this.target.awake();
                 }
                 else if (Settings.mode == MouseMode.Grab) {
                     this.world.forceIntegration = false;
                     this.world.unregister(this.grabJoint.id, true);
                 }
-                this.grabBody = false;
+                this.grabbing = false;
             }
         }
         if (Input.isMousePressed()) {
@@ -119,19 +120,19 @@ export class Game {
             for (let i = 0; i < this.world.bodies.length; i++) {
                 let b = this.world.bodies[i];
                 if (b.type != Type.Static && Util.checkInside(b, this.cursorPos)) {
-                    this.grabBody = true;
+                    this.grabbing = true;
                     if (Settings.grabCenter)
                         this.bindPosition = new Vector2(0, 0);
                     else
                         this.bindPosition = b.globalToLocal.mulVector2(this.cursorPos, 1);
-                    this.targetBody = b;
+                    this.target = b;
                     skipGeneration = true;
                     break;
                 }
             }
             if (skipGeneration && Settings.mode == MouseMode.Grab) {
-                let bind = Settings.grabCenter ? this.targetBody.position : this.cursorPos.copy();
-                this.grabJoint = new GrabJoint(this.targetBody, bind, this.cursorPos, Settings.mouseStrength, undefined);
+                let bind = Settings.grabCenter ? this.target.position : this.cursorPos.copy();
+                this.grabJoint = new GrabJoint(this.target, bind, this.cursorPos, Settings.mouseStrength, undefined);
                 this.world.register(this.grabJoint);
             }
             if (!skipGeneration && !this.cameraMove) {
@@ -186,17 +187,11 @@ export class Game {
             updateSetting("p");
         if (Input.isKeyPressed("g"))
             updateSetting("g");
-        if (Input.isKeyPressed("w"))
-            updateSetting("w");
         if (Input.isKeyPressed("b"))
             updateSetting("b");
-        if (Input.isKeyPressed("c"))
-            updateSetting("c");
-        if (Input.isKeyPressed("a"))
-            updateSetting("a");
         if (Input.isKeyPressed("i"))
             updateSetting("i");
-        if (Input.isKeyPressed("k"))
+        if (Input.isKeyPressed("s"))
             this.world.surprise();
     }
     render(r) {
@@ -210,14 +205,14 @@ export class Game {
                 if (!(Settings.colorizeBody || Settings.colorizeIsland))
                     id = b.islandID;
                 let hStride = 17;
-                let sStride = 3;
-                let lStride = 2;
+                let sStride = 5;
+                let lStride = 3;
                 let period = Math.trunc(360 / hStride);
                 let cycle = Math.trunc(id / period);
                 // let dir = (cycle & 1) == 1 ? -1 : 1;
                 let h = (id - 1) * hStride;
-                let s = 100 - (cycle * sStride) % 17;
-                let l = 75 - (cycle * lStride) % 11;
+                let s = 100 - (cycle * sStride) % 21;
+                let l = 75 - (cycle * lStride) % 17;
                 if (!(Settings.colorizeBody || Settings.colorizeIsland))
                     l = Util.clamp(l + 10, 0, 100);
                 let color = b.type == Type.Static ? "#f0f0f0" : `hsl(${h}, ${s}%, ${l}%)`;
@@ -242,8 +237,8 @@ export class Game {
             }
         }
         // Rendering for mouse forcing 
-        if (this.grabBody && (Settings.mode == MouseMode.Force)) {
-            let bindInGlobal = this.targetBody.localToGlobal.mulVector2(this.bindPosition, 1);
+        if (this.grabbing && (Settings.mode == MouseMode.Force)) {
+            let bindInGlobal = this.target.localToGlobal.mulVector2(this.bindPosition, 1);
             r.drawCircleV(bindInGlobal, 0.03);
             r.drawVectorP(bindInGlobal, this.cursorPos);
         }
@@ -356,43 +351,42 @@ export class Game {
         }
         // Log rigid body information
         if (Settings.showInfo) {
-            let target;
             let i = 0;
             for (; i < this.world.bodies.length; i++) {
-                target = this.world.bodies[i];
-                if (Util.checkInside(target, this.cursorPos))
+                this.target = this.world.bodies[i];
+                if (Util.checkInside(this.target, this.cursorPos))
                     break;
             }
             if (this.world.bodies.length > 0 && i != this.world.bodies.length) {
                 let line = 0;
-                r.log("Type: " + String(Type[target.type]), line++);
-                r.log("Mass: " + String(target.mass) + "kg", line++);
-                r.log("Moment of inertia: " + String((target.inertia).toFixed(4)) + "kg⋅m²", line++);
-                if (target instanceof Polygon) {
-                    if (target instanceof Box) {
-                        r.log("Density: " + String(target.density.toFixed(4)) + "kg/m²", line++);
-                        r.log("Area: " + String(target.area.toFixed(4)) + "m²", line++);
+                r.log("Type: " + String(Type[this.target.type]), line++);
+                r.log("Mass: " + String(this.target.mass) + "kg", line++);
+                r.log("Moment of inertia: " + String((this.target.inertia).toFixed(4)) + "kg⋅m²", line++);
+                if (this.target instanceof Polygon) {
+                    if (this.target instanceof Box) {
+                        r.log("Density: " + String(this.target.density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String(this.target.area.toFixed(4)) + "m²", line++);
                     }
                     else {
-                        r.log("Density: " + String(target.density.toFixed(4)) + "kg/m²", line++);
-                        r.log("Area: " + String(target.area.toFixed(4)) + "m²", line++);
+                        r.log("Density: " + String(this.target.density.toFixed(4)) + "kg/m²", line++);
+                        r.log("Area: " + String(this.target.area.toFixed(4)) + "m²", line++);
                     }
                 }
-                else if (target instanceof Circle) {
-                    r.log("Density: " + String(target.density.toFixed(4)) + "kg/m²", line++);
-                    r.log("Area: " + String(target.area.toFixed(4)) + "m²", line++);
+                else if (this.target instanceof Circle) {
+                    r.log("Density: " + String(this.target.density.toFixed(4)) + "kg/m²", line++);
+                    r.log("Area: " + String(this.target.area.toFixed(4)) + "m²", line++);
                 }
-                r.log("Friction: " + String(target.friction), line++);
-                r.log("Restitution: " + String(target.restitution), line++);
-                r.log("Position: [" + String(target.position.x.toFixed(4)) + ", " + String(target.position.y.toFixed(4)) + "]", line++);
-                r.log("Rotation: " + String(target.rotation.toFixed(4)) + "rad", line++);
-                r.log("Linear velocity: [" + String((target.linearVelocity.x / 100).toFixed(4)) + ", " + String((target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
-                r.log("Angular velocity: " + String(target.angularVelocity.toFixed(4)) + "rad/s", line++);
-                r.log("Surface velocity: " + String(target.surfaceSpeed.toFixed(4)) + "m/s", line++);
-                r.log("Contacts: " + target.manifoldIDs.length, line++);
-                r.log("Joints: " + target.jointIDs.length, line++);
-                r.log("Island: " + target.islandID, line++);
-                r.log("Sleeping: " + target.sleeping, line++);
+                r.log("Friction: " + String(this.target.friction), line++);
+                r.log("Restitution: " + String(this.target.restitution), line++);
+                r.log("Position: [" + String(this.target.position.x.toFixed(4)) + ", " + String(this.target.position.y.toFixed(4)) + "]", line++);
+                r.log("Rotation: " + String(this.target.rotation.toFixed(4)) + "rad", line++);
+                r.log("Linear velocity: [" + String((this.target.linearVelocity.x / 100).toFixed(4)) + ", " + String((this.target.linearVelocity.y / 100).toFixed(4)) + "]m/s", line++);
+                r.log("Angular velocity: " + String(this.target.angularVelocity.toFixed(4)) + "rad/s", line++);
+                r.log("Surface velocity: " + String(this.target.surfaceSpeed.toFixed(4)) + "m/s", line++);
+                r.log("Contacts: " + this.target.manifoldIDs.length, line++);
+                r.log("Joints: " + this.target.jointIDs.length, line++);
+                r.log("Island: " + this.target.islandID, line++);
+                r.log("Sleeping: " + this.target.sleeping, line++);
             }
         }
     }

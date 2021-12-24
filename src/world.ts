@@ -241,6 +241,8 @@ export class World
                     let joint = this.jointMap.get(jid)!;
                     let other = joint.bodyA.id == id ? joint.bodyB : joint.bodyA;
 
+                    other.awake();
+
                     for (let k = 0; k < other.jointIDs.length; k++)
                     {
                         if (other.jointIDs[k] == jid)
