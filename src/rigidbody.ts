@@ -1,3 +1,4 @@
+import { ContactInfo } from "./contact.js";
 import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
@@ -35,6 +36,10 @@ export class RigidBody extends Entity
     public resting: number = 0;
     public sleeping: boolean = false;
 
+    // Callback function that will be called after the constraint is solved
+    // If the callback returns true, it reset itself to undefined
+    public onContact?: (contactInfo: ContactInfo) => boolean;
+
     constructor(type: Type)
     {
         super();
@@ -60,7 +65,7 @@ export class RigidBody extends Entity
             case Type.Dynamic:
                 this._mass = Settings.defaultMass;
                 this._invMass = 1 / this._mass;
-                this._inertia = Util.calculateCircleInertia(Settings.defaultMass, Settings.defaultSize);
+                this._inertia = Util.calculateBoxInertia(Settings.defaultSize, Settings.defaultSize, Settings.defaultMass);
                 this._invInertia = 1 / this._inertia;
                 break;
         }

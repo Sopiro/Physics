@@ -153,7 +153,7 @@ export class Game {
                         }
                     case GenerationShape.Regular:
                         {
-                            nb = Util.createRegularPolygon(nbs.size / 2, nbs.numVertices);
+                            nb = Util.createRegularPolygon(nbs.size / 2.0, nbs.numVertices);
                             nb.mass = nbs.mass;
                             break;
                         }
@@ -287,9 +287,7 @@ export class Game {
                 let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
                 let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
                 if (j.drawConnectionLine) {
-                    let dir = anchorB.sub(anchorA).normalized().mul(j.maxDistance);
-                    r.drawLineV(anchorA, anchorA.add(dir));
-                    r.drawLineV(anchorB, anchorB.add(dir.inverted()));
+                    r.drawLineV(anchorA, anchorB);
                 }
                 if (j.drawAnchor) {
                     r.drawCircleV(anchorA, 0.03);

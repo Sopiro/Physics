@@ -44,6 +44,7 @@ export class Polygon extends RigidBody
         area += this.vertices[count - 1].cross(this.vertices[0]);
 
         this.area = Math.abs(area) / 2.0;
+        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
         this._density = this.mass / this.area;
 
         if (!resetPosition)
@@ -74,7 +75,7 @@ export class Polygon extends RigidBody
     set mass(mass: number)
     {
         super.mass = mass;
-        super.inertia = Util.calculateCircleInertia(Math.sqrt(this.area) / 2.0, mass);
+        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
         this._density = mass / this.area;
     }
 
@@ -87,7 +88,7 @@ export class Polygon extends RigidBody
     set density(density: number)
     {
         super.mass = density * this.area;
-        super.inertia = Util.calculateCircleInertia(Math.sqrt(this.area) / 2.0, this.mass);
+        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
         this._density = density;
     }
 }

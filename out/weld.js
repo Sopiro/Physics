@@ -4,7 +4,7 @@ import * as Util from "./util.js";
 import { Joint } from "./joint.js";
 // Revolute joint + Angle joint
 export class WeldJoint extends Joint {
-    constructor(bodyA, bodyB, anchor = Util.mid(bodyA.position, bodyB.position), frequency = 60, dampingRatio = 1.0, mass = -1) {
+    constructor(bodyA, bodyB, anchor = Util.mid(bodyA.position, bodyB.position), frequency = 240, dampingRatio = 1.0, mass = -1) {
         super(bodyA, bodyB);
         this.impulseSum = new Vector3();
         this.initialAngle = bodyB.rotation - bodyA.rotation;

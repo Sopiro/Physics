@@ -14,8 +14,6 @@ export class Box extends Polygon
 
         this.width = width;
         this.height = height;
-
-        this.inertia = Util.calculateBoxInertia(width, height, this.mass);
     }
 
     get mass(): number

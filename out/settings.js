@@ -51,7 +51,7 @@ export const Settings = {
         size: 0.5,
         friction: 0.7,
         restitution: 0.001,
-        numVertices: 5
+        numVertices: Math.trunc(Util.random(3.0, 18.0)),
     },
     gravity: -10,
     gravityScale: 0.25,
@@ -62,7 +62,7 @@ export const Settings = {
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,
-    randonConvexMaxVertices: 8,
+    randomConvexMaxVertices: 8,
     regularPolygonMaxVertices: 11,
     defaultMass: 2.0,
     defaultSize: 0.5,

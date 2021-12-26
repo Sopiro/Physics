@@ -22,10 +22,10 @@ export function lerpVector(a, b, uv) {
 }
 export function createRandomConvexBody(radius, numVertices = -1) {
     if (numVertices < 0)
-        numVertices = Math.trunc(Math.random() * Settings.randonConvexMaxVertices);
+        numVertices = Math.trunc(Math.random() * Settings.randomConvexMaxVertices);
     if (numVertices == 0)
         return new Circle(radius);
-    if (numVertices == Settings.randonConvexMaxVertices - 1)
+    if (numVertices == Settings.randomConvexMaxVertices - 1)
         return new Box(radius * 2, radius * 2);
     numVertices += 2;
     let angles = [];
@@ -37,10 +37,10 @@ export function createRandomConvexBody(radius, numVertices = -1) {
     }));
     return res;
 }
-export function createRegularPolygon(radius, numVertices = -1) {
+export function createRegularPolygon(radius, numVertices = -1, initialAngle) {
     if (numVertices < 3)
         numVertices = Math.trunc(random(3, Settings.regularPolygonMaxVertices));
-    let angleStart = Math.PI / 2.0;
+    let angleStart = initialAngle != undefined ? initialAngle : Math.PI / 2.0;
     let angle = Math.PI * 2 / numVertices;
     if ((numVertices % 2) == 0)
         angleStart += angle / 2.0;
@@ -50,7 +50,6 @@ export function createRegularPolygon(radius, numVertices = -1) {
         vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mul(radius * 1.4142));
     }
     return new Polygon(vertices, Type.Dynamic);
-    ;
 }
 export function random(left = -1, right = 1) {
     if (left > right) {
@@ -78,6 +77,30 @@ export function calculateBoxInertia(width, height, mass) {
 }
 export function calculateCircleInertia(radius, mass) {
     return mass * radius * radius / 2.0;
+}
+// This function assumes the origin is the rotation axis
+export function calculateConvexPolygonInertia(vertices, mass, area = -1) {
+    let inertia = 0;
+    let count = vertices.length;
+    if (area <= 0) {
+        area = 0;
+        for (let i = 0; i < count; i++) {
+            let v1 = vertices[i];
+            let v2 = vertices[(i + 1) % count];
+            area += Math.abs(v1.cross(v2));
+        }
+        area *= 0.5;
+    }
+    for (let i = 0; i < count; i++) {
+        let v1 = vertices[i];
+        let v2 = vertices[(i + 1) % count];
+        let l1 = v1.length;
+        let l2 = v2.length;
+        let beta = Math.acos(v1.dot(v2) / (l1 * l2)) / 2;
+        let partialMass = (Math.abs(v1.cross(v2)) / 2.0) / area * mass;
+        inertia += 0.5 * partialMass * l1 * l2 * (1 - 2.0 / 3.0 * Math.sin(beta) * Math.sin(beta));
+    }
+    return inertia;
 }
 export function checkInside(b, p) {
     let localP = b.globalToLocal.mulVector2(p, 1);

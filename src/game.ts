@@ -216,7 +216,7 @@ export class Game
                         }
                     case GenerationShape.Regular:
                         {
-                            nb = Util.createRegularPolygon(nbs.size / 2, nbs.numVertices);
+                            nb = Util.createRegularPolygon(nbs.size / 2.0, nbs.numVertices);
                             (nb as Polygon).mass = nbs.mass;
                             break;
                         }
@@ -389,10 +389,7 @@ export class Game
 
                 if (j.drawConnectionLine)
                 {
-                    let dir = anchorB.sub(anchorA).normalized().mul(j.maxDistance);
-
-                    r.drawLineV(anchorA, anchorA.add(dir));
-                    r.drawLineV(anchorB, anchorB.add(dir.inverted()));
+                    r.drawLineV(anchorA, anchorB);
                 }
                 if (j.drawAnchor)
                 {

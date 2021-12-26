@@ -97,7 +97,7 @@ export class Island
 
         // Iteratively solve the violated velocity constraint
         {
-            for (let i = 0; i < Settings.numIterations; i++)
+            for (let i = 0; i < Settings.numIterations - 1; i++)
             {
                 for (let j = 0; j < this.manifolds.length; j++)
                     this.manifolds[j].solve();
@@ -105,6 +105,30 @@ export class Island
                 for (let j = 0; j < this.joints.length; j++)
                     this.joints[j].solve();
             }
+
+            for (let i = 0; i < this.manifolds.length; i++)
+            {
+                let manifold = this.manifolds[i];
+                manifold.solve();
+
+                // Contact callbacks
+                if (manifold.bodyA.onContact != undefined)
+                {
+                    let contactInfo = manifold.getContactInfo(false);
+                    if (manifold.bodyA.onContact(contactInfo))
+                        manifold.bodyA.onContact = undefined;
+                }
+
+                if (manifold.bodyB.onContact != undefined)
+                {
+                    let contactInfo = manifold.getContactInfo(true);
+                    if (manifold.bodyB.onContact(contactInfo))
+                        manifold.bodyB.onContact = undefined;
+                }
+            }
+
+            for (let i = 0; i < this.joints.length; i++)
+                this.joints[i].solve();
         }
 
         // Update positions using corrected velocities (Semi-implicit euler integration)

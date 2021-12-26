@@ -192,7 +192,8 @@ export class World
     {
         if (isJoint)
         {
-            let joint = this.jointMap.get(id)!;
+            let joint = this.jointMap.get(id);
+            if (joint == undefined) return false;
 
             for (let i = 0; i < joint.bodyA.jointIDs.length; i++)
             {
@@ -213,6 +214,7 @@ export class World
             }
 
             this.jointMap.delete(id);
+            this.removePassTestPair(joint.bodyA, joint.bodyB);
             this.joints = Array.from(this.jointMap.values());
 
             return true;
@@ -267,6 +269,12 @@ export class World
     {
         this.passTestSet.add(Util.make_pair_natural(bodyA.id, bodyB.id));
         this.passTestSet.add(Util.make_pair_natural(bodyB.id, bodyA.id));
+    }
+
+    removePassTestPair(bodyA: RigidBody, bodyB: RigidBody)
+    {
+        this.passTestSet.delete(Util.make_pair_natural(bodyA.id, bodyB.id));
+        this.passTestSet.delete(Util.make_pair_natural(bodyB.id, bodyA.id));
     }
 
     reset(): void

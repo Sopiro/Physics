@@ -7,7 +7,6 @@ export class Box extends Polygon {
         super([new Vector2(0, 0), new Vector2(0, height), new Vector2(width, height), new Vector2(width, 0)], type);
         this.width = width;
         this.height = height;
-        this.inertia = Util.calculateBoxInertia(width, height, this.mass);
     }
     get mass() {
         return super.mass;

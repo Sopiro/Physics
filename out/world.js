@@ -133,6 +133,8 @@ export class World {
     unregister(id, isJoint = false) {
         if (isJoint) {
             let joint = this.jointMap.get(id);
+            if (joint == undefined)
+                return false;
             for (let i = 0; i < joint.bodyA.jointIDs.length; i++) {
                 if (id == joint.bodyA.jointIDs[i]) {
                     joint.bodyA.jointIDs.splice(i, 1);
@@ -146,6 +148,7 @@ export class World {
                 }
             }
             this.jointMap.delete(id);
+            this.removePassTestPair(joint.bodyA, joint.bodyB);
             this.joints = Array.from(this.jointMap.values());
             return true;
         }
@@ -180,6 +183,10 @@ export class World {
     addPassTestPair(bodyA, bodyB) {
         this.passTestSet.add(Util.make_pair_natural(bodyA.id, bodyB.id));
         this.passTestSet.add(Util.make_pair_natural(bodyB.id, bodyA.id));
+    }
+    removePassTestPair(bodyA, bodyB) {
+        this.passTestSet.delete(Util.make_pair_natural(bodyA.id, bodyB.id));
+        this.passTestSet.delete(Util.make_pair_natural(bodyB.id, bodyA.id));
     }
     reset() {
         this.bodies = [];

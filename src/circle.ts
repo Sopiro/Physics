@@ -12,6 +12,7 @@ export class Circle extends RigidBody
         super(type);
 
         this.radius = radius;
+        
         this.area = Math.PI * this.radius * this.radius;
         this.inertia = Util.calculateCircleInertia(radius, this.mass);
         this._density = this.mass / this.area;

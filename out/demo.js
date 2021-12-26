@@ -13,6 +13,7 @@ import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
 import { Engine } from "./engine.js";
+import { Polygon } from "./polygon.js";
 Reflect.set(demo1, "SimulationName", "Single box");
 function demo1(game, world) {
     updateSetting("g", true);
@@ -38,6 +39,7 @@ function demo2(game, world) {
     let error = 0.0;
     for (let i = 0; i < 17; i++) {
         let b = new Box(size);
+        // let b = Util.createRegularPolygon(size / 2, 6);
         b.position = new Vector2(Util.random(-error, error), start + i * (size + gap));
         world.register(b);
     }
@@ -436,7 +438,7 @@ function demo15(game, world) {
     b.position.x = 2;
     b.position.y = 6;
     world.register(b);
-    j = new MaxDistanceJoint(c, b, 1.2, undefined, undefined, 0.7, 0.1);
+    j = new MaxDistanceJoint(c, b, 1.5, undefined, undefined, 0.7, 0.1);
     world.register(j);
 }
 Reflect.set(demo16, "SimulationName", "Prismatic joint");
@@ -586,6 +588,7 @@ function demo18(game, world) {
     game.callback = () => {
         if ((game.frame - last_spawn) / Engine.fps > 0.3 * 144 * game.deltaTime) {
             let c = Util.createRegularPolygon(Util.random(0.1, 0.25));
+            c.density = 20.0;
             c.restitution = 0.3;
             c.position.x = Util.random(-5.5, -3.0);
             c.position.y = 7.0;
@@ -876,8 +879,50 @@ function demo20(game, world) {
     c.position.y += 2.5;
     world.register(c);
 }
+Reflect.set(demo21, "SimulationName", "Contact callbacks: Breakable body");
+function demo21(game, world) {
+    updateSetting("g", true);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+    world.register(ground);
+    let count = 5;
+    let xGap = 2.3;
+    let xStart = -xGap / 2 * Math.trunc(count - 1 / 2);
+    let yStart = 1.0;
+    for (let i = 0; i < count; i++) {
+        let b1 = new Polygon([new Vector2(0, 0), new Vector2(0, 0.6), new Vector2(0.5, 1.0)], undefined, false);
+        b1.translate(new Vector2(xStart + xGap * i, yStart + i * 1.2));
+        world.register(b1);
+        let b2 = new Polygon([new Vector2(0, 0), new Vector2(-0.5, 1.0), new Vector2(0, 0.6)], undefined, false);
+        b2.translate(new Vector2(xStart + xGap * i, yStart + i * 1.2));
+        world.register(b2);
+        let j = new WeldJoint(b1, b2);
+        world.register(j, true);
+        b1.angularVelocity = Util.random(4.0, 8.0) * (Util.random(0, 1) > 0.5 ? -1 : 1);
+        b1.onContact = (contactInfo) => {
+            if (contactInfo.impulse > 12) {
+                world.unregister(j.id, true);
+                b2.onContact = undefined;
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        b2.onContact = (contactInfo) => {
+            if (contactInfo.impulse > 12) {
+                world.unregister(j.id, true);
+                b1.onContact = undefined;
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+    }
+}
 export const demos = [
     demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
     demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18, demo19,
-    demo20
+    demo20, demo21
 ];
