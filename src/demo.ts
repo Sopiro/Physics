@@ -1186,9 +1186,189 @@ function demo21(game: Game, world: World): void
     }
 }
 
+Reflect.set(demo22, "SimulationName", "Car driving");
+function demo22(game: Game, world: World): void
+{
+    updateSetting("g", true);
+
+    //Car
+    {
+        let body = new Polygon([new Vector2(-1.2, 0), new Vector2(-1.2, 0.5), new Vector2(-1.0, 1.0), new Vector2(0.2, 1.0), new Vector2(1.0, 0.5), new Vector2(1.0, 0.0)]);
+        body.mass = 100;
+
+        body.translate(new Vector2(0, 3));
+        world.register(body);
+
+        let wheel1 = new Circle(0.3);
+        wheel1.mass = 30.0;
+        wheel1.friction = 0.95;
+        wheel1.translate(new Vector2(-0.6, 2.5));
+        world.register(wheel1);
+
+        let j: Joint = new RevoluteJoint(body, wheel1, wheel1.position, 1.5, 0.5);
+        j.drawConnectionLine = false;
+        world.register(j, true);
+
+        let wheel2 = new Circle(0.3);
+        wheel2.mass = 30.0;
+        wheel2.friction = 0.95;
+        wheel2.translate(new Vector2(0.8, 2.5));
+        world.register(wheel2);
+
+        j = new RevoluteJoint(body, wheel2, wheel2.position, 1.5, 0.5);
+        j.drawConnectionLine = false;
+        world.register(j, true);
+
+        let motor = new MotorJoint(body, wheel1, wheel1.position, 300, 100);
+        motor.drawAnchor = false;
+        world.register(motor);
+
+        game.callback = () =>
+        {
+            game.camera.scale = new Vector2(2, 2);
+            let uv = { u: 1 - game.deltaTime * 3, v: game.deltaTime * 3 };
+            game.camera.position = Util.lerpVector(game.camera.position, body.position.add(new Vector2(0, 2.0)), uv);
+
+            if (Input.isKeyDown("w") || Input.isKeyDown("d"))
+            {
+                body.awake();
+                motor.maxTorque = 80.0;
+                motor.angularOffset = wheel1.rotation - 0.3;
+            }
+            else if (Input.isKeyDown("s") || Input.isKeyDown("a"))
+            {
+                body.awake();
+                motor.maxTorque = 80.0;
+                motor.angularOffset = wheel1.rotation + 0.3;
+            }
+            else
+            {
+                motor.maxTorque = 0.0;
+            }
+
+            if (Input.isKeyDown(" "))
+            {
+                body.awake();
+                motor.maxTorque = 70.0;
+                motor.angularOffset = wheel1.rotation - body.rotation;
+            }
+        }
+    }
+
+    // Ground
+    {
+        let g1 = new Box(Settings.clipWidth, 0.4, Type.Static);
+        g1.restitution = 0.45;
+        g1.friction = 0.9;
+        world.register(g1);
+
+        let g2 = new Polygon([new Vector2(Settings.clipWidth / 2.0, 0.2), new Vector2(20, 1.0), new Vector2(20, 0.6), new Vector2(Settings.clipWidth / 2.0, -0.2)], Type.Static, false);
+        g2.restitution = 0.45;
+        g2.friction = 0.9;
+        world.register(g2);
+
+        let g3 = new Polygon([new Vector2(20.0, -1), new Vector2(50, -1), new Vector2(50, -1.4), new Vector2(20.0, -1.4)], Type.Static, false);
+        g3.restitution = 0.45;
+        g3.friction = 0.9;
+        world.register(g3);
+
+        let ss = new Box(12, 0.2);
+        ss.position = new Vector2(29, -0.4);
+        world.register(ss);
+
+        let j = new RevoluteJoint(g3, ss, ss.position);
+        j.drawConnectionLine = false;
+        world.register(j);
+
+        let b = new Box(0.5);
+        b.mass = 0.5;
+        b.position = new Vector2(34, 0);
+        world.register(b);
+
+        let h = Util.createRegularPolygon(0.25, 6);
+        h.mass = 0.3;
+        h.position = new Vector2(34.8, 0);
+        world.register(h);
+
+        let xStart = 50.0;
+        let yStart = -1;
+        let sizeX = 1.0;
+        let sizeY = 0.3;
+        let gap = 0.1;
+
+        b = new Box(sizeX, sizeY);
+        b.position = new Vector2(xStart + sizeX / 2.0 + gap, yStart - sizeY / 2.0);
+        world.register(b);
+
+        j = new RevoluteJoint(g3, b, b.position.sub(new Vector2(sizeX / 2.0, 0)));
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j);
+
+        let count = 15;
+
+        for (let i = 1; i < count; i++)
+        {
+            let b2 = new Box(sizeX, sizeY);
+            b2.position = new Vector2(xStart + (sizeX / 2.0 + gap) + (sizeX + gap) * i, yStart - sizeY / 2.0);
+            world.register(b2);
+
+            let j = new RevoluteJoint(b, b2, b2.position.sub(new Vector2((sizeX + gap) / 2.0, 0)), 32, 1.0);
+            j.drawAnchor = false;
+            world.register(j);
+            b = b2;
+        }
+
+        let g4 = new Box(50, 0.4, Type.Static);
+        g4.position = new Vector2(xStart + (gap + sizeX) * count + g4.width / 2 + gap, yStart - sizeY / 2.0);
+        g4.friction = 0.9;
+        g4.restitution = 0.45;
+        world.register(g4);
+
+        j = new RevoluteJoint(g4, b, b.position.add(new Vector2(b.width / 2.0, 0)));
+        j.drawConnectionLine = false;
+        j.drawAnchor = false;
+        world.register(j);
+
+        xStart = 80.0;
+        yStart = 0.5;
+        let size = 0.5;
+        gap = 0.1;
+
+        for (let i = 0; i < 15; i++)
+        {
+            let b = new Circle(size / 2.0);
+            b.position = new Vector2(xStart, yStart + i * (size + gap));
+            world.register(b);
+        }
+
+        xStart = 90.0;
+
+        for (let i = 0; i < 15; i++)
+        {
+            let b = new Box(size);
+            b.position = new Vector2(xStart, yStart + i * (size + gap));
+            world.register(b);
+        }
+
+        xStart = 100.0;
+
+        for (let i = 0; i < 15; i++)
+        {
+            let b = Util.createRegularPolygon(size / 2, 6);
+            b.position = new Vector2(xStart, yStart + i * (size + gap));
+            world.register(b);
+        }
+
+        let g5 = new Box(0.4, 3, Type.Static);
+        g5.position = g4.position.add(new Vector2(g4.width / 2.0, g4.height / 2.0)).add(new Vector2(g5.width / 2.0, g5.height / 2.0));
+        world.register(g5);
+    }
+}
+
 export const demos: ((game: Game, world: World) => void)[] =
     [
         demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
         demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18, demo19,
-        demo20, demo21
+        demo20, demo21, demo22
     ];

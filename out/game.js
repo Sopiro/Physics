@@ -55,6 +55,8 @@ export class Game {
     initDemo() {
         this.frame = 0;
         this.time = 0.0;
+        this.camera.position = new Vector2(0, Settings.clipHeight / 2.0);
+        this.camera.scale = new Vector2(1, 1);
         this.world.reset();
         this.callback = () => { };
         demos[this.currentDemo](this, this.world);

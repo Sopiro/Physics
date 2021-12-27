@@ -22,6 +22,7 @@ export class PrismaticJoint extends Joint {
         else {
             this.t = new Vector2(-dir.y, dir.x).normalized();
         }
+        Util.assert(this.t.squaredLength > 0);
         if (mass <= 0)
             mass = bodyB.mass;
         if (frequency <= 0)
@@ -43,7 +44,7 @@ export class PrismaticJoint extends Joint {
         this.rb = this.bodyB.localToGlobal.mulVector2(this.localAnchorB, 0);
         let pa = this.bodyA.position.add(this.ra);
         let pb = this.bodyB.position.add(this.rb);
-        this.u = pb.sub(pa).normalized();
+        this.u = pb.sub(pa);
         let sa = this.ra.add(this.u).cross(this.t);
         let sb = this.rb.cross(this.t);
         let k = new Matrix2();

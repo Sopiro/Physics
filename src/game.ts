@@ -80,6 +80,8 @@ export class Game
     {
         this.frame = 0;
         this.time = 0.0;
+        this.camera.position = new Vector2(0, Settings.clipHeight / 2.0);
+        this.camera.scale = new Vector2(1, 1);
         this.world.reset();
         this.callback = () => { };
         demos[this.currentDemo](this, this.world);
@@ -100,8 +102,8 @@ export class Game
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
 
-        this.camera.translate(new Vector2(mx, my).mul(delta * 10 * this.camera.scale.x));
 
+        this.camera.translate(new Vector2(mx, my).mul(delta * 10 * this.camera.scale.x));
         let tmpCursorPos = this.renderer.pick(Input.mousePosition);
 
         this.cursorPos.x = tmpCursorPos.x;
