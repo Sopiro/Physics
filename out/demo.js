@@ -928,23 +928,26 @@ function demo22(game, world) {
     //Car
     {
         let body = new Polygon([new Vector2(-1.2, 0), new Vector2(-1.2, 0.5), new Vector2(-1.0, 1.0), new Vector2(0.2, 1.0), new Vector2(1.0, 0.5), new Vector2(1.0, 0.0)]);
+        body.translate(new Vector2(-25, 5));
         body.mass = 100;
         body.translate(new Vector2(0, 3));
         world.register(body);
         let wheel1 = new Circle(0.3);
         wheel1.mass = 30.0;
-        wheel1.friction = 0.95;
+        wheel1.friction = 1.0;
         wheel1.translate(new Vector2(-0.6, 2.5));
+        wheel1.translate(new Vector2(-25, 5));
         world.register(wheel1);
-        let j = new RevoluteJoint(body, wheel1, wheel1.position, 1.5, 0.5);
+        let j = new RevoluteJoint(body, wheel1, wheel1.position, 2, 0.5);
         j.drawConnectionLine = false;
         world.register(j, true);
         let wheel2 = new Circle(0.3);
         wheel2.mass = 30.0;
-        wheel2.friction = 0.95;
+        wheel2.friction = 1.0;
         wheel2.translate(new Vector2(0.8, 2.5));
+        wheel2.translate(new Vector2(-25, 5));
         world.register(wheel2);
-        j = new RevoluteJoint(body, wheel2, wheel2.position, 1.5, 0.5);
+        j = new RevoluteJoint(body, wheel2, wheel2.position, 2, 0.5);
         j.drawConnectionLine = false;
         world.register(j, true);
         let motor = new MotorJoint(body, wheel1, wheel1.position, 300, 100);
@@ -956,37 +959,46 @@ function demo22(game, world) {
             game.camera.position = Util.lerpVector(game.camera.position, body.position.add(new Vector2(0, 2.0)), uv);
             if (Input.isKeyDown("w") || Input.isKeyDown("d")) {
                 body.awake();
-                motor.maxTorque = 80.0;
-                motor.angularOffset = wheel1.rotation - 0.3;
+                motor.maxTorque = 60.0;
+                motor.angularOffset = wheel1.rotation - body.rotation - 0.3;
             }
             else if (Input.isKeyDown("s") || Input.isKeyDown("a")) {
                 body.awake();
-                motor.maxTorque = 80.0;
-                motor.angularOffset = wheel1.rotation + 0.3;
+                motor.maxTorque = 60.0;
+                motor.angularOffset = wheel1.rotation - body.rotation + 0.3;
             }
             else {
+                motor.angularOffset = wheel1.rotation;
                 motor.maxTorque = 0.0;
             }
             if (Input.isKeyDown(" ")) {
                 body.awake();
-                motor.maxTorque = 70.0;
+                motor.maxTorque = 60.0;
                 motor.angularOffset = wheel1.rotation - body.rotation;
             }
         };
     }
     // Ground
     {
+        let g_1 = new Polygon([new Vector2(-30, 5), new Vector2(-20, 5), new Vector2(-20, 5 - 0.4), new Vector2(-30, 5 - 0.4)], Type.Static, false);
+        g_1.restitution = 0.45;
+        g_1.friction = 1.0;
+        world.register(g_1);
+        let g0 = new Polygon([new Vector2(-20, 5), new Vector2(-Settings.clipWidth / 2.0, 0.2), new Vector2(-Settings.clipWidth / 2.0, -0.2), new Vector2(-20, 5 - 0.4)], Type.Static, false);
+        g0.restitution = 0.45;
+        g0.friction = 1.0;
+        world.register(g0);
         let g1 = new Box(Settings.clipWidth, 0.4, Type.Static);
         g1.restitution = 0.45;
-        g1.friction = 0.9;
+        g1.friction = 1.0;
         world.register(g1);
         let g2 = new Polygon([new Vector2(Settings.clipWidth / 2.0, 0.2), new Vector2(20, 1.0), new Vector2(20, 0.6), new Vector2(Settings.clipWidth / 2.0, -0.2)], Type.Static, false);
         g2.restitution = 0.45;
-        g2.friction = 0.9;
+        g2.friction = 1.0;
         world.register(g2);
         let g3 = new Polygon([new Vector2(20.0, -1), new Vector2(50, -1), new Vector2(50, -1.4), new Vector2(20.0, -1.4)], Type.Static, false);
         g3.restitution = 0.45;
-        g3.friction = 0.9;
+        g3.friction = 1.0;
         world.register(g3);
         let ss = new Box(12, 0.2);
         ss.position = new Vector2(29, -0.4);
@@ -1026,7 +1038,7 @@ function demo22(game, world) {
         }
         let g4 = new Box(50, 0.4, Type.Static);
         g4.position = new Vector2(xStart + (gap + sizeX) * count + g4.width / 2 + gap, yStart - sizeY / 2.0);
-        g4.friction = 0.9;
+        g4.friction = 1.0;
         g4.restitution = 0.45;
         world.register(g4);
         j = new RevoluteJoint(g4, b, b.position.add(new Vector2(b.width / 2.0, 0)));
@@ -1055,7 +1067,7 @@ function demo22(game, world) {
             world.register(b);
         }
         let g5 = new Box(0.4, 3, Type.Static);
-        g5.position = g4.position.add(new Vector2(g4.width / 2.0, g4.height / 2.0)).add(new Vector2(g5.width / 2.0, g5.height / 2.0));
+        g5.position = g4.position.add(new Vector2(g4.width / 2.0, g4.height / 2.0)).add(new Vector2(g5.width / 2.0, g5.height / 2.0 - 0.4));
         world.register(g5);
     }
 }
