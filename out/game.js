@@ -18,6 +18,7 @@ import { MaxDistanceJoint } from "./maxdistance.js";
 import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
 import { Polygon } from "./polygon.js";
+export let gWorld;
 export class Game {
     constructor(renderer) {
         this.cursorPos = new Vector2(0, 0);
@@ -35,6 +36,7 @@ export class Game {
         let viewportTransform = Util.viewport(Settings.width, Settings.height);
         this.renderer.init(viewportTransform, projectionTransform, this.camera.cameraTransform);
         this.world = new World();
+        gWorld = this.world;
         const restartBtn = document.querySelector("#restart");
         restartBtn.addEventListener("click", () => {
             this.initDemo();

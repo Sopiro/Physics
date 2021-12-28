@@ -20,6 +20,8 @@ import { PrismaticJoint } from "./prismatic.js";
 import { MotorJoint } from "./motor.js";
 import { Polygon } from "./polygon.js";
 
+export let gWorld: World;
+
 export class Game
 {
     private renderer: Renderer;
@@ -53,6 +55,7 @@ export class Game
         this.renderer.init(viewportTransform, projectionTransform, this.camera.cameraTransform);
 
         this.world = new World();
+        gWorld = this.world;
 
         const restartBtn = document.querySelector("#restart") as HTMLButtonElement;
         restartBtn.addEventListener("click", () =>

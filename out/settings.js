@@ -1,3 +1,4 @@
+import { gWorld } from "./game.js";
 import * as Util from "./util.js";
 export var GenerationShape;
 (function (GenerationShape) {
@@ -89,7 +90,10 @@ pause.checked = Settings.paused;
 pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
 const applyGravity = document.querySelector("#gravity");
 applyGravity.checked = Settings.applyGravity;
-applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
+applyGravity.addEventListener("click", () => {
+    gWorld.surprise();
+    Settings.applyGravity = applyGravity.checked;
+});
 const correction = document.querySelector("#correction");
 correction.checked = Settings.positionCorrection;
 correction.addEventListener("click", () => { Settings.positionCorrection = correction.checked; });

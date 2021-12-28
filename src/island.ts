@@ -49,8 +49,12 @@ export class Island
                 let angular_a = b.torque * b.inverseInertia * Settings.dt // Torque / Inertia * dt
                 b.angularVelocity += angular_a;
 
-                if ((linear_a.squaredLength >= Settings.restLinearTolerance) || (angular_a * angular_a >= Settings.restAngularTolerance))
+                if (this.sleeping &&
+                    (linear_a.squaredLength >= Settings.restLinearTolerance) || (angular_a * angular_a >= Settings.restAngularTolerance))
+                {
+                    this.sleeping = false;
                     awakeIsland = true;
+                }
             }
 
             if ((this.sleeping && !this.world.forceIntegration) ||
@@ -61,8 +65,8 @@ export class Island
             }
             else
             {
-                b.awake();
                 this.sleeping = false;
+                awakeIsland = true;
             }
 
             // Apply gravity 
@@ -76,15 +80,6 @@ export class Island
 
         // If island is sleeping, skip the extra computation
         if (this.sleeping) return;
-
-        if (awakeIsland)
-        {
-            for (let i = 0; i < this.bodies.length; i++)
-            {
-                let b = this.bodies[i];
-                b.awake();
-            }
-        }
 
         // Prepare for solving
         {
@@ -135,6 +130,8 @@ export class Island
         for (let i = 0; i < this.bodies.length; i++)
         {
             let b = this.bodies[i];
+
+            if (awakeIsland) b.awake();
 
             b.force.clear();
             b.torque = 0;

@@ -1,3 +1,4 @@
+import { gWorld } from "./game.js";
 import * as Util from "./util.js";
 
 export enum GenerationShape
@@ -98,7 +99,12 @@ pause.addEventListener("click", () => { Settings.paused = !Settings.paused; });
 
 const applyGravity = document.querySelector("#gravity")! as HTMLInputElement;
 applyGravity.checked = Settings.applyGravity;
-applyGravity.addEventListener("click", () => { Settings.applyGravity = applyGravity.checked; });
+applyGravity.addEventListener("click", () =>
+{
+    gWorld.surprise();
+    Settings.applyGravity = applyGravity.checked;
+});
+
 
 const correction = document.querySelector("#correction")! as HTMLInputElement;
 correction.checked = Settings.positionCorrection;
