@@ -3,9 +3,7 @@
 2D Rigid body physics engine implemented in HTML canvas with Typescript.
 
 Live demo: https://sopiro.github.io/Physics/  
-
-Video1: https://youtu.be/mHnHj9HHSBg  
-Video2: https://youtu.be/57seMGrGWhw
+Video: https://youtu.be/ROAqjE40pxU  
 
 ## Examples
 |![example1](.github/Animation1.gif)|![example2](.github/Animation2.gif)|
@@ -13,7 +11,7 @@ Video2: https://youtu.be/57seMGrGWhw
 |![example3](.github/Animation3.gif)|![example4](.github/Animation4.gif)|
 
 ## Features
-- Basic input, Rendering system
+- Basic input, rendering system
 - Collision detection
   - Convex polygons and circles
   - AABB Broad phase
