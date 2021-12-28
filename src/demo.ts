@@ -1254,7 +1254,7 @@ function demo22(game: Game, world: World): void
             if (Input.isKeyDown(" "))
             {
                 body.awake();
-                motor.maxTorque = 60.0;
+                motor.maxTorque = 100.0;
                 motor.angularOffset = wheel1.rotation - body.rotation;
             }
         }

@@ -21,8 +21,8 @@ export class World
 
     public manifoldMap: Map<number, ContactManifold> = new Map();
     public jointMap: Map<number, Joint> = new Map();
-
     public passTestSet: Set<number> = new Set();
+
     public numIslands: number = 0;
     public sleepingIslands: number = 0;
     public sleepingBodies: number = 0;
