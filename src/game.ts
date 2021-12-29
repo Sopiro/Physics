@@ -255,7 +255,6 @@ export class Game
         if (Input.isKeyPressed("b")) updateSetting("b");
         if (Input.isKeyPressed("i")) updateSetting("i");
         if (Input.isKeyPressed("f")) updateSetting("f");
-        if (Input.isKeyPressed("s")) this.world.surprise();
     }
 
     render(r: Renderer): void

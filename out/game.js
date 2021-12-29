@@ -192,8 +192,6 @@ export class Game {
             updateSetting("i");
         if (Input.isKeyPressed("f"))
             updateSetting("f");
-        if (Input.isKeyPressed("s"))
-            this.world.surprise();
     }
     render(r) {
         r.setCameraTransform(this.camera.cameraTransform);
