@@ -1020,7 +1020,7 @@ function demo20(game: Game, world: World): void
     // Right arm
     {
         j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), force, torque_upper_arm, frequency, 1);
-        (j as MotorJoint).initialAngle = -Math.PI / 2.0 + 0.3;
+        (j as MotorJoint).initialAngleOffset = -Math.PI / 2.0 + 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, false);
@@ -1044,7 +1044,7 @@ function demo20(game: Game, world: World): void
     // Left arm
     {
         j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), force, torque_upper_arm, frequency, 1);
-        (j as MotorJoint).initialAngle = Math.PI / 2.0 - 0.3;
+        (j as MotorJoint).initialAngleOffset = Math.PI / 2.0 - 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, false);
@@ -1222,7 +1222,7 @@ function demo22(game: Game, world: World): void
         j.drawConnectionLine = false;
         world.register(j, true);
 
-        let motor = new MotorJoint(body, wheel1, wheel1.position, 300, 100);
+        let motor = new MotorJoint(body, wheel1, wheel1.position, 100, 100);
         motor.drawAnchor = false;
         world.register(motor);
 
@@ -1288,6 +1288,7 @@ function demo22(game: Game, world: World): void
         world.register(g3);
 
         let ss = new Box(12, 0.2);
+        ss.mass = 10.0;
         ss.position = new Vector2(29, -0.4);
         world.register(ss);
 

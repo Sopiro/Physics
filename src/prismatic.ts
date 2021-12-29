@@ -24,15 +24,17 @@ export class PrismaticJoint extends Joint
         bodyA: RigidBody, bodyB: RigidBody,
         anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
         dir?: Vector2,
-        frequency = 30, dampingRatio = 1.0, mass = -1
+        frequency = 30, dampingRatio = 1.0, jointMass = -1
     )
     {
-        super(bodyA, bodyB);
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
 
         if (bodyA.type == Type.Static && bodyB.type == Type.Static)
             throw "Can't make prismatic constraint between static bodies";
+        if (bodyA.type == Type.Dynamic && bodyB.type == Type.Dynamic)
+            throw "Can't make prismatic constraint between dynamic bodies";
         if (bodyB.type == Type.Static)
-            throw "Please make prismatic constraint by using the bodyA as a static body"
+            throw "Please make prismatic constraint by using the bodyA as a static body";
 
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
@@ -50,18 +52,6 @@ export class PrismaticJoint extends Joint
         }
 
         Util.assert(this.t.squaredLength > 0);
-
-        if (mass <= 0) mass = bodyB.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
     }
 
     override prepare(): void

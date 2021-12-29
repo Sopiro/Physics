@@ -36,8 +36,8 @@ export class RigidBody extends Entity
     public resting: number = 0;
     public sleeping: boolean = false;
 
-    // Callback function that will be called after the constraint is solved
-    // If the callback returns true, it reset itself to undefined
+    // Callback function which is called after the constraint is solved
+    // If the callback returns true, it will reset itself to undefined
     public onContact?: (contactInfo: ContactInfo) => boolean;
 
     constructor(type: Type)

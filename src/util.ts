@@ -5,6 +5,12 @@ import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Settings } from "./settings.js";
 
+export interface Pair<A, B>
+{
+    p1: A;
+    p2: B;
+}
+
 export function toFixed(value: number, limit = 1e-13): number
 {
     return Math.round(value / limit) * limit;
@@ -81,12 +87,6 @@ export function createRegularPolygon(radius: number, numVertices: number = -1, i
     }
 
     return new Polygon(vertices, Type.Dynamic);
-}
-
-export interface Pair<A, B>
-{
-    p1: A;
-    p2: B;
 }
 
 export function random(left: number = -1, right: number = 1): number

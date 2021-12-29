@@ -789,7 +789,7 @@ function demo20(game, world) {
     // Right arm
     {
         j = new MotorJoint(body3, upper_arm_r, new Vector2(arm_start_x - 0.2, arm_start_y), force, torque_upper_arm, frequency, 1);
-        j.initialAngle = -Math.PI / 2.0 + 0.3;
+        j.initialAngleOffset = -Math.PI / 2.0 + 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, false);
@@ -809,7 +809,7 @@ function demo20(game, world) {
     // Left arm
     {
         j = new MotorJoint(body3, upper_arm_l, new Vector2(-(arm_start_x - 0.2), arm_start_y), force, torque_upper_arm, frequency, 1);
-        j.initialAngle = Math.PI / 2.0 - 0.3;
+        j.initialAngleOffset = Math.PI / 2.0 - 0.3;
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j, false);
@@ -950,7 +950,7 @@ function demo22(game, world) {
         j = new RevoluteJoint(body, wheel2, wheel2.position, 2, 0.5);
         j.drawConnectionLine = false;
         world.register(j, true);
-        let motor = new MotorJoint(body, wheel1, wheel1.position, 300, 100);
+        let motor = new MotorJoint(body, wheel1, wheel1.position, 100, 100);
         motor.drawAnchor = false;
         world.register(motor);
         game.callback = () => {
@@ -1001,6 +1001,7 @@ function demo22(game, world) {
         g3.friction = 1.0;
         world.register(g3);
         let ss = new Box(12, 0.2);
+        ss.mass = 10.0;
         ss.position = new Vector2(29, -0.4);
         world.register(ss);
         let j = new RevoluteJoint(g3, ss, ss.position);

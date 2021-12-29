@@ -10,11 +10,12 @@ export class MotorJoint extends Joint
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
 
-    public initialAngle: number;
+    public initialAngleOffset: number;
     public linearOffset: Vector2;
     public angularOffset: number;
-    public maxForce: number;
-    public maxTorque: number;
+
+    private _maxForce: number;
+    private _maxTorque: number;
 
     private ra!: Vector2;
     private rb!: Vector2;
@@ -29,30 +30,20 @@ export class MotorJoint extends Joint
         bodyA: RigidBody, bodyB: RigidBody,
         anchor: Vector2 = bodyB.position,
         maxForce = 1000.0, maxTorque = 1000.0,
-        frequency = 60, dampingRatio = 1.0, mass = -1
+        frequency = 60, dampingRatio = 1.0, jointMass = -1
     )
     {
-        super(bodyA, bodyB);
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
+
         this.linearOffset = new Vector2();
-        this.initialAngle = bodyB.rotation - bodyA.rotation;
+        this.initialAngleOffset = bodyB.rotation - bodyA.rotation;
         this.angularOffset = 0.0;
-        this.maxForce = maxForce;
-        this.maxTorque = maxTorque;
+
+        this._maxForce = Util.clamp(maxForce, 0, Number.MAX_VALUE);
+        this._maxTorque = Util.clamp(maxTorque, 0, Number.MAX_VALUE);;
 
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchor, 1);
-
-        if (mass <= 0) mass = bodyB.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
 
         this.drawConnectionLine = false;
     }
@@ -91,7 +82,7 @@ export class MotorJoint extends Joint
         let pb = this.bodyB.position.add(this.rb);
 
         let error0 = pb.sub(pa.add(this.linearOffset));
-        let error1 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle - this.angularOffset;
+        let error1 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngleOffset - this.angularOffset;
 
         if (Settings.positionCorrection)
         {
@@ -100,7 +91,7 @@ export class MotorJoint extends Joint
         }
         else
         {
-            this.bias0 = new Vector2(0, 0);
+            this.bias0 = new Vector2(0.0, 0.0);
             this.bias1 = 0.0;
         }
 
@@ -123,7 +114,7 @@ export class MotorJoint extends Joint
 
         // Clamp linear impulse
         {
-            let maxLinearImpulse = Settings.dt * this.maxForce;
+            let maxLinearImpulse = Settings.dt * this._maxForce;
             let oldLinearImpulse = this.linearImpulseSum.copy();
             this.linearImpulseSum = this.linearImpulseSum.add(lambda0);
 
@@ -135,7 +126,7 @@ export class MotorJoint extends Joint
 
         // Clamp angular impulse
         {
-            let maxAngularImpulse = Settings.dt * this.maxTorque;
+            let maxAngularImpulse = Settings.dt * this._maxTorque;
             let oldAngularImpulse = this.angularImpulseSum;
             this.angularImpulseSum += lambda1;
 
@@ -161,5 +152,25 @@ export class MotorJoint extends Joint
         // Solve for angle constraint
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - lambda1 * this.bodyA.inverseInertia;
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + lambda1 * this.bodyB.inverseInertia;
+    }
+    
+    get maxForce(): number
+    {
+        return this._maxForce;
+    }
+
+    set maxForce(maxForce: number)
+    {
+        this._maxForce = Util.clamp(maxForce, 0, Number.MAX_VALUE);
+    }
+        
+    get maxTorque(): number
+    {
+        return this._maxTorque;
+    }
+
+    set maxTorque(maxTorque: number)
+    {
+        this._maxTorque = Util.clamp(maxTorque, 0, Number.MAX_VALUE);
     }
 }

@@ -17,24 +17,13 @@ export class GrabJoint extends Joint
     constructor(
         body: RigidBody, anchor: Vector2,
         target: Vector2,
-        frequency = 0.8, dampingRatio = 0.6, mass = -1
+        frequency = 0.8, dampingRatio = 0.6, jointMass = -1
     )
     {
-        super(body, body);
+        super(body, body, frequency, dampingRatio, jointMass);
+
         this.localAnchor = body.globalToLocal.mulVector2(anchor, 1);
         this.target = target;
-
-        if (mass <= 0) mass = body.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
     }
 
     override prepare(): void

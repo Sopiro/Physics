@@ -8,7 +8,8 @@ export class MaxDistanceJoint extends Joint
 {
     public readonly localAnchorA: Vector2;
     public readonly localAnchorB: Vector2;
-    public maxDistance;
+    
+    private _maxDistance: number;
 
     private ra!: Vector2;
     private rb!: Vector2;
@@ -21,25 +22,15 @@ export class MaxDistanceJoint extends Joint
         bodyA: RigidBody, bodyB: RigidBody,
         maxDistance: number = -1,
         anchorA: Vector2 = bodyA.position, anchorB: Vector2 = bodyB.position,
-        frequency = 15, dampingRatio = 1.0, mass = -1
+        frequency = 15, dampingRatio = 1.0, jointMass = -1
     )
     {
-        super(bodyA, bodyB);
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
+
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
-        this.maxDistance = maxDistance <= 0 ? anchorB.sub(anchorA).length : maxDistance;
 
-        if (mass <= 0) mass = bodyB.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
+        this._maxDistance = maxDistance <= 0 ? anchorB.sub(anchorA).length : maxDistance;
     }
 
     override prepare(): void
@@ -55,7 +46,7 @@ export class MaxDistanceJoint extends Joint
         let pb = this.bodyB.position.add(this.rb);
 
         let u = pb.sub(pa);
-        let error = (u.length - this.maxDistance);
+        let error = (u.length - this._maxDistance);
 
         // Inequality constraint needs to check if the constraint is violated. If not, then do nothing.
         if (error < 0)
@@ -112,5 +103,15 @@ export class MaxDistanceJoint extends Joint
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(lambda, this.ra)) * this.bodyA.inverseInertia;
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.n.mul(lambda * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(lambda, this.rb)) * this.bodyB.inverseInertia;
+    }
+
+    get maxDistance(): number
+    {
+        return this._maxDistance;
+    }
+
+    set maxDistance(maxDistance: number)
+    {
+        this._maxDistance = Util.clamp(maxDistance, 0, Number.MAX_VALUE);
     }
 }

@@ -10,7 +10,7 @@ export class WeldJoint extends Joint
     public localAnchorA: Vector2;
     public localAnchorB: Vector2;
 
-    private initialAngle: number;
+    public initialAngleOffset: number;
 
     private ra!: Vector2;
     private rb!: Vector2;
@@ -21,25 +21,14 @@ export class WeldJoint extends Joint
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
         anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
-        frequency = 240, dampingRatio = 1.0, mass = -1
+        frequency = 240, dampingRatio = 1.0, jointMass = -1
     )
     {
-        super(bodyA, bodyB);
-        this.initialAngle = bodyB.rotation - bodyA.rotation;
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
+
+        this.initialAngleOffset = bodyB.rotation - bodyA.rotation;
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchor, 1);
-
-        if (mass <= 0) mass = bodyB.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
 
         this.drawAnchor = false;
         this.drawConnectionLine = false;
@@ -85,7 +74,7 @@ export class WeldJoint extends Joint
         let pb = this.bodyB.position.add(this.rb);
 
         let error01 = pb.sub(pa);
-        let error2 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
+        let error2 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngleOffset;
 
         if (Settings.positionCorrection)
             this.bias = new Vector3(error01.x, error01.y, error2).mul(this.beta * Settings.inv_dt);

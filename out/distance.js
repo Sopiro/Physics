@@ -2,23 +2,12 @@ import { Joint } from "./joint.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 export class DistanceJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, length = -1, frequency = 15, dampingRatio = 1.0, mass = -1) {
-        super(bodyA, bodyB);
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, length = -1, frequency = 15, dampingRatio = 1.0, jointMass = -1) {
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
         this.impulseSum = 0.0;
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchorB, 1);
-        this.length = length <= 0 ? anchorB.sub(anchorA).length : length;
-        if (mass <= 0)
-            mass = bodyB.mass;
-        if (frequency <= 0)
-            frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
+        this._length = length <= 0 ? anchorB.sub(anchorA).length : length;
     }
     prepare() {
         // Calculate Jacobian J and effective mass M
@@ -35,7 +24,7 @@ export class DistanceJoint extends Joint {
             + this.bodyB.inverseInertia * this.n.cross(this.rb) * this.n.cross(this.rb)
             + this.gamma;
         this.m = 1.0 / k;
-        let error = (u.length - this.length);
+        let error = (u.length - this._length);
         if (Settings.positionCorrection)
             this.bias = error * this.beta * Settings.inv_dt;
         else
@@ -63,5 +52,11 @@ export class DistanceJoint extends Joint {
         this.bodyA.angularVelocity = this.bodyA.angularVelocity - this.n.dot(Util.cross(lambda, this.ra)) * this.bodyA.inverseInertia;
         this.bodyB.linearVelocity = this.bodyB.linearVelocity.add(this.n.mul(lambda * this.bodyB.inverseMass));
         this.bodyB.angularVelocity = this.bodyB.angularVelocity + this.n.dot(Util.cross(lambda, this.rb)) * this.bodyB.inverseInertia;
+    }
+    get length() {
+        return this._length;
+    }
+    set length(length) {
+        this._length = Util.clamp(length, 0, Number.MAX_VALUE);
     }
 }

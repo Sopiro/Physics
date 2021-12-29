@@ -12,11 +12,9 @@ export class Polygon extends RigidBody
     constructor(vertices: Vector2[], type: Type = Type.Dynamic, resetPosition: boolean = true)
     {
         super(type);
-
         this.vertices = vertices;
 
         let centerOfMass = new Vector2(0, 0);
-
         let count = this.count;
 
         for (let i = 0; i < count; i++)

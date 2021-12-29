@@ -8,11 +8,14 @@ export class Engine
     public cvs: HTMLCanvasElement;
     public gfx: CanvasRenderingContext2D;
     public frameCounter: HTMLDivElement;
+
     public renderer: Renderer;
     public game: Game;
+
     public time: number;
     private lastTime: number = 0.0;
     private frames: number = 0;
+    
     public static fps: number = 0;
 
     constructor()

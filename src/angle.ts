@@ -1,11 +1,10 @@
 import { Joint } from "./joint.js";
 import { RigidBody } from "./rigidbody.js";
 import { Settings } from "./settings.js";
-import * as Util from "./util.js";
 
 export class AngleJoint extends Joint
 {
-    private initialAngle: number;
+    public initialAngleOffset: number;
 
     private m!: number;
     private bias!: number;
@@ -13,24 +12,12 @@ export class AngleJoint extends Joint
 
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
-        frequency = 60, dampingRatio = 1.0, mass = -1
+        frequency = 60, dampingRatio = 1.0, jointMass = -1
     )
     {
-        super(bodyA, bodyB);
-
-        this.initialAngle = bodyB.rotation - bodyA.rotation;
-
-        if (mass <= 0) mass = bodyB.mass;
-        if (frequency <= 0) frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
+        
+        this.initialAngleOffset = bodyB.rotation - bodyA.rotation;
     }
 
     override prepare(): void
@@ -43,7 +30,7 @@ export class AngleJoint extends Joint
 
         this.m = 1.0 / k;
 
-        let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
+        let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngleOffset;
 
         if (Settings.positionCorrection)
             this.bias = error * this.beta * Settings.inv_dt;

@@ -5,11 +5,13 @@ import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 // Line joint + Angle joint
 export class PrismaticJoint extends Joint {
-    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, dir, frequency = 30, dampingRatio = 1.0, mass = -1) {
-        super(bodyA, bodyB);
+    constructor(bodyA, bodyB, anchorA = bodyA.position, anchorB = bodyB.position, dir, frequency = 30, dampingRatio = 1.0, jointMass = -1) {
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
         this.impulseSum = new Vector2();
         if (bodyA.type == Type.Static && bodyB.type == Type.Static)
             throw "Can't make prismatic constraint between static bodies";
+        if (bodyA.type == Type.Dynamic && bodyB.type == Type.Dynamic)
+            throw "Can't make prismatic constraint between dynamic bodies";
         if (bodyB.type == Type.Static)
             throw "Please make prismatic constraint by using the bodyA as a static body";
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchorA, 1);
@@ -23,17 +25,6 @@ export class PrismaticJoint extends Joint {
             this.t = new Vector2(-dir.y, dir.x).normalized();
         }
         Util.assert(this.t.squaredLength > 0);
-        if (mass <= 0)
-            mass = bodyB.mass;
-        if (frequency <= 0)
-            frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
     }
     prepare() {
         // Calculate Jacobian J and effective mass M

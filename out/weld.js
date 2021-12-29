@@ -4,23 +4,12 @@ import * as Util from "./util.js";
 import { Joint } from "./joint.js";
 // Revolute joint + Angle joint
 export class WeldJoint extends Joint {
-    constructor(bodyA, bodyB, anchor = Util.mid(bodyA.position, bodyB.position), frequency = 240, dampingRatio = 1.0, mass = -1) {
-        super(bodyA, bodyB);
+    constructor(bodyA, bodyB, anchor = Util.mid(bodyA.position, bodyB.position), frequency = 240, dampingRatio = 1.0, jointMass = -1) {
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
         this.impulseSum = new Vector3();
-        this.initialAngle = bodyB.rotation - bodyA.rotation;
+        this.initialAngleOffset = bodyB.rotation - bodyA.rotation;
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchor, 1);
-        if (mass <= 0)
-            mass = bodyB.mass;
-        if (frequency <= 0)
-            frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
         this.drawAnchor = false;
         this.drawConnectionLine = false;
     }
@@ -50,7 +39,7 @@ export class WeldJoint extends Joint {
         let pa = this.bodyA.position.add(this.ra);
         let pb = this.bodyB.position.add(this.rb);
         let error01 = pb.sub(pa);
-        let error2 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
+        let error2 = this.bodyB.rotation - this.bodyA.rotation - this.initialAngleOffset;
         if (Settings.positionCorrection)
             this.bias = new Vector3(error01.x, error01.y, error2).mul(this.beta * Settings.inv_dt);
         else

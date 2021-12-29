@@ -10,14 +10,7 @@ import { Circle } from "./circle.js";
 import { createAABB } from "./detection.js";
 import { GenerationShape, MouseMode, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
-import { RevoluteJoint } from "./revolute.js";
-import { DistanceJoint } from "./distance.js";
 import { GrabJoint } from "./grab.js";
-import { WeldJoint } from "./weld.js";
-import { LineJoint } from "./line.js";
-import { MaxDistanceJoint } from "./maxdistance.js";
-import { PrismaticJoint } from "./prismatic.js";
-import { MotorJoint } from "./motor.js";
 import { Polygon } from "./polygon.js";
 
 export let gWorld: World;
@@ -27,6 +20,7 @@ export class Game
     private renderer: Renderer;
     public camera: Camera;
     private world: World;
+
     public cursorPos: Vector2 = new Vector2(0, 0);
     public deltaTime: number = 0.0;
     public time: number = 0.0;
@@ -257,7 +251,7 @@ export class Game
         if (Input.isKeyPressed("r")) this.initDemo();
         if (Input.isKeyPressed("m")) updateSetting("m");
         if (Input.isKeyPressed("p")) updateSetting("p");
-        if (Input.isKeyPressed("g")) updateSetting("g");
+        if (Input.isKeyPressed("g")) { this.world.surprise(); updateSetting("g"); }
         if (Input.isKeyPressed("b")) updateSetting("b");
         if (Input.isKeyPressed("i")) updateSetting("i");
         if (Input.isKeyPressed("f")) updateSetting("f");
@@ -357,125 +351,7 @@ export class Game
         for (let i = 0; i < this.world.joints.length; i++)
         {
             let j = this.world.joints[i];
-
-            if (j instanceof RevoluteJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, j.bodyA.position);
-                    r.drawLineV(anchorB, j.bodyB.position);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA, 0.03);
-                }
-            }
-            else if (j instanceof DistanceJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, anchorB);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA, 0.03);
-                    r.drawCircleV(anchorB, 0.03);
-                }
-            } else if (j instanceof MaxDistanceJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, anchorB);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA, 0.03);
-                    r.drawCircleV(anchorB, 0.03);
-                }
-            }
-            else if (j instanceof GrabJoint)
-            {
-                let anchor = j.bodyA.localToGlobal.mulVector2(j.localAnchor, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchor, j.target);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchor, 0.03);
-                    r.drawCircleV(j.target, 0.03);
-                }
-            }
-            else if (j instanceof WeldJoint)
-            {
-                let anchor = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(j.bodyA.position, j.bodyB.position);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchor, 0.03);
-                }
-            } else if (j instanceof LineJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, anchorB);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA, 0.03);
-                    r.drawCircleV(anchorB, 0.03);
-                }
-            }
-            else if (j instanceof PrismaticJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, anchorB);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA, 0.03);
-                    r.drawCircleV(anchorB, 0.03);
-                }
-            }
-            else if (j instanceof MotorJoint)
-            {
-                let anchorA = j.bodyA.localToGlobal.mulVector2(j.localAnchorA, 1);
-                let anchorB = j.bodyB.localToGlobal.mulVector2(j.localAnchorB, 1);
-
-                if (j.drawConnectionLine)
-                {
-                    r.drawLineV(anchorA, anchorB);
-                }
-                if (j.drawAnchor)
-                {
-                    r.drawCircleV(anchorA.add(j.linearOffset), 0.03);
-                    r.drawCircleV(anchorB, 0.03);
-                }
-            }
-
-            // if (Settings.showContactLink)
-            //     r.drawLineV(j.bodyA.position, j.bodyB.position);
+            r.drawJoint(j);
         }
 
         // Log rigid body information

@@ -1,22 +1,10 @@
 import { Joint } from "./joint.js";
 import { Settings } from "./settings.js";
-import * as Util from "./util.js";
 export class AngleJoint extends Joint {
-    constructor(bodyA, bodyB, frequency = 60, dampingRatio = 1.0, mass = -1) {
-        super(bodyA, bodyB);
+    constructor(bodyA, bodyB, frequency = 60, dampingRatio = 1.0, jointMass = -1) {
+        super(bodyA, bodyB, frequency, dampingRatio, jointMass);
         this.impulseSum = 0.0;
-        this.initialAngle = bodyB.rotation - bodyA.rotation;
-        if (mass <= 0)
-            mass = bodyB.mass;
-        if (frequency <= 0)
-            frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
+        this.initialAngleOffset = bodyB.rotation - bodyA.rotation;
     }
     prepare() {
         // Calculate Jacobian J and effective mass M
@@ -24,7 +12,7 @@ export class AngleJoint extends Joint {
         // M = (J · M^-1 · J^t)^-1
         let k = this.bodyA.inverseInertia + this.bodyB.inverseInertia + this.gamma;
         this.m = 1.0 / k;
-        let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngle;
+        let error = this.bodyB.rotation - this.bodyA.rotation - this.initialAngleOffset;
         if (Settings.positionCorrection)
             this.bias = error * this.beta * Settings.inv_dt;
         else

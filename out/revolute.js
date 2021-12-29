@@ -4,21 +4,10 @@ import * as Util from "./util.js";
 import { Joint } from "./joint.js";
 export class RevoluteJoint extends Joint {
     constructor(bodyA, bodyB, anchor, frequency = 15, dampingRatio = 1.0, mass = -1) {
-        super(bodyA, bodyB);
+        super(bodyA, bodyB, frequency, dampingRatio, mass);
         this.impulseSum = new Vector2();
         this.localAnchorA = this.bodyA.globalToLocal.mulVector2(anchor, 1);
         this.localAnchorB = this.bodyB.globalToLocal.mulVector2(anchor, 1);
-        if (mass <= 0)
-            mass = bodyB.mass;
-        if (frequency <= 0)
-            frequency = 0.01;
-        dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        let omega = 2 * Math.PI * frequency;
-        let d = 2 * mass * dampingRatio * omega; // Damping coefficient
-        let k = mass * omega * omega; // Spring constant
-        let h = Settings.dt;
-        this.beta = h * k / (d + h * k);
-        this.gamma = 1.0 / ((d + h * k) * h);
     }
     prepare() {
         // Calculate Jacobian J and effective mass M
