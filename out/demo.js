@@ -22,6 +22,7 @@ function demo1(game, world) {
     ground.restitution = 0.45;
     world.register(ground);
     let b = new Box(0.4);
+    b.mass = 2.0;
     b.position = new Vector2(0, 5);
     b.restitution = 0.7;
     b.angularVelocity = Util.random(-8, 8);
@@ -214,6 +215,7 @@ function demo9(game, world) {
     ground.restitution = 0.45;
     world.register(ground);
     let b = new Box(0.3);
+    b.mass = 2.0;
     b.position = new Vector2(-3, 5);
     world.register(b);
     let j = new RevoluteJoint(ground, b, new Vector2(0, 5));
@@ -231,12 +233,14 @@ function demo10(game, world) {
     let sizeH = 0.15;
     let gap = 0.1;
     let b1 = new Box(sizeW, sizeH);
+    b1.mass = 1.0;
     b1.position = new Vector2(xStart - (gap + sizeW), yStart);
     world.register(b1);
     let j = new RevoluteJoint(ground, b1, new Vector2(xStart, yStart));
     world.register(j);
     for (let i = 1; i < 12; i++) {
         let b2 = new Box(sizeW, sizeH);
+        b2.mass = 1.0;
         b2.position = new Vector2(xStart - (gap + sizeW) * (i + 1), yStart);
         world.register(b2);
         j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart), 8, 0.5);
@@ -398,13 +402,16 @@ function demo14(game, world) {
         let cos = Math.cos(rr);
         let sin = Math.sin(rr);
         let b2 = new Box(0.8, 0.03);
+        b2.mass = 2.0;
         b2.position = start;
         b2.rotation = rr;
         world.register(b2);
         let b1 = Util.createRegularPolygon(0.15);
+        b1.mass = 2.0;
         b1.position = start.add(new Vector2(cos, sin).mul(-0.4));
         world.register(b1);
         let b3 = Util.createRegularPolygon(0.15);
+        b3.mass = 2.0;
         b3.position = start.add(new Vector2(cos, sin).mul(0.4));
         world.register(b3);
         let j = new WeldJoint(b1, b2);
@@ -471,6 +478,7 @@ function demo16(game, world) {
     b.position = new Vector2(-4, 2.5);
     world.register(b);
     let b3 = new Box(1.2, 0.2);
+    b3.mass = 2.0;
     b3.position = new Vector2(3, 6);
     world.register(b3);
     j = new PrismaticJoint(b1, b3, undefined, undefined, new Vector2(1, 0));
@@ -479,16 +487,19 @@ function demo16(game, world) {
     j.drawConnectionLine = false;
     world.register(j);
     b = Util.createRegularPolygon(0.15);
+    b.mass = 2.0;
     b.position = new Vector2(2.5, 5.0);
     world.register(b);
     j = new DistanceJoint(b3, b);
     world.register(j);
     b = Util.createRegularPolygon(0.15);
+    b.mass = 2.0;
     b.position = new Vector2(2.5, 3.5);
     world.register(b);
     j = new DistanceJoint(b, j.bodyB);
     world.register(j);
     b = new Box(1.2, 0.2);
+    b.mass = 2.0;
     b.position = new Vector2(3.5, 2.5);
     world.register(b);
     j = new DistanceJoint(b, j.bodyA);
@@ -521,7 +532,8 @@ function demo17(game, world) {
     game.callback = () => {
         j.angularOffset = b2.rotation + 0.05;
         if ((game.frame - last_spawn) / Engine.fps > 0.2 * 144 * game.deltaTime) {
-            let c = Util.createRegularPolygon(0.15);
+            let c = Util.createRegularPolygon(0.15, undefined, undefined, 18.0);
+            console.log(c.density);
             c.position.x = Util.random(-1.8, 1.8);
             c.position.y = 6.0;
             world.register(c);
@@ -588,8 +600,7 @@ function demo18(game, world) {
     let last_spawn = 0;
     game.callback = () => {
         if ((game.frame - last_spawn) / Engine.fps > 0.3 * 144 * game.deltaTime) {
-            let c = Util.createRegularPolygon(Util.random(0.1, 0.25));
-            c.density = 20.0;
+            let c = Util.createRegularPolygon(Util.random(0.1, 0.25), undefined, undefined, 20.0);
             c.restitution = 0.3;
             c.position.x = Util.random(-5.5, -3.0);
             c.position.y = 7.0;
@@ -609,12 +620,14 @@ function demo19(game, world) {
     {
         let xStart = -3.0;
         let b0 = new Box(0.5);
+        b0.mass = 2.0;
         b0.position.x = xStart;
         b0.position.y = 4.0;
         world.register(b0);
         let sizeX = 1.0;
         let sizeY = 0.2;
         c1 = new Box(sizeX, sizeY);
+        c1.mass = 2.0;
         c1.repositionCenterOfMass(new Vector2(-sizeX / 2.0, 0.0));
         c1.position.x = xStart;
         c1.position.y = 1.5;
@@ -624,10 +637,12 @@ function demo19(game, world) {
         j.drawConnectionLine = false;
         world.register(j);
         let b1 = new Box(1.2, sizeY);
+        b1.mass = 2.0;
         b1.position.x = xStart;
         b1.position.y = 3.3;
         world.register(b1);
         let b2 = new Box(0.2, 2.0);
+        b2.mass = 2.0;
         b2.rotation = Math.atan2(sizeX, b1.position.y - c1.position.y);
         b2.position.x = xStart + sizeX / 2.0;
         b2.position.y = (c1.position.y + b1.position.y) / 2.0;
@@ -652,6 +667,7 @@ function demo19(game, world) {
         let xStart = 1.0;
         let yStart = 2.0;
         c2 = new Circle(0.7);
+        c2.mass = 2.0;
         c2.position.x = xStart;
         c2.position.y = yStart;
         world.register(c2);
@@ -659,6 +675,7 @@ function demo19(game, world) {
         j.drawConnectionLine = false;
         world.register(j);
         let b = new Box(1.5, 0.2);
+        b.mass = 2.0;
         b.position.x = xStart + 1.5 / 2.0 + 0.7;
         b.position.y = yStart;
         world.register(b);
@@ -666,6 +683,7 @@ function demo19(game, world) {
         j.drawConnectionLine = false;
         world.register(j, true);
         let b1 = new Box(2.0, 0.2);
+        b1.mass = 2.0;
         b1.position.x = xStart + 0.7 + 1.5 + 1.0;
         b1.position.y = yStart;
         world.register(b1);
@@ -679,6 +697,7 @@ function demo19(game, world) {
         m2 = new MotorJoint(ground, c2, c2.position);
         world.register(m2);
         b = new Box(0.4);
+        b.mass = 2.0;
         b.position = new Vector2(3.0, 5.0);
         b.friction = 0.8;
         world.register(b);
@@ -1020,7 +1039,7 @@ function demo22(game, world) {
         let sizeX = 1.0;
         let sizeY = 0.3;
         let gap = 0.1;
-        b = new Box(sizeX, sizeY);
+        b = new Box(sizeX, sizeY, Type.Dynamic, 7.0);
         b.position = new Vector2(xStart + sizeX / 2.0 + gap, yStart - sizeY / 2.0);
         world.register(b);
         j = new RevoluteJoint(g3, b, b.position.sub(new Vector2(sizeX / 2.0, 0)));
@@ -1029,7 +1048,7 @@ function demo22(game, world) {
         world.register(j);
         let count = 15;
         for (let i = 1; i < count; i++) {
-            let b2 = new Box(sizeX, sizeY);
+            let b2 = new Box(sizeX, sizeY, Type.Dynamic, 7.0);
             b2.position = new Vector2(xStart + (sizeX / 2.0 + gap) + (sizeX + gap) * i, yStart - sizeY / 2.0);
             world.register(b2);
             let j = new RevoluteJoint(b, b2, b2.position.sub(new Vector2((sizeX + gap) / 2.0, 0)), 32, 1.0);

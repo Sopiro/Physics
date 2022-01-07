@@ -20,7 +20,7 @@ export function lerpVector(a, b, uv) {
     // return a.mul(uv.u).add(b.mul(uv.v));
     return new Vector2(a.x * uv.u + b.x * uv.v, a.y * uv.u + b.y * uv.v);
 }
-export function createRandomConvexBody(radius, numVertices = -1) {
+export function createRandomConvexBody(radius, numVertices = -1, density = Settings.defaultDensity) {
     if (numVertices < 0)
         numVertices = Math.trunc(Math.random() * Settings.randomConvexMaxVertices);
     if (numVertices == 0)
@@ -34,10 +34,10 @@ export function createRandomConvexBody(radius, numVertices = -1) {
     angles.sort();
     let res = new Polygon(angles.map((angle) => {
         return new Vector2(Math.cos(angle), Math.sin(angle)).mul(radius);
-    }));
+    }), Type.Dynamic, undefined, density);
     return res;
 }
-export function createRegularPolygon(radius, numVertices = -1, initialAngle) {
+export function createRegularPolygon(radius, numVertices = -1, initialAngle, density = Settings.defaultDensity) {
     if (numVertices < 3)
         numVertices = Math.trunc(random(3, Settings.regularPolygonMaxVertices));
     let angleStart = initialAngle != undefined ? initialAngle : Math.PI / 2.0;
@@ -49,7 +49,7 @@ export function createRegularPolygon(radius, numVertices = -1, initialAngle) {
         let currentAngle = angleStart + angle * i;
         vertices.push(new Vector2(Math.cos(currentAngle), Math.sin(currentAngle)).mul(radius * 1.4142));
     }
-    return new Polygon(vertices, Type.Dynamic);
+    return new Polygon(vertices, Type.Dynamic, true, density);
 }
 export function random(left = -1, right = 1) {
     if (left > right) {

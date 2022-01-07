@@ -25,28 +25,32 @@ export class RigidBody extends Entity {
         this._restitution = Settings.defaultRestitution;
         this._surfaceSpeed = 0.0;
         this.type = type;
-        switch (this.type) {
-            case Type.Static:
-                this._mass = Number.MAX_VALUE;
-                this._invMass = 0;
-                this._inertia = Number.MAX_VALUE;
-                this._invInertia = 0;
-                this.sleeping = true;
-                break;
-            case Type.Dynamic:
-                this._mass = Settings.defaultMass;
-                this._invMass = 1 / this._mass;
-                this._inertia = Util.calculateBoxInertia(Settings.defaultSize, Settings.defaultSize, Settings.defaultMass);
-                this._invInertia = 1 / this._inertia;
-                break;
+        if (this.type == Type.Static) {
+            this._density = Number.MAX_VALUE;
+            this._mass = Number.MAX_VALUE;
+            this._invMass = 0;
+            this._inertia = Number.MAX_VALUE;
+            this._invInertia = 0;
+            this.sleeping = true;
         }
+        else {
+            // This part is implemented by children.
+        }
+    }
+    get density() {
+        return this._density;
+    }
+    set density(d) {
+        Util.assert(d > 0);
+        this._density = d;
     }
     get mass() {
         return this._mass;
     }
     set mass(m) {
-        this._mass = Util.clamp(m, 0, Number.MAX_VALUE);
-        this._invMass = this._mass == 0 ? 0 : 1.0 / this._mass;
+        Util.assert(m > 0);
+        this._mass = m;
+        this._invMass = 1.0 / m;
     }
     get inverseMass() {
         return this._invMass;
@@ -55,8 +59,9 @@ export class RigidBody extends Entity {
         return this._inertia;
     }
     set inertia(i) {
-        this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
-        this._invInertia = this._inertia == Number.MAX_VALUE ? 0 : 1.0 / this._inertia;
+        Util.assert(i > 0);
+        this._inertia = i;
+        this._invInertia = 1.0 / i;
     }
     get inverseInertia() {
         return this._invInertia;
@@ -65,13 +70,15 @@ export class RigidBody extends Entity {
         return this._friction;
     }
     set friction(f) {
-        this._friction = Util.clamp(f, 0.0, Number.MAX_VALUE);
+        Util.assert(f > 0);
+        this._friction = f;
     }
     get restitution() {
         return this._restitution;
     }
     set restitution(r) {
-        this._restitution = Util.clamp(r, 0.0, 1.0);
+        Util.assert(r >= 0 && r <= 1.0);
+        this._restitution = r;
     }
     get surfaceSpeed() {
         return this._surfaceSpeed;

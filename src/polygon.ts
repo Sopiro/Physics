@@ -1,15 +1,15 @@
 import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
+import { Settings } from "./settings.js";
 
 // Children: Box
 export class Polygon extends RigidBody
 {
     public readonly vertices: Vector2[];
     public readonly area: number;
-    protected _density: number;
 
-    constructor(vertices: Vector2[], type: Type = Type.Dynamic, resetPosition: boolean = true)
+    constructor(vertices: Vector2[], type: Type = Type.Dynamic, resetPosition: boolean = true, density: number = Settings.defaultDensity)
     {
         super(type);
         this.vertices = vertices;
@@ -38,12 +38,16 @@ export class Polygon extends RigidBody
 
             area += this.vertices[i - 1].cross(this.vertices[i]);
         }
-
         area += this.vertices[count - 1].cross(this.vertices[0]);
 
         this.area = Math.abs(area) / 2.0;
-        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = this.mass / this.area;
+
+        if(this.type == Type.Dynamic)
+        {
+            super.density = density;
+            super.mass = super.density * this.area;
+            super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
+        }
 
         if (!resetPosition)
             this.translate(centerOfMass);
@@ -72,21 +76,21 @@ export class Polygon extends RigidBody
     // This will automatically set the inertia
     set mass(mass: number)
     {
+        super.density = mass / this.area;
         super.mass = mass;
         super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = mass / this.area;
     }
 
-    get density(): number
+    override get density(): number
     {
-        return this._density;
+        return super.density;
     }
 
     // This will automatically set the mass and inertia
-    set density(density: number)
+    override set density(density: number)
     {
+        super.density = density;
         super.mass = density * this.area;
         super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = density;
     }
 }

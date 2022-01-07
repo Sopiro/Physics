@@ -1,9 +1,10 @@
 import { RigidBody, Type } from "./rigidbody.js";
 import { Vector2 } from "./math.js";
 import * as Util from "./util.js";
+import { Settings } from "./settings.js";
 // Children: Box
 export class Polygon extends RigidBody {
-    constructor(vertices, type = Type.Dynamic, resetPosition = true) {
+    constructor(vertices, type = Type.Dynamic, resetPosition = true, density = Settings.defaultDensity) {
         super(type);
         this.vertices = vertices;
         let centerOfMass = new Vector2(0, 0);
@@ -24,8 +25,11 @@ export class Polygon extends RigidBody {
         }
         area += this.vertices[count - 1].cross(this.vertices[0]);
         this.area = Math.abs(area) / 2.0;
-        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = this.mass / this.area;
+        if (this.type == Type.Dynamic) {
+            super.density = density;
+            super.mass = super.density * this.area;
+            super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
+        }
         if (!resetPosition)
             this.translate(centerOfMass);
     }
@@ -44,17 +48,17 @@ export class Polygon extends RigidBody {
     }
     // This will automatically set the inertia
     set mass(mass) {
+        super.density = mass / this.area;
         super.mass = mass;
         super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = mass / this.area;
     }
     get density() {
-        return this._density;
+        return super.density;
     }
     // This will automatically set the mass and inertia
     set density(density) {
+        super.density = density;
         super.mass = density * this.area;
         super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
-        this._density = density;
     }
 }

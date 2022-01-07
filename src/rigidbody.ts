@@ -12,17 +12,21 @@ export enum Type
 
 
 // Children: Circle, Polygon
-export class RigidBody extends Entity
+export abstract class RigidBody extends Entity
 {
     // Center of mass in local space = (0, 0)
     private _force: Vector2;            // N
     private _torque: number;            // N⋅m
-    private _mass: number;              // kg
-    private _invMass: number;
-    private _inertia: number;           // kg⋅m²
-    private _invInertia: number;
+
     private _linearVelocity: Vector2;   // m/s
     private _angularVelocity: number;   // rad/s
+
+    private _density!: number;          // kg/m²
+    private _mass!: number;             // kg
+    private _invMass!: number;
+    private _inertia!: number;          // kg⋅m²
+    private _invInertia!: number;
+
     private _friction: number;
     private _restitution: number;
     private _surfaceSpeed: number;      // m/s (Tangential speed)
@@ -31,8 +35,8 @@ export class RigidBody extends Entity
 
     public id: number = -1;
     public islandID: number = 0;
-    public manifoldIDs: number[] = []; // ids of contact manifold containing this body
-    public jointIDs: number[] = [];   // ids of the joint containing this body
+    public manifoldIDs: number[] = [];  // ids of contact manifold containing this body
+    public jointIDs: number[] = [];     // ids of the joint containing this body
     public resting: number = 0;
     public sleeping: boolean = false;
 
@@ -53,22 +57,31 @@ export class RigidBody extends Entity
         this._surfaceSpeed = 0.0;
         this.type = type;
 
-        switch (this.type)
+        if (this.type == Type.Static)
         {
-            case Type.Static:
-                this._mass = Number.MAX_VALUE;
-                this._invMass = 0;
-                this._inertia = Number.MAX_VALUE;
-                this._invInertia = 0;
-                this.sleeping = true;
-                break;
-            case Type.Dynamic:
-                this._mass = Settings.defaultMass;
-                this._invMass = 1 / this._mass;
-                this._inertia = Util.calculateBoxInertia(Settings.defaultSize, Settings.defaultSize, Settings.defaultMass);
-                this._invInertia = 1 / this._inertia;
-                break;
+            this._density = Number.MAX_VALUE;
+            this._mass = Number.MAX_VALUE;
+            this._invMass = 0;
+            this._inertia = Number.MAX_VALUE;
+            this._invInertia = 0;
+            this.sleeping = true;
         }
+        else
+        {
+            // This part is implemented by children.
+        }
+    }
+
+    get density(): number
+    {
+        return this._density;
+    }
+
+    set density(d: number)
+    {
+        Util.assert(d > 0)
+
+        this._density = d;
     }
 
     get mass(): number
@@ -78,8 +91,10 @@ export class RigidBody extends Entity
 
     set mass(m: number)
     {
-        this._mass = Util.clamp(m, 0, Number.MAX_VALUE);
-        this._invMass = this._mass == 0 ? 0 : 1.0 / this._mass;
+        Util.assert(m > 0);
+
+        this._mass = m;
+        this._invMass = 1.0 / m;
     }
 
     get inverseMass(): number
@@ -94,8 +109,10 @@ export class RigidBody extends Entity
 
     protected set inertia(i: number)
     {
-        this._inertia = Util.clamp(i, 0, Number.MAX_VALUE);
-        this._invInertia = this._inertia == Number.MAX_VALUE ? 0 : 1.0 / this._inertia;
+        Util.assert(i > 0);
+
+        this._inertia = i;
+        this._invInertia = 1.0 / i;
     }
 
     get inverseInertia(): number
@@ -110,7 +127,9 @@ export class RigidBody extends Entity
 
     set friction(f: number)
     {
-        this._friction = Util.clamp(f, 0.0, Number.MAX_VALUE);
+        Util.assert(f > 0);
+
+        this._friction = f;
     }
 
     get restitution(): number
@@ -120,7 +139,9 @@ export class RigidBody extends Entity
 
     set restitution(r: number)
     {
-        this._restitution = Util.clamp(r, 0.0, 1.0);
+        Util.assert(r >= 0 && r <= 1.0);
+
+        this._restitution = r;
     }
 
     get surfaceSpeed(): number
