@@ -50,14 +50,14 @@ export class RigidBody extends Entity {
         return this._friction;
     }
     set friction(f) {
-        Util.assert(f > 0);
+        Util.assert(f >= 0.0);
         this._friction = f;
     }
     get restitution() {
         return this._restitution;
     }
     set restitution(r) {
-        Util.assert(r >= 0 && r <= 1.0);
+        Util.assert(r >= 0.0 && r <= 1.0);
         this._restitution = r;
     }
     get surfaceSpeed() {

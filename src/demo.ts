@@ -695,7 +695,6 @@ function demo17(game: Game, world: World): void
         if ((game.frame - last_spawn) / Engine.fps > 0.2 * 144 * game.deltaTime)
         {
             let c = Util.createRegularPolygon(0.15, undefined, undefined, 18.0);
-            console.log(c.density);
 
             c.position.x = Util.random(-1.8, 1.8);
             c.position.y = 6.0;

@@ -100,7 +100,7 @@ export abstract class RigidBody extends Entity
 
     set friction(f: number)
     {
-        Util.assert(f > 0);
+        Util.assert(f >= 0.0);
 
         this._friction = f;
     }
@@ -112,7 +112,7 @@ export abstract class RigidBody extends Entity
 
     set restitution(r: number)
     {
-        Util.assert(r >= 0 && r <= 1.0);
+        Util.assert(r >= 0.0 && r <= 1.0);
 
         this._restitution = r;
     }
