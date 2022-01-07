@@ -573,6 +573,7 @@ function demo18(game, world) {
     let sizeX = 0.4;
     let gap = 0.05;
     let b0 = new Box(sizeX, 0.1);
+    b0.mass = 2.0;
     b0.surfaceSpeed = -1.5;
     b0.position.x = xStart;
     b0.position.y = yStart;
@@ -583,6 +584,7 @@ function demo18(game, world) {
     world.register(j);
     for (let i = 1; i < 14; i++) {
         let b1 = new Box(sizeX, 0.1);
+        b1.mass = 2.0;
         b1.surfaceSpeed = -1.5;
         b1.position.x = xStart + (sizeX + gap) * i;
         b1.position.y = yStart;
