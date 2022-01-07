@@ -37,31 +37,11 @@ export class RigidBody extends Entity {
             // This part is implemented by children.
         }
     }
-    get density() {
-        return this._density;
-    }
-    set density(d) {
-        Util.assert(d > 0);
-        this._density = d;
-    }
-    get mass() {
-        return this._mass;
-    }
-    set mass(m) {
-        Util.assert(m > 0);
-        this._mass = m;
-        this._invMass = 1.0 / m;
-    }
     get inverseMass() {
         return this._invMass;
     }
     get inertia() {
         return this._inertia;
-    }
-    set inertia(i) {
-        Util.assert(i > 0);
-        this._inertia = i;
-        this._invInertia = 1.0 / i;
     }
     get inverseInertia() {
         return this._invInertia;

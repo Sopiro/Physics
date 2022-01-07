@@ -21,11 +21,11 @@ export abstract class RigidBody extends Entity
     private _linearVelocity: Vector2;   // m/s
     private _angularVelocity: number;   // rad/s
 
-    private _density!: number;          // kg/m²
-    private _mass!: number;             // kg
-    private _invMass!: number;
-    private _inertia!: number;          // kg⋅m²
-    private _invInertia!: number;
+    protected _density!: number;          // kg/m²
+    protected _mass!: number;             // kg
+    protected _invMass!: number;
+    protected _inertia!: number;          // kg⋅m²
+    protected _invInertia!: number;
 
     private _friction: number;
     private _restitution: number;
@@ -72,30 +72,11 @@ export abstract class RigidBody extends Entity
         }
     }
 
-    get density(): number
-    {
-        return this._density;
-    }
+    abstract get density(): number;
+    abstract set density(d: number);
 
-    set density(d: number)
-    {
-        Util.assert(d > 0)
-
-        this._density = d;
-    }
-
-    get mass(): number
-    {
-        return this._mass;
-    }
-
-    set mass(m: number)
-    {
-        Util.assert(m > 0);
-
-        this._mass = m;
-        this._invMass = 1.0 / m;
-    }
+    abstract get mass(): number;
+    abstract set mass(m: number)
 
     get inverseMass(): number
     {
@@ -105,14 +86,6 @@ export abstract class RigidBody extends Entity
     get inertia(): number
     {
         return this._inertia;
-    }
-
-    protected set inertia(i: number)
-    {
-        Util.assert(i > 0);
-
-        this._inertia = i;
-        this._invInertia = 1.0 / i;
     }
 
     get inverseInertia(): number

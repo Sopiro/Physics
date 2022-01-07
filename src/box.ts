@@ -17,29 +17,37 @@ export class Box extends Polygon
         this.height = height;
     }
 
-    get mass(): number
+    override get mass(): number
     {
-        return super.mass;
+        return this._mass;
     }
 
     // This will automatically set the inertia
-    set mass(mass: number)
+    override set mass(mass: number)
     {
-        super.density = mass / this.area;
-        super.mass = mass;
-        super.inertia = Util.calculateBoxInertia(this.width, this.height, mass);
+        Util.assert(mass > 0);
+
+        this._density = mass / this.area;
+        this._mass = mass;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateBoxInertia(this.width, this.height, this._mass);
+        this._invInertia = 1.0 / this._inertia;
     }
 
     override get density(): number
     {
-        return super.density;
+        return this._density;
     }
 
     // This will automatically set the mass and inertia
     override set density(density: number)
     {
-        super.density = density;
-        super.mass = density * (this.width * this.height);
-        super.inertia = Util.calculateBoxInertia(this.width, this.height, this.mass);
+        Util.assert(density > 0);
+
+        this._density = density;
+        this._mass = density * this.area;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateBoxInertia(this.width, this.height, this._mass);
+        this._invInertia = 1.0 / this._inertia;
     }
 }

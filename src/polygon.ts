@@ -42,11 +42,15 @@ export class Polygon extends RigidBody
 
         this.area = Math.abs(area) / 2.0;
 
-        if(this.type == Type.Dynamic)
+        if (this.type == Type.Dynamic)
         {
-            super.density = density;
-            super.mass = super.density * this.area;
-            super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
+            Util.assert(density > 0);
+
+            this._density = density;
+            this._mass = density * this.area;
+            this._invMass = 1.0 / this._mass;
+            this._inertia = Util.calculateConvexPolygonInertia(this.vertices, this._mass, this.area);
+            this._invInertia = 1.0 / this._inertia;
         }
 
         if (!resetPosition)
@@ -68,29 +72,37 @@ export class Polygon extends RigidBody
         return this.vertices.length;
     }
 
-    get mass(): number
+    override get mass(): number
     {
-        return super.mass;
+        return this._mass;
     }
 
     // This will automatically set the inertia
-    set mass(mass: number)
+    override set mass(mass: number)
     {
-        super.density = mass / this.area;
-        super.mass = mass;
-        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
+        Util.assert(mass > 0);
+
+        this._density = mass / this.area;
+        this._mass = mass;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateConvexPolygonInertia(this.vertices, this._mass, this.area);
+        this._invInertia = 1.0 / this._inertia;
     }
 
     override get density(): number
     {
-        return super.density;
+        return this._density;
     }
 
     // This will automatically set the mass and inertia
     override set density(density: number)
     {
-        super.density = density;
-        super.mass = density * this.area;
-        super.inertia = Util.calculateConvexPolygonInertia(this.vertices, this.mass, this.area);
+        Util.assert(density > 0);
+
+        this._density = density;
+        this._mass = density * this.area;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateConvexPolygonInertia(this.vertices, this._mass, this.area);
+        this._invInertia = 1.0 / this._inertia;
     }
 }

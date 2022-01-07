@@ -13,38 +13,50 @@ export class Circle extends RigidBody
 
         this.radius = radius;
         this.area = Math.PI * this.radius * this.radius;
-        
-        if(this.type == Type.Dynamic)
+
+        if (this.type == Type.Dynamic)
         {
-            super.density = density;
-            super.mass = super.density * this.area;
-            super.inertia = Util.calculateCircleInertia(radius, this.mass);
+            Util.assert(density > 0);
+
+            this._density = density;
+            this._mass = density * this.area;
+            this._invMass = 1.0 / this._mass;
+            this._inertia = Util.calculateCircleInertia(this.radius, this._mass);
+            this._invInertia = 1.0 / this._inertia;
         }
     }
 
-    get mass(): number
+    override get mass(): number
     {
-        return super.mass;
+        return this._mass;
     }
 
     // This will automatically set the inertia
-    set mass(mass: number)
+    override set mass(mass: number)
     {
-        super.density = mass / this.area;
-        super.mass = mass;
-        super.inertia = Util.calculateCircleInertia(this.radius, mass);
+        Util.assert(mass > 0);
+
+        this._density = mass / this.area;
+        this._mass = mass;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateCircleInertia(this.radius, this._mass);
+        this._invInertia = 1.0 / this._inertia;
     }
 
-    get density(): number
+    override get density(): number
     {
-        return super.density;
+        return this._density;
     }
 
     // This will automatically set the mass and inertia
-    set density(density: number) //kg/m²
+    override set density(density: number) //kg/m²
     {
-        super.density = density;
-        super.mass = density * this.area;
-        super.inertia = Util.calculateCircleInertia(this.radius, this.mass);
+        Util.assert(density > 0);
+
+        this._density = density;
+        this._mass = density * this.area;
+        this._invMass = 1.0 / this._mass;
+        this._inertia = Util.calculateCircleInertia(this.radius, this._mass);
+        this._invInertia = 1.0 / this._inertia;
     }
 }
