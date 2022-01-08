@@ -203,26 +203,22 @@ export class Game
                 {
                     case GenerationShape.Box:
                         {
-                            nb = new Box(nbs.size, nbs.size);
-                            (nb as Box).mass = nbs.mass;
+                            nb = new Box(nbs.size, nbs.size, Type.Dynamic, nbs.density);
                             break;
                         }
                     case GenerationShape.Circle:
                         {
-                            nb = new Circle(nbs.size / 2.0);
-                            (nb as Circle).mass = nbs.mass;
+                            nb = new Circle(nbs.size / 2.0, Type.Dynamic, nbs.density);
                             break;
                         }
                     case GenerationShape.Regular:
                         {
-                            nb = Util.createRegularPolygon(nbs.size / 2.0, nbs.numVertices);
-                            (nb as Polygon).mass = nbs.mass;
+                            nb = Util.createRegularPolygon(nbs.size / 2.0, nbs.numVertices, undefined, nbs.density);
                             break;
                         }
                     case GenerationShape.Random:
                         {
-                            nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2);
-                            (nb as Polygon).mass = nbs.mass;
+                            nb = Util.createRandomConvexBody(Math.random() * nbs.size / 3 + nbs.size / 2, undefined, nbs.density);
                             break;
                         }
                 }

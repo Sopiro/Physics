@@ -17,7 +17,7 @@ export enum MouseMode
 
 const frequencyRange: Util.Pair<number, number> = { p1: 10, p2: 240 };
 const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
-const massRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
+const densityRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
 const sizeRange: Util.Pair<number, number> = { p1: 0.1, p2: 3 };
 const gravityForceRange: Util.Pair<number, number> = { p1: -20, p2: 20 };
 const frictionRange: Util.Pair<number, number> = { p1: 0, p2: 1 };
@@ -53,7 +53,7 @@ export const Settings = {
     newBodySettings:
     {
         shape: GenerationShape.Box,
-        mass: 2,
+        density: 8,
         size: 0.5,
         friction: 0.7,
         restitution: 0.001,
@@ -197,17 +197,17 @@ for (var i = 0; i < 4; i++)
     });
 }
 
-const mass = document.querySelector("#mass")! as HTMLInputElement;
-mass.value = String(Util.map(Settings.newBodySettings.mass, massRange.p1, massRange.p2, 0, 100));
-const massLabel = document.querySelector("#mass_label")! as HTMLLabelElement;
-massLabel.innerHTML = String(Settings.newBodySettings.mass) + "kg";
-mass.addEventListener("input", () =>
+const density = document.querySelector("#density")! as HTMLInputElement;
+density.value = String(Util.map(Settings.newBodySettings.density, densityRange.p1, densityRange.p2, 0, 100));
+const densityLabel = document.querySelector("#density_label")! as HTMLLabelElement;
+densityLabel.innerHTML = String(Settings.newBodySettings.density) + "kg";
+density.addEventListener("input", () =>
 {
-    let mappedValue = Util.map(Number(mass.value), 0, 100, massRange.p1, massRange.p2);
+    let mappedValue = Util.map(Number(density.value), 0, 100, densityRange.p1, densityRange.p2);
     mappedValue = Math.trunc(mappedValue);
-    massLabel.innerHTML = String(mappedValue) + "kg";
+    densityLabel.innerHTML = String(mappedValue) + "kg";
 
-    updateSetting("mass", mappedValue);
+    updateSetting("density", mappedValue);
 });
 
 const size = document.querySelector("#size")! as HTMLInputElement;
@@ -365,8 +365,8 @@ export function updateSetting(id: string, content?: any)
         case "iteration":
             Settings.numIterations = content!;
             break;
-        case "mass":
-            Settings.newBodySettings.mass = content!;
+        case "density":
+            Settings.newBodySettings.density = content!;
             break;
         case "size":
             Settings.newBodySettings.size = content!;

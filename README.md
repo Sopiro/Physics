@@ -12,8 +12,10 @@ Video: https://youtu.be/ROAqjE40pxU
 
 ## Features
 - Basic input, rendering system
+- Rigid body
+  - Shapes: Convex polygons and circles
+  - Density-based body definition
 - Collision detection
-  - Convex polygons and circles
   - AABB Broad phase
   - Computing minimum distance between two convex shapes (GJK)
   - Generate contact manifold (EPA)
