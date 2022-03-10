@@ -7,11 +7,11 @@ import { RigidBody, Type } from "./rigidbody.js";
 import { World } from "./world.js";
 import { Box } from "./box.js";
 import { Circle } from "./circle.js";
-import { createAABB } from "./detection.js";
 import { GenerationShape, MouseMode, Settings, updateSetting } from "./settings.js";
 import { demos } from "./demo.js";
 import { GrabJoint } from "./grab.js";
 import { Polygon } from "./polygon.js";
+import { createAABB } from "./aabb.js";
 
 export let gWorld: World;
 
@@ -409,5 +409,21 @@ export class Game
                 r.log("Sleeping: " + this.target.sleeping, line++);
             }
         }
+
+        // let q = [this.world.tree.root];
+
+        // while (q.length != 0)
+        // {
+        //     let current = q.shift()!;
+
+        //     if (current == undefined) break;
+
+        //     r.drawAABB(current!.aabb);
+        //     if (!current.isLeaf)
+        //     {
+        //         q.push(current.child1!);
+        //         q.push(current.child2!);
+        //     }
+        // }
     }
 }

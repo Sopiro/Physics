@@ -48,16 +48,17 @@ function demo2(game: Game, world: World): void
 
     let start = 0.5;
     let size = 0.3;
-    let gap = 0.1;
+    let gap = 0.2;
 
     // let error = 0.015;
     let error = 0.0;
 
-    for (let i = 0; i < 17; i++)
+    for (let i = 0; i < 20; i++)
     {
         let b = new Box(size);
         // let b = Util.createRegularPolygon(size / 2, 6);
         b.position = new Vector2(Util.random(-error, error), start + i * (size + gap));
+        b.restitution = 0.0;
         world.register(b);
     }
 }
@@ -83,6 +84,7 @@ function demo3(game: Game, world: World): void
         {
             let b = new Box(boxSize);
             b.position = new Vector2(xStart + y * (boxSize + xGap) / 2 + x * (boxSize + xGap), yStart + y * (boxSize + yGap));
+            b.restitution = 0.0;
             world.register(b);
         }
     }
@@ -521,6 +523,7 @@ function demo14(game: Game, world: World): void
 
         let b2 = new Box(0.8, 0.03);
         b2.mass = 2.0;
+        b2.restitution = 0.0;
         b2.position = start;
         b2.rotation = rr;
         world.register(b2);
@@ -528,10 +531,12 @@ function demo14(game: Game, world: World): void
         let b1 = Util.createRegularPolygon(0.15);
         b1.mass = 2.0;
         b1.position = start.add(new Vector2(cos, sin).mul(-0.4));
+        b1.restitution = 0.0;
         world.register(b1);
 
         let b3 = Util.createRegularPolygon(0.15);
         b3.mass = 2.0;
+        b3.restitution = 0.0;
         b3.position = start.add(new Vector2(cos, sin).mul(0.4));
         world.register(b3);
 

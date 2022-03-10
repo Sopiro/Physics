@@ -3,7 +3,7 @@ import { RigidBody } from "./rigidbody.js";
 import { Matrix3, Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
 import { Simplex } from "./simplex.js";
-import { AABB } from "./detection.js";
+import { AABB } from "./aabb.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 import { Joint } from "./joint.js";

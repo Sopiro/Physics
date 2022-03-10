@@ -5,9 +5,13 @@ import { Settings } from "./settings.js";
 import { Joint } from "./joint.js";
 import { Island } from "./island.js";
 import { GrabJoint } from "./grab.js";
+import { AABBTree } from "./aabbtree.js";
 export class World {
     constructor() {
         this.uid = 0;
+        // Dynamic AABB Tree for broad phase collision detection
+        this.tree = new AABBTree();
+        // All registered rigid bodies
         this.bodies = [];
         // Constraints to be solved
         this.manifolds = [];
@@ -22,36 +26,43 @@ export class World {
     }
     update(delta) {
         let newManifolds = [];
-        if (this.bodies.length > 0)
-            this.bodies[0].manifoldIDs = [];
-        // Detect collisions, generate contact manifolds, try warm starting
-        for (let i = 0; i < this.bodies.length; i++) {
-            let a = this.bodies[i];
-            for (let j = i + 1; j < this.bodies.length; j++) {
-                let b = this.bodies[j];
-                if (i == 0)
-                    b.manifoldIDs = [];
-                if (a.type == Type.Static && b.type == Type.Static)
-                    continue;
-                let key = Util.make_pair_natural(a.id, b.id);
-                if (this.passTestSet.has(key))
-                    continue;
-                let newManifold = detectCollision(a, b);
-                if (newManifold != null) {
-                    a.manifoldIDs.push(key);
-                    b.manifoldIDs.push(key);
-                    if (Settings.warmStarting && this.manifoldMap.has(key)) {
-                        let oldManifold = this.manifoldMap.get(key);
-                        newManifold.tryWarmStart(oldManifold);
-                    }
-                    this.manifoldMap.set(key, newManifold);
-                    newManifolds.push(newManifold);
-                }
-                else {
-                    this.manifoldMap.delete(key);
-                }
-            }
+        let newManifoldMap = new Map();
+        this.tree = new AABBTree();
+        for (let b of this.bodies) {
+            b.manifoldIDs = [];
+            this.tree.add(b);
         }
+        // Broad Phase
+        // Retrieve a list of collider pairs that are potentially colliding
+        let pairs = this.tree.getCollisionPairs();
+        for (let pair of pairs) {
+            let a = pair.p1.body;
+            let b = pair.p2.body;
+            // imrove coherence
+            if (a.id > b.id) {
+                a = pair.p2.body;
+                b = pair.p1.body;
+            }
+            if (a.type == Type.Static && b.type == Type.Static)
+                continue;
+            let key = Util.make_pair_natural(a.id, b.id);
+            if (this.passTestSet.has(key))
+                continue;
+            // Narrow Phase
+            // Execute more accurate and expensive collision detection
+            let newManifold = detectCollision(a, b);
+            if (newManifold == null)
+                continue;
+            a.manifoldIDs.push(key);
+            b.manifoldIDs.push(key);
+            if (Settings.warmStarting && this.manifoldMap.has(key)) {
+                let oldManifold = this.manifoldMap.get(key);
+                newManifold.tryWarmStart(oldManifold);
+            }
+            newManifoldMap.set(key, newManifold);
+            newManifolds.push(newManifold);
+        }
+        this.manifoldMap = newManifoldMap;
         this.manifolds = newManifolds;
         // Build the constraint island
         let island = new Island(this);

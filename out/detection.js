@@ -7,40 +7,6 @@ import { Polytope } from "./polytope.js";
 import { Simplex } from "./simplex.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
-export function createAABB(b) {
-    if (b instanceof Circle) {
-        return {
-            min: new Vector2(b.position.x - b.radius, b.position.y - b.radius),
-            max: new Vector2(b.position.x + b.radius, b.position.y + b.radius)
-        };
-    }
-    else if (b instanceof Polygon) {
-        let localToGlobal = b.localToGlobal;
-        let res = { min: localToGlobal.mulVector2(b.vertices[0], 1), max: localToGlobal.mulVector2(b.vertices[0], 1) };
-        for (let i = 1; i < b.count; i++) {
-            let gv = localToGlobal.mulVector2(b.vertices[i], 1);
-            if (gv.x < res.min.x)
-                res.min.x = gv.x;
-            else if (gv.x > res.max.x)
-                res.max.x = gv.x;
-            if (gv.y < res.min.y)
-                res.min.y = gv.y;
-            else if (gv.y > res.max.y)
-                res.max.y = gv.y;
-        }
-        return res;
-    }
-    else {
-        throw "Not a supported shape";
-    }
-}
-export function testCollideAABB(a, b) {
-    if (a.min.x > b.max.x || a.max.x < b.min.x)
-        return false;
-    if (a.min.y > b.max.y || a.max.y < b.min.y)
-        return false;
-    return true;
-}
 // Returns the fardest vertex in the 'dir' direction
 function support(b, dir) {
     if (b instanceof Polygon) {
@@ -231,12 +197,6 @@ export function detectCollision(a, b) {
             return contact;
         }
     }
-    // Broad Phase
-    let boundingBoxA = createAABB(a);
-    let boundingBoxB = createAABB(b);
-    if (!testCollideAABB(boundingBoxA, boundingBoxB))
-        return null;
-    // Narrow Phase
     const gjkResult = gjk(a, b);
     if (!gjkResult.collide) {
         return null;
