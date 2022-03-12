@@ -413,21 +413,10 @@ export class Game
 
         if (Settings.visualizeAABBTree)
         {
-            let q = [this.world.tree.root];
-
-            while (q.length != 0)
+            this.world.tree.traverse(node =>
             {
-                let current = q.shift()!;
-
-                if (current == undefined) break;
-
-                r.drawAABB(current!.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
-                if (!current.isLeaf)
-                {
-                    q.push(current.child1!);
-                    q.push(current.child2!);
-                }
-            }
+                r.drawAABB(node!.aabb, 1.0, !node.isLeaf ? "#00000055" : "#000000");
+            })
         }
     }
 }

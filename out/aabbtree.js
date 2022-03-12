@@ -202,4 +202,18 @@ export class AABBTree {
             }
         }
     }
+    // BFS tree traversal
+    traverse(callback) {
+        let q = [this.root];
+        while (q.length != 0) {
+            let current = q.shift();
+            if (current == undefined)
+                break;
+            callback(current);
+            if (!current.isLeaf) {
+                q.push(current.child1);
+                q.push(current.child2);
+            }
+        }
+    }
 }

@@ -163,17 +163,17 @@ export function calculateConvexPolygonInertia(vertices: Vector2[], mass: number,
     return inertia;
 }
 
-export function checkInside(b: RigidBody, p: Vector2): boolean
+export function checkInside(body: RigidBody, point: Vector2): boolean
 {
-    let localP = b.globalToLocal.mulVector2(p, 1);
+    let localP = body.globalToLocal.mulVector2(point, 1);
 
-    if (b instanceof Circle)
+    if (body instanceof Circle)
     {
-        return localP.length <= (b as Circle).radius;
+        return localP.length <= (body as Circle).radius;
     }
-    else if (b instanceof Polygon)
+    else if (body instanceof Polygon)
     {
-        let poly = b as Polygon;
+        let poly = body as Polygon;
 
         let dir = poly.vertices[0].sub(localP).cross(poly.vertices[1].sub(localP));
 
