@@ -37,6 +37,13 @@ export class RigidBody extends Entity {
             // This part is implemented by children.
         }
     }
+    awake() {
+        if (this.type == Type.Static)
+            return;
+        this.resting = 0;
+        this.sleeping = false;
+    }
+    // Getters and Setters
     get inverseMass() {
         return this._invMass;
     }
@@ -90,11 +97,5 @@ export class RigidBody extends Entity {
     }
     set torque(t) {
         this._torque = t;
-    }
-    awake() {
-        if (this.type == Type.Static)
-            return;
-        this.resting = 0;
-        this.sleeping = false;
     }
 }

@@ -104,12 +104,12 @@ export class Renderer
             this.gfx.stroke();
     }
 
-    drawLine(x0: number, y0: number, x1: number, y1: number, lineWidth = 1): void
+    drawLine(x0: number, y0: number, x1: number, y1: number, lineWidth = 1, strokeStyle: string = "#000000"): void
     {
-        this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
+        this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth, strokeStyle);
     }
 
-    drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1): void
+    drawLineV(v0: Vector2, v1: Vector2, lineWidth: number = 1, strokeStyle: string = "#000000"): void
     {
         let vpcm = this.vpc.mulMatrix(this.modelTransform);
 
@@ -117,6 +117,7 @@ export class Renderer
         let tv1 = vpcm.mulVector2(v1, 1);
 
         this.gfx.lineWidth = lineWidth;
+        this.gfx.strokeStyle = strokeStyle;
         this.gfx.beginPath();
         this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
         this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
@@ -236,12 +237,12 @@ export class Renderer
         this.resetModelTransform();
     }
 
-    drawAABB(aabb: AABB, lineWidth = 1)
+    drawAABB(aabb: AABB, lineWidth = 1, strokeStyle: string = "#000000")
     {
-        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth);
-        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth);
-        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth);
-        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth);
+        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth, strokeStyle);
     }
 
     drawJoint(j: Joint)

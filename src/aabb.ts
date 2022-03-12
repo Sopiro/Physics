@@ -33,13 +33,13 @@ function fix(aabb: AABB): void
     aabb.max.y = maxY;
 }
 
-export function createAABB(b: RigidBody): AABB
+export function createAABB(b: RigidBody, margin: number = 0.0): AABB
 {
     if (b instanceof Circle)
     {
         return new AABB(
-            new Vector2(b.position.x - b.radius, b.position.y - b.radius),
-            new Vector2(b.position.x + b.radius, b.position.y + b.radius)
+            new Vector2(b.position.x - b.radius - margin, b.position.y - b.radius - margin),
+            new Vector2(b.position.x + b.radius + margin, b.position.y + b.radius + margin)
         );
     }
     else if (b instanceof Polygon) 
@@ -60,6 +60,12 @@ export function createAABB(b: RigidBody): AABB
             else if (gv.y > res.max.y)
                 res.max.y = gv.y;
         }
+
+        res.min.x -= margin;
+        res.min.y -= margin;
+        res.max.x += margin;
+        res.max.y += margin;
+
         return res;
     }
     else

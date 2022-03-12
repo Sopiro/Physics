@@ -64,14 +64,15 @@ export class Renderer {
         else
             this.gfx.stroke();
     }
-    drawLine(x0, y0, x1, y1, lineWidth = 1) {
-        this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth);
+    drawLine(x0, y0, x1, y1, lineWidth = 1, strokeStyle = "#000000") {
+        this.drawLineV(new Vector2(x0, y0), new Vector2(x1, y1), lineWidth, strokeStyle);
     }
-    drawLineV(v0, v1, lineWidth = 1) {
+    drawLineV(v0, v1, lineWidth = 1, strokeStyle = "#000000") {
         let vpcm = this.vpc.mulMatrix(this.modelTransform);
         let tv0 = vpcm.mulVector2(v0, 1);
         let tv1 = vpcm.mulVector2(v1, 1);
         this.gfx.lineWidth = lineWidth;
+        this.gfx.strokeStyle = strokeStyle;
         this.gfx.beginPath();
         this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
         this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
@@ -160,11 +161,11 @@ export class Renderer {
         }
         this.resetModelTransform();
     }
-    drawAABB(aabb, lineWidth = 1) {
-        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth);
-        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth);
-        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth);
-        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth);
+    drawAABB(aabb, lineWidth = 1, strokeStyle = "#000000") {
+        this.drawLine(aabb.min.x, aabb.min.y, aabb.min.x, aabb.max.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.min.x, aabb.max.y, aabb.max.x, aabb.max.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.max.x, aabb.max.y, aabb.max.x, aabb.min.y, lineWidth, strokeStyle);
+        this.drawLine(aabb.max.x, aabb.min.y, aabb.min.x, aabb.min.y, lineWidth, strokeStyle);
     }
     drawJoint(j) {
         if (j instanceof RevoluteJoint) {

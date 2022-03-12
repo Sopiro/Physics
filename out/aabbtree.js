@@ -1,18 +1,26 @@
 import { detectCollisionAABB, testPointInside, union, createAABB } from "./aabb.js";
+import { Type } from "./rigidbody.js";
 import { make_pair_natural } from "./util.js";
 export class AABBTree {
     constructor() {
         this.nodeID = 0;
         this.root = undefined;
+        this.aabbMargin = 0.05;
+    }
+    reset() {
+        this.nodeID = 0;
+        this.root = undefined;
     }
     add(body) {
-        let aabb = createAABB(body);
+        // Enlarged AABB
+        let aabb = createAABB(body, body.type == Type.Static ? 0.0 : this.aabbMargin);
         let newNode = {
             id: this.nodeID++,
             aabb: aabb,
             isLeaf: true,
             body: body
         };
+        body.node = newNode;
         if (this.root == undefined) {
             this.root = newNode;
         }
@@ -81,6 +89,7 @@ export class AABBTree {
     }
     remove(node) {
         let parent = node.parent;
+        node.body.node = undefined;
         if (parent != undefined) {
             let sibling = parent.child1 == node ? parent.child2 : parent.child1;
             if (parent.parent != undefined) {

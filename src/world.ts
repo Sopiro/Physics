@@ -7,6 +7,7 @@ import { Joint } from "./joint.js";
 import { Island } from "./island.js";
 import { GrabJoint } from "./grab.js";
 import { AABBTree } from "./aabbtree.js";
+import { containsAABB, createAABB } from "./aabb.js";
 
 type Registrable = RigidBody | Joint;
 
@@ -38,11 +39,18 @@ export class World
         let newManifolds: ContactManifold[] = [];
         let newManifoldMap: Map<number, ContactManifold> = new Map();
 
-        this.tree = new AABBTree();
-
-        for (let b of this.bodies)
+        // Update the AABB tree dynamically
+        for (let i = 0; i < this.bodies.length; i++)
         {
+            let b = this.bodies[i];
             b.manifoldIDs = [];
+
+            let node = b.node!;
+            let tightAABB = createAABB(b, 0.0);
+
+            if (containsAABB(node.aabb, tightAABB)) continue;
+
+            this.tree.remove(node);
             this.tree.add(b);
         }
 
@@ -50,12 +58,13 @@ export class World
         // Retrieve a list of collider pairs that are potentially colliding
         let pairs = this.tree.getCollisionPairs();
 
-        for (let pair of pairs)
+        for (let i = 0; i < pairs.length; i++)
         {
+            let pair = pairs[i];
             let a = pair.p1.body!;
             let b = pair.p2.body!;
 
-            // imrove coherence
+            // Improve coherence
             if (a.id > b.id)
             {
                 a = pair.p2.body!;
@@ -182,6 +191,7 @@ export class World
         if (r instanceof RigidBody)
         {
             this.bodies.push(r);
+            this.tree.add(r);
         }
         else if (r instanceof Joint)
         {
@@ -235,43 +245,42 @@ export class World
         for (let i = 0; i < this.bodies.length; i++)
         {
             let b = this.bodies[i];
+            if (b.id != id) continue;
 
-            if (b.id == id)
+            this.bodies.splice(i, 1);
+            this.tree.remove(b.node!);
+
+            for (let m = 0; m < b.manifoldIDs.length; m++)
             {
-                this.bodies.splice(i, 1);
+                let manifold = this.manifoldMap.get(b.manifoldIDs[m])!;
 
-                for (let m = 0; m < b.manifoldIDs.length; m++)
-                {
-                    let manifold = this.manifoldMap.get(b.manifoldIDs[m])!;
-
-                    manifold.bodyA.awake();
-                    manifold.bodyB.awake();
-                }
-
-                for (let j = 0; j < b.jointIDs.length; j++)
-                {
-                    let jid = b.jointIDs[j];
-
-                    let joint = this.jointMap.get(jid)!;
-                    let other = joint.bodyA.id == id ? joint.bodyB : joint.bodyA;
-
-                    other.awake();
-
-                    for (let k = 0; k < other.jointIDs.length; k++)
-                    {
-                        if (other.jointIDs[k] == jid)
-                        {
-                            other.jointIDs.splice(k, 1);
-                            break;
-                        }
-                    }
-
-                    this.jointMap.delete(jid);
-                }
-
-                this.joints = Array.from(this.jointMap.values());
-                return true;
+                manifold.bodyA.awake();
+                manifold.bodyB.awake();
             }
+
+            for (let j = 0; j < b.jointIDs.length; j++)
+            {
+                let jid = b.jointIDs[j];
+
+                let joint = this.jointMap.get(jid)!;
+                let other = joint.bodyA.id == id ? joint.bodyB : joint.bodyA;
+
+                other.awake();
+
+                for (let k = 0; k < other.jointIDs.length; k++)
+                {
+                    if (other.jointIDs[k] == jid)
+                    {
+                        other.jointIDs.splice(k, 1);
+                        break;
+                    }
+                }
+
+                this.jointMap.delete(jid);
+            }
+
+            this.joints = Array.from(this.jointMap.values());
+            return true;
         }
 
         return false;
@@ -291,6 +300,7 @@ export class World
 
     reset(): void
     {
+        this.tree.reset();
         this.bodies = [];
         this.joints = [];
         this.manifolds = [];

@@ -1,6 +1,6 @@
 import { AABB, detectCollisionAABB, testPointInside, union, createAABB } from "./aabb.js";
 import { Vector2 } from "./math.js";
-import { RigidBody } from "./rigidbody.js";
+import { RigidBody, Type } from "./rigidbody.js";
 import { make_pair_natural, Pair } from "./util.js";
 
 export interface Node
@@ -18,10 +18,18 @@ export class AABBTree
 {
     private nodeID = 0;
     public root?: Node = undefined;
+    public aabbMargin = 0.05;
+
+    reset(): void
+    {
+        this.nodeID = 0;
+        this.root = undefined;
+    }
 
     add(body: RigidBody): Node
     {
-        let aabb = createAABB(body);
+        // Enlarged AABB
+        let aabb = createAABB(body, body.type == Type.Static ? 0.0 : this.aabbMargin);
 
         let newNode: Node =
         {
@@ -30,6 +38,7 @@ export class AABBTree
             isLeaf: true,
             body: body
         }
+        body.node = newNode;
 
         if (this.root == undefined)
         {
@@ -125,6 +134,7 @@ export class AABBTree
     remove(node: Node): void
     {
         let parent = node.parent;
+        node.body!.node = undefined;
 
         if (parent != undefined)
         {

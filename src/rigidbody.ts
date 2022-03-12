@@ -3,6 +3,7 @@ import { Entity } from "./entity.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
+import { Node } from "./aabbtree.js";
 
 export enum Type
 {
@@ -39,6 +40,9 @@ export abstract class RigidBody extends Entity
     public jointIDs: number[] = [];     // ids of the joint containing this body
     public resting: number = 0;
     public sleeping: boolean = false;
+
+    // Pointer to the node in the AABB tree
+    public node?: Node;
 
     // Callback function which is called after the constraint is solved
     // If the callback returns true, it will reset itself to undefined
@@ -78,6 +82,15 @@ export abstract class RigidBody extends Entity
     abstract get mass(): number;
     abstract set mass(m: number)
 
+    awake(): void
+    {
+        if (this.type == Type.Static) return;
+
+        this.resting = 0;
+        this.sleeping = false;
+    }
+
+    // Getters and Setters
     get inverseMass(): number
     {
         return this._invMass;
@@ -166,13 +179,5 @@ export abstract class RigidBody extends Entity
     set torque(t)
     {
         this._torque = t;
-    }
-
-    awake(): void
-    {
-        if (this.type == Type.Static) return;
-
-        this.resting = 0;
-        this.sleeping = false;
     }
 }

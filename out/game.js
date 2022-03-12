@@ -310,7 +310,7 @@ export class Game {
         // {
         //     let current = q.shift()!;
         //     if (current == undefined) break;
-        //     r.drawAABB(current!.aabb);
+        //     r.drawAABB(current!.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
         //     if (!current.isLeaf)
         //     {
         //         q.push(current.child1!);
