@@ -29,12 +29,12 @@
                 <canvas id="canvas" style="border: 2px solid black; width: 1280px; height: 720px;"></canvas>
             </div>
 
-            <div class="col fw-normal" style="margin: 4rem 1rem 1rem 1rem">
+            <div class="col fw-normal" style="margin: 3.8rem 1rem 1rem 1rem">
                 <div class="row">
                     <select class="form-select form-select-sm mb-2" aria-label=".form-select-sm example" id="demo_select"></select>
                 </div>
 
-                <div class="row mb-2">
+                <div class="row mb-1">
                     <button class="btn btn-primary" type="button" id="restart">
                         Restart
                     </button>
@@ -118,6 +118,13 @@
                 </div>
 
                 <div class="row">
+                    <div class="form-check form-switch m-0">
+                        <label class="form-check-label" for="visualizeAABBTree">Visualize dynamic AABB Tree</label>
+                        <input class="form-check-input" type="checkbox" role="switch" id="visualizeAABBTree">
+                    </div>
+                </div>
+
+                <div class="row">
                     <label for="frequency" class="form-label col-9 p-0 m-0">Frequency</label>
                     <div class="col text-end p-0 m-0" id="frequency_label">0Hz</div>
                     <input type="range" class="form-range " id="frequency">
@@ -150,7 +157,7 @@
                     </div>
                 </div>
 
-                <div class="row mb-2 mt-2">
+                <div class="row mb-2 mt-1">
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Shortcuts
                     </button>
@@ -206,6 +213,9 @@
                                 </div>
                                 <div class="row">
                                     - F to show profile
+                                </div>
+                                <div class="row">
+                                    - V to visualize dynamic AABB tree
                                 </div>
                             </div>
                             <div class="modal-footer">

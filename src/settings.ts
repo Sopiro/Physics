@@ -82,6 +82,7 @@ export const Settings = {
     colorizeActiveBody: true,
     sleepEnabled: true,
     showProfile: false,
+    visualizeAABBTree: false,
 }
 
 // Remove the default pop-up context menu
@@ -306,6 +307,10 @@ const colorizeActiveBody = document.querySelector("#colorizeActiveBody")! as HTM
 colorizeActiveBody.checked = Settings.colorizeActiveBody;
 colorizeActiveBody.addEventListener("click", () => { Settings.colorizeActiveBody = !Settings.colorizeActiveBody; });
 
+const visualizeAABBTree = document.querySelector("#visualizeAABBTree")! as HTMLInputElement;
+visualizeAABBTree.checked = Settings.visualizeAABBTree;
+visualizeAABBTree.addEventListener("click", () => { Settings.visualizeAABBTree = !Settings.visualizeAABBTree; });
+
 const showProfile = document.querySelector("#showProfile")! as HTMLInputElement;
 showProfile.checked = Settings.showProfile;
 showProfile.addEventListener("click", () => { Settings.showProfile = !Settings.showProfile; });
@@ -352,6 +357,10 @@ export function updateSetting(id: string, content?: any)
         case "f":
             Settings.showProfile = !Settings.showProfile;
             showProfile.checked = Settings.showProfile;
+            break;
+        case "v":
+            Settings.visualizeAABBTree = !Settings.visualizeAABBTree;
+            visualizeAABBTree.checked = Settings.visualizeAABBTree;
             break;
         case "b":
             Settings.showBoundingBox = !Settings.showBoundingBox;

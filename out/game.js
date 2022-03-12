@@ -188,6 +188,8 @@ export class Game {
             updateSetting("i");
         if (Input.isKeyPressed("f"))
             updateSetting("f");
+        if (Input.isKeyPressed("v"))
+            updateSetting("v");
     }
     render(r) {
         r.setCameraTransform(this.camera.cameraTransform);
@@ -305,17 +307,18 @@ export class Game {
                 r.log("Sleeping: " + this.target.sleeping, line++);
             }
         }
-        // let q = [this.world.tree.root];
-        // while (q.length != 0)
-        // {
-        //     let current = q.shift()!;
-        //     if (current == undefined) break;
-        //     r.drawAABB(current!.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
-        //     if (!current.isLeaf)
-        //     {
-        //         q.push(current.child1!);
-        //         q.push(current.child2!);
-        //     }
-        // }
+        if (Settings.visualizeAABBTree) {
+            let q = [this.world.tree.root];
+            while (q.length != 0) {
+                let current = q.shift();
+                if (current == undefined)
+                    break;
+                r.drawAABB(current.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
+                if (!current.isLeaf) {
+                    q.push(current.child1);
+                    q.push(current.child2);
+                }
+            }
+        }
     }
 }

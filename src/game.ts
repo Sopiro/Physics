@@ -251,6 +251,7 @@ export class Game
         if (Input.isKeyPressed("b")) updateSetting("b");
         if (Input.isKeyPressed("i")) updateSetting("i");
         if (Input.isKeyPressed("f")) updateSetting("f");
+        if (Input.isKeyPressed("v")) updateSetting("v");
     }
 
     render(r: Renderer): void
@@ -410,20 +411,23 @@ export class Game
             }
         }
 
-        // let q = [this.world.tree.root];
+        if (Settings.visualizeAABBTree)
+        {
+            let q = [this.world.tree.root];
 
-        // while (q.length != 0)
-        // {
-        //     let current = q.shift()!;
+            while (q.length != 0)
+            {
+                let current = q.shift()!;
 
-        //     if (current == undefined) break;
+                if (current == undefined) break;
 
-        //     r.drawAABB(current!.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
-        //     if (!current.isLeaf)
-        //     {
-        //         q.push(current.child1!);
-        //         q.push(current.child2!);
-        //     }
-        // }
+                r.drawAABB(current!.aabb, 1.0, !current.isLeaf ? "#00000055" : "#000000");
+                if (!current.isLeaf)
+                {
+                    q.push(current.child1!);
+                    q.push(current.child2!);
+                }
+            }
+        }
     }
 }
