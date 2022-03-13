@@ -1,5 +1,5 @@
 import { RigidBody, Type } from "./rigidbody.js";
-import { detectCollision } from "./detection.js";
+import { testPointInside, detectCollision } from "./detection.js";
 import { ContactManifold } from "./contact.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
@@ -7,7 +7,8 @@ import { Joint } from "./joint.js";
 import { Island } from "./island.js";
 import { GrabJoint } from "./grab.js";
 import { AABBTree } from "./aabbtree.js";
-import { containsAABB, createAABB } from "./aabb.js";
+import { AABB, containsAABB, createAABB, toRigidBody } from "./aabb.js";
+import { Vector2 } from "./math.js";
 
 type Registrable = RigidBody | Joint;
 
@@ -284,6 +285,49 @@ export class World
         }
 
         return false;
+    }
+
+    queryPoint(point: Vector2): RigidBody[]
+    {
+        let res: RigidBody[] = [];
+        let nodes = this.tree.queryPoint(point);
+
+        for (let i = 0; i < nodes.length; i++)
+        {
+            let b = nodes[i].body!;
+
+            if (testPointInside(b, point))
+            {
+                res.push(b);
+                break;
+            }
+        }
+
+        return res;
+    }
+
+    queryRegion(region: AABB): RigidBody[]
+    {
+        let res: RigidBody[] = [];
+        let nodes = this.tree.queryRegion(region);
+
+        for (let i = 0; i < nodes.length; i++)
+        {
+            let node = nodes[i];
+
+            if (containsAABB(region, node.aabb))
+            {
+                res.push(node.body!);
+                continue;
+            }
+
+            if (detectCollision(toRigidBody(region), node.body!) != null)
+            {
+                res.push(node.body!);
+            }
+        }
+
+        return res;
     }
 
     addPassTestPair(bodyA: RigidBody, bodyB: RigidBody)

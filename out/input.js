@@ -1,5 +1,11 @@
 import { Vector2 } from "./math.js";
 import { Settings, updateSetting } from "./settings.js";
+export var Button;
+(function (Button) {
+    Button[Button["Left"] = 0] = "Left";
+    Button[Button["Middle"] = 1] = "Middle";
+    Button[Button["Right"] = 2] = "Right";
+})(Button || (Button = {}));
 const last_keys = {};
 const curr_keys = {};
 const mouses = [];
@@ -64,13 +70,13 @@ export function isScrollingStart() {
 export function isScrollingEnd() {
     return !curr_scroll && last_scroll;
 }
-export function isMousePressed(button = 0) {
+export function isMousePressed(button = Button.Left) {
     return mouses[button].curr_down && !mouses[button].last_down;
 }
-export function isMouseReleased(button = 0) {
+export function isMouseReleased(button = Button.Left) {
     return !mouses[button].curr_down && mouses[button].last_down;
 }
-export function isMouseDown(button = 0) {
+export function isMouseDown(button = Button.Left) {
     return mouses[button].curr_down;
 }
 export function isKeyPressed(key) {

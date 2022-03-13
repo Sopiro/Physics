@@ -1,3 +1,4 @@
+import { Box } from "./box.js";
 import { Circle } from "./circle.js";
 import { Vector2 } from "./math.js";
 import { Polygon } from "./polygon.js";
@@ -20,7 +21,7 @@ export class AABB
     }
 }
 
-function fix(aabb: AABB): void
+export function fix(aabb: AABB): void
 {
     let minX = Math.min(aabb.min.x, aabb.max.x);
     let maxX = Math.max(aabb.min.x, aabb.max.x);
@@ -33,24 +34,36 @@ function fix(aabb: AABB): void
     aabb.max.y = maxY;
 }
 
-export function createAABB(b: RigidBody, margin: number = 0.0): AABB
+export function toRigidBody(aabb: AABB): RigidBody
 {
-    if (b instanceof Circle)
+    let width = aabb.max.x - aabb.min.x;
+    let height = aabb.max.y - aabb.min.y;
+
+    let box = new Box(width, height);
+    box.position.x += aabb.min.x + width / 2.0;
+    box.position.y += aabb.min.y + height / 2.0;
+
+    return box;
+}
+
+export function createAABB(body: RigidBody, margin: number = 0.0): AABB
+{
+    if (body instanceof Circle)
     {
         return new AABB(
-            new Vector2(b.position.x - b.radius - margin, b.position.y - b.radius - margin),
-            new Vector2(b.position.x + b.radius + margin, b.position.y + b.radius + margin)
+            new Vector2(body.position.x - body.radius - margin, body.position.y - body.radius - margin),
+            new Vector2(body.position.x + body.radius + margin, body.position.y + body.radius + margin)
         );
     }
-    else if (b instanceof Polygon) 
+    else if (body instanceof Polygon) 
     {
-        let localToGlobal = b.localToGlobal;
+        let localToGlobal = body.localToGlobal;
 
-        let res = new AABB(localToGlobal.mulVector2(b.vertices[0], 1), localToGlobal.mulVector2(b.vertices[0], 1));
+        let res = new AABB(localToGlobal.mulVector2(body.vertices[0], 1), localToGlobal.mulVector2(body.vertices[0], 1));
 
-        for (let i = 1; i < b.count; i++)
+        for (let i = 1; i < body.count; i++)
         {
-            let gv = localToGlobal.mulVector2(b.vertices[i], 1);
+            let gv = localToGlobal.mulVector2(body.vertices[i], 1);
             if (gv.x < res.min.x)
                 res.min.x = gv.x;
             else if (gv.x > res.max.x)

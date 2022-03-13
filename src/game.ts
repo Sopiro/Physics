@@ -11,7 +11,7 @@ import { GenerationShape, MouseMode, Settings, updateSetting } from "./settings.
 import { demos } from "./demo.js";
 import { GrabJoint } from "./grab.js";
 import { Polygon } from "./polygon.js";
-import { createAABB } from "./aabb.js";
+import { AABB, createAABB, fix } from "./aabb.js";
 
 export let gWorld: World;
 
@@ -28,6 +28,7 @@ export class Game
 
     private cameraPosStart!: Vector2;
     private cursorStart!: Vector2;
+    private dragging = false;
     private cameraMove = false;
     private grabbing = false;
     private bindPosition!: Vector2;
@@ -99,12 +100,32 @@ export class Game
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
 
-
         this.camera.translate(new Vector2(mx, my).mul(delta * 10 * this.camera.scale.x));
         let tmpCursorPos = this.renderer.pick(Input.mousePosition);
 
         this.cursorPos.x = tmpCursorPos.x;
         this.cursorPos.y = tmpCursorPos.y;
+
+        if (!this.dragging && Input.isMousePressed(Input.Button.Middle))
+        {
+            this.cursorStart = this.cursorPos.copy();
+            this.dragging = true;
+        }
+
+        if (this.dragging && Input.isMouseReleased(Input.Button.Middle))
+        {
+            this.dragging = false;
+            let aabb = new AABB(this.cursorStart.copy(), this.cursorPos.copy());
+            fix(aabb);
+
+            let bodies = this.world.queryRegion(aabb);
+            for (let i = 0; i < bodies.length; i++)
+            {
+                let b = bodies[i];
+
+                this.world.unregister(b.id);
+            }
+        }
 
         if (Input.isScrolling())
         {
@@ -118,13 +139,13 @@ export class Game
             }
         }
 
-        if (!this.cameraMove && Input.isMousePressed(2))
+        if (!this.cameraMove && Input.isMousePressed(Input.Button.Right))
         {
             this.cameraMove = true;
             this.cursorStart = Input.mousePosition.copy();
             this.cameraPosStart = this.camera.position.copy();
         }
-        else if (Input.isMouseReleased(2))
+        else if (Input.isMouseReleased(Input.Button.Right))
         {
             this.cameraMove = false;
         }
@@ -139,7 +160,7 @@ export class Game
 
         if (this.grabbing && !this.cameraMove)
         {
-            if (Input.isMouseReleased())
+            if (Input.isMouseReleased(Input.Button.Left))
             {
                 if (Settings.mode == MouseMode.Force)
                 {
@@ -166,14 +187,16 @@ export class Game
             }
         }
 
-        if (Input.isMousePressed())
+        if (Input.isMousePressed(Input.Button.Left))
         {
             let skipGeneration = false;
 
-            for (let i = 0; i < this.world.bodies.length; i++)
+            let bodies = this.world.queryPoint(this.cursorPos);
+
+            for (let i = 0; i < bodies.length; i++)
             {
-                let b = this.world.bodies[i];
-                if (b.type != Type.Static && Util.checkInside(b, this.cursorPos))
+                let b = bodies[i];
+                if (b.type != Type.Static)
                 {
                     this.grabbing = true;
                     if (Settings.grabCenter)
@@ -231,16 +254,13 @@ export class Game
             }
         }
 
-        if (Input.isMousePressed(2))
+        if (Input.isMousePressed(Input.Button.Right))
         {
-            for (let i = 0; i < this.world.bodies.length; i++)
+            let bodies = this.world.queryPoint(this.cursorPos);
+
+            if (bodies.length != 0)
             {
-                let b = this.world.bodies[i];
-                if (Util.checkInside(b, this.cursorPos))
-                {
-                    this.world.unregister(b.id);
-                    break;
-                }
+                this.world.unregister(bodies[0].id);
             }
         }
 
@@ -365,15 +385,16 @@ export class Game
 
         if (Settings.showInfo)
         {
-            let i = 0;
-            for (; i < this.world.bodies.length; i++)
-            {
-                this.target = this.world.bodies[i];
+            let found = false;
+            let bodies = this.world.queryPoint(this.cursorPos);
 
-                if (Util.checkInside(this.target, this.cursorPos)) break;
+            if (bodies.length != 0)
+            {
+                this.target = bodies[0];
+                found = true;
             }
 
-            if (this.world.bodies.length > 0 && i != this.world.bodies.length)
+            if (found)
             {
                 r.log("Type: " + String(Type[this.target.type]), line++);
                 r.log("Mass: " + String(this.target.mass) + "kg", line++);
@@ -417,6 +438,14 @@ export class Game
             {
                 r.drawAABB(node!.aabb, 1.0, !node.isLeaf ? "#00000055" : "#000000");
             })
+        }
+
+        if (this.dragging && Input.isMouseDown(Input.Button.Middle))
+        {
+            let aabb = new AABB(this.cursorStart.copy(), this.cursorPos.copy());
+            fix(aabb);
+
+            r.drawAABB(aabb);
         }
     }
 }

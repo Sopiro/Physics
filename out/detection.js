@@ -237,3 +237,22 @@ export function detectCollision(a, b) {
         return contact;
     }
 }
+export function testPointInside(body, point) {
+    let localP = body.globalToLocal.mulVector2(point, 1);
+    if (body instanceof Circle) {
+        return localP.length <= body.radius;
+    }
+    else if (body instanceof Polygon) {
+        let poly = body;
+        let dir = poly.vertices[0].sub(localP).cross(poly.vertices[1].sub(localP));
+        for (let i = 1; i < poly.vertices.length; i++) {
+            let nDir = poly.vertices[i].sub(localP).cross(poly.vertices[(i + 1) % poly.count].sub(localP));
+            if (dir * nDir < 0)
+                return false;
+        }
+        return true;
+    }
+    else {
+        throw "Not a supported shape";
+    }
+}

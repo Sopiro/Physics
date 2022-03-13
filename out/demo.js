@@ -53,7 +53,7 @@ function demo3(game, world) {
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
-    const rows = 12;
+    const rows = 15;
     const boxSize = 0.35;
     const xGap = 0.05;
     const yGap = 0.33;

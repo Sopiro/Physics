@@ -1,4 +1,4 @@
-import { detectCollisionAABB, testPointInside, union, createAABB } from "./aabb.js";
+import { detectCollisionAABB, testPointInside, union, createAABB, fix } from "./aabb.js";
 import { Type } from "./rigidbody.js";
 import { make_pair_natural } from "./util.js";
 export class AABBTree {
@@ -142,6 +142,7 @@ export class AABBTree {
         let res = [];
         if (this.root == undefined)
             return res;
+        fix(region);
         let q = [this.root];
         while (q.length != 0) {
             let current = q.shift();

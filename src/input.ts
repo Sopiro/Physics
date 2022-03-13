@@ -2,6 +2,13 @@ import { Engine } from "./engine";
 import { Vector2 } from "./math.js";
 import { Settings, updateSetting } from "./settings.js";
 
+export enum Button
+{
+    Left = 0,
+    Middle,
+    Right,
+}
+
 interface Key
 {
     [key: string]: boolean;
@@ -101,17 +108,17 @@ export function isScrollingEnd(): boolean
     return !curr_scroll && last_scroll;
 }
 
-export function isMousePressed(button: number = 0): boolean
+export function isMousePressed(button: Button = Button.Left): boolean
 {
     return mouses[button].curr_down && !mouses[button].last_down;
 }
 
-export function isMouseReleased(button: number = 0): boolean
+export function isMouseReleased(button: Button = Button.Left): boolean
 {
     return !mouses[button].curr_down && mouses[button].last_down;
 }
 
-export function isMouseDown(button: number = 0): boolean
+export function isMouseDown(button: Button = Button.Left): boolean
 {
     return mouses[button].curr_down;
 }

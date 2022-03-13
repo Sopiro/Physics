@@ -1,4 +1,4 @@
-import { AABB, detectCollisionAABB, testPointInside, union, createAABB } from "./aabb.js";
+import { AABB, detectCollisionAABB, testPointInside, union, createAABB, fix } from "./aabb.js";
 import { Vector2 } from "./math.js";
 import { RigidBody, Type } from "./rigidbody.js";
 import { make_pair_natural, Pair } from "./util.js";
@@ -209,11 +209,11 @@ export class AABBTree
     queryRegion(region: AABB): Node[]
     {
         let res: Node[] = [];
-
         if (this.root == undefined) return res;
 
+        fix(region);
+        
         let q = [this.root];
-
         while (q.length != 0)
         {
             let current = q.shift()!;

@@ -1,12 +1,12 @@
 import { RigidBody, Type } from "./rigidbody.js";
-import { detectCollision } from "./detection.js";
+import { testPointInside, detectCollision } from "./detection.js";
 import * as Util from "./util.js";
 import { Settings } from "./settings.js";
 import { Joint } from "./joint.js";
 import { Island } from "./island.js";
 import { GrabJoint } from "./grab.js";
 import { AABBTree } from "./aabbtree.js";
-import { containsAABB, createAABB } from "./aabb.js";
+import { containsAABB, createAABB, toRigidBody } from "./aabb.js";
 export class World {
     constructor() {
         this.uid = 0;
@@ -200,6 +200,33 @@ export class World {
             return true;
         }
         return false;
+    }
+    queryPoint(point) {
+        let res = [];
+        let nodes = this.tree.queryPoint(point);
+        for (let i = 0; i < nodes.length; i++) {
+            let b = nodes[i].body;
+            if (testPointInside(b, point)) {
+                res.push(b);
+                break;
+            }
+        }
+        return res;
+    }
+    queryRegion(region) {
+        let res = [];
+        let nodes = this.tree.queryRegion(region);
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            if (containsAABB(region, node.aabb)) {
+                res.push(node.body);
+                continue;
+            }
+            if (detectCollision(toRigidBody(region), node.body) != null) {
+                res.push(node.body);
+            }
+        }
+        return res;
     }
     addPassTestPair(bodyA, bodyB) {
         this.passTestSet.add(Util.make_pair_natural(bodyA.id, bodyB.id));
