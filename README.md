@@ -11,18 +11,18 @@ Video: https://youtu.be/ROAqjE40pxU
 |![example3](.github/Animation3.gif)|![example4](.github/Animation4.gif)|
 
 ## Features
-- Basic input, rendering system
+- Real-time interactive simulation
 - Rigid body
   - Shapes: Convex polygons and circles
   - Density-based body definition
 - Collision detection
-  - AABB Broad phase
+  - Broad phase, narrow phase collision detection
+  - Dynamic AABB volume tree for spatial partitioning
   - Computing minimum distance between two convex shapes (GJK)
   - Generate contact manifold (EPA)
 - Collision resolution 
   - Friction and restitution
-  - Iterative solver
-  - Sequential impulses  
+  - Iterative solver (Sequential impulses)  
   - Collision callback  
 - Constraint-basd simulation
   - Contact constraint
@@ -32,7 +32,6 @@ Video: https://youtu.be/ROAqjE40pxU
 - Optimization
   - Constraint islanding
   - Island sleeping
-
 
 ## References
 - https://box2d.org/publications/
