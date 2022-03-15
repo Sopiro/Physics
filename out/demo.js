@@ -56,7 +56,7 @@ function demo3(game, world) {
     const rows = 15;
     const boxSize = 0.35;
     const xGap = 0.05;
-    const yGap = 0.33;
+    const yGap = 0.15;
     const xStart = -rows * boxSize / 2.0;
     const yStart = 0.6;
     for (let y = 0; y < rows; y++) {
