@@ -804,7 +804,6 @@ function demo19(game: Game, world: World): void
     ground.restitution = 0.45;
     world.register(ground);
 
-
     let m1: MotorJoint;
     let c1: RigidBody;
 

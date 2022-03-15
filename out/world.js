@@ -41,15 +41,16 @@ export class World {
         }
         // Broad Phase
         // Retrieve a list of collider pairs that are potentially colliding
+        // let pairs = getCollisionPairsNSquared(this.bodies);
         let pairs = this.tree.getCollisionPairs();
         for (let i = 0; i < pairs.length; i++) {
             let pair = pairs[i];
-            let a = pair.p1.body;
-            let b = pair.p2.body;
+            let a = pair.p1;
+            let b = pair.p2;
             // Improve coherence
             if (a.id > b.id) {
-                a = pair.p2.body;
-                b = pair.p1.body;
+                a = pair.p2;
+                b = pair.p1;
             }
             if (a.type == Type.Static && b.type == Type.Static)
                 continue;

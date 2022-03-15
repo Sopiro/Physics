@@ -266,7 +266,7 @@ export class AABBTree {
         checked.add(key);
         if (a.isLeaf && b.isLeaf) {
             if (detectCollisionAABB(a.aabb, b.aabb)) {
-                pairs.push({ p1: a, p2: b });
+                pairs.push({ p1: a.body, p2: b.body });
             }
         }
         else if (!a.isLeaf && !b.isLeaf) {

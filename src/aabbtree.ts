@@ -358,11 +358,11 @@ export class AABBTree
         return res;
     }
 
-    getCollisionPairs(): Pair<Node, Node>[]
+    getCollisionPairs(): Pair<RigidBody, RigidBody>[]
     {
         if (this.root == undefined) return [];
 
-        let res: Pair<Node, Node>[] = [];
+        let res: Pair<RigidBody, RigidBody>[] = [];
         let checked: Set<number> = new Set<number>();
 
         if (!this.root.isLeaf)
@@ -373,7 +373,7 @@ export class AABBTree
         return res;
     }
 
-    private checkCollision(a: Node, b: Node, pairs: Pair<Node, Node>[], checked: Set<number>): void
+    private checkCollision(a: Node, b: Node, pairs: Pair<RigidBody, RigidBody>[], checked: Set<number>): void
     {
         const key = make_pair_natural(a.id, b.id);
         if (checked.has(key)) return;
@@ -384,7 +384,7 @@ export class AABBTree
         {
             if (detectCollisionAABB(a.aabb, b.aabb))
             {
-                pairs.push({ p1: a, p2: b });
+                pairs.push({ p1: a.body!, p2: b.body! });
             }
         }
         else if (!a.isLeaf && !b.isLeaf)
