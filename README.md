@@ -1,6 +1,6 @@
 # 2D Rigid Body Physics Engine
 
-2D Rigid body physics engine implemented in HTML canvas with Typescript.
+2D Rigid body physics engine written in TypeScript.
 
 Live demo: https://sopiro.github.io/Physics/  
 Video: https://youtu.be/ROAqjE40pxU  
@@ -19,9 +19,10 @@ Video: https://youtu.be/ROAqjE40pxU
   - Broad phase, narrow phase collision detection
   - Dynamic AABB volume tree for spatial partitioning
   - Computing minimum distance between two convex shapes (GJK)
-  - Generate contact manifold (EPA)
+  - Contact manifold generation (EPA)
 - Collision resolution 
-  - Friction and restitution
+  - Impulse-based collision response  
+  - Friction and restitution  
   - Iterative solver (Sequential impulses)  
   - Collision callback  
 - Constraint-basd simulation
@@ -31,7 +32,7 @@ Video: https://youtu.be/ROAqjE40pxU
   - Block solver
 - Optimization
   - Constraint islanding
-  - Island sleeping
+  - Island(Rigid body) sleeping
 
 ## References
 - https://box2d.org/publications/
