@@ -308,7 +308,7 @@ export class ContactManifold extends Constraint {
     }
     applyImpulse() { }
     tryWarmStart(oldManifold) {
-        const distance_clamping = false;
+        const distance_clamping = true;
         for (let n = 0; n < this.numContacts; n++) {
             let o = 0;
             for (; o < oldManifold.numContacts; o++) {

@@ -61,6 +61,7 @@ export const Settings = {
     positionCorrectionBeta: 0.2,
     warmStartingThreshold: 0.005 * 0.005,
     deadBottom: -10.0,
+    resetCamera: true,
     grabCenter: false,
     showInfo: false,
     randomConvexMaxVertices: 8,
@@ -229,6 +230,9 @@ gravityForce.addEventListener("input", () => {
 const grabCenter = document.querySelector("#grabCenter");
 grabCenter.checked = Settings.grabCenter;
 grabCenter.addEventListener("click", () => { Settings.grabCenter = !Settings.grabCenter; });
+const resetCamera = document.querySelector("#resetCamera");
+resetCamera.checked = Settings.resetCamera;
+resetCamera.addEventListener("click", () => { Settings.resetCamera = !Settings.resetCamera; });
 const showInfo = document.querySelector("#showInfo");
 showInfo.checked = Settings.showInfo;
 showInfo.addEventListener("click", () => { Settings.showInfo = !Settings.showInfo; });

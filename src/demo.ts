@@ -48,7 +48,7 @@ function demo2(game: Game, world: World): void
 
     let start = 0.5;
     let size = 0.3;
-    let gap = 0.2;
+    let gap = 0.26;
 
     // let error = 0.015;
     let error = 0.0;
@@ -76,7 +76,7 @@ function demo3(game: Game, world: World): void
     const xGap = 0.05;
     const yGap = 0.2;
     const xStart = - rows * boxSize / 2.0;
-    const yStart = 0.6;
+    const yStart = 0.55;
 
     for (let y = 0; y < rows; y++)
     {

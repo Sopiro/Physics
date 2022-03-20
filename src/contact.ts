@@ -452,7 +452,7 @@ export class ContactManifold extends Constraint
 
     tryWarmStart(oldManifold: ContactManifold)
     {
-        const distance_clamping = false;
+        const distance_clamping = true;
 
         for (let n = 0; n < this.numContacts; n++)
         {
