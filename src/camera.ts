@@ -17,4 +17,9 @@ export class Camera extends Entity
     {
         return super.globalToLocal;
     }
+
+    reset(): void
+    {
+        this.resetTransform();
+    }
 }

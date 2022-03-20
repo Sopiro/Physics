@@ -161,6 +161,8 @@ function epa(b1: RigidBody, b2: RigidBody, gjkResult: Simplex): EPAResult
     };
 }
 
+const TANGENT_MIN_LENGTH = 0.01;
+
 function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
 {
     let localDir = b.globalToLocal.mulVector2(dir, 0)
@@ -173,9 +175,9 @@ function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
     if (b instanceof Circle)
     {
         curr = localToGlobal.mulVector2(curr, 1);
-        let tangent = Util.cross(1, dir).mul(0.01);
+        let tangent = Util.cross(1, dir).mul(TANGENT_MIN_LENGTH);
 
-        return new Edge(curr, curr.add(tangent));
+        return new Edge(curr, curr.add(tangent), -1);
     }
     else if (b instanceof Polygon)
     {
@@ -191,7 +193,9 @@ function findFarthestEdge(b: RigidBody, dir: Vector2): Edge
 
         curr = localToGlobal.mulVector2(curr, 1);
 
-        return w ? new Edge(localToGlobal.mulVector2(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector2(next, 1));
+        return w ?
+            new Edge(localToGlobal.mulVector2(prev, 1), curr, (idx - 1 + p.count) % p.count, idx) :
+            new Edge(curr, localToGlobal.mulVector2(next, 1), idx, (idx + 1) % p.count);
     }
     else
     {
@@ -211,24 +215,40 @@ function clipEdge(edge: Edge, p: Vector2, dir: Vector2, remove: boolean = false)
     if (d1 < 0)
     {
         if (remove)
+        {
             edge.p1 = edge.p2;
+            edge.id1 = edge.id2;
+        }
         else
+        {
             edge.p1 = edge.p1.add(edge.p2.sub(edge.p1).mul(-d1 / per));
+        }
     }
     else if (d2 < 0)
     {
         if (remove)
+        {
             edge.p2 = edge.p1;
+            edge.id2 = edge.id1;
+        }
         else
+        {
             edge.p2 = edge.p2.add(edge.p1.sub(edge.p2).mul(-d2 / per));
+        }
     }
+}
+
+export interface ContactPoint
+{
+    point: Vector2;
+    id: number;
 }
 
 // Since the findFarthestEdge function returns a edge with a minimum length of 0.01 for circle,
 // merging threshold should be greater than sqrt(2) * minimum edge length
-const CONTACT_MERGE_THRESHOLD = 1.415 * 0.01;
+const CONTACT_MERGE_THRESHOLD = 1.415 * TANGENT_MIN_LENGTH;
 
-function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
+function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): ContactPoint[]
 {
     let edgeA = findFarthestEdge(a, n);
     let edgeB = findFarthestEdge(b, n.inverted());
@@ -251,13 +271,17 @@ function findContactPoints(n: Vector2, a: RigidBody, b: RigidBody): Vector2[]
     clipEdge(inc, ref.p2, ref.dir.inverted());
     clipEdge(inc, ref.p1, flip ? n : n.inverted(), true);
 
-    let contactPoints: Vector2[];
+    let contactPoints: ContactPoint[];
 
     // If two points are closer than threshold, merge them into one point
     if (inc.length <= CONTACT_MERGE_THRESHOLD)
-        contactPoints = [inc.p1];
+    {
+        contactPoints = [{ point: inc.p1, id: inc.id1 }];
+    }
     else
-        contactPoints = [inc.p1, inc.p2];
+    {
+        contactPoints = [{ point: inc.p1, id: inc.id1 }, { point: inc.p2, id: inc.id2 }];
+    }
 
     return contactPoints;
 }
@@ -293,7 +317,7 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
                 flipped = true;
             }
 
-            let contact = new ContactManifold(a, b, [contactPoint], penetrationDepth, contactNormal, flipped);
+            let contact = new ContactManifold(a, b, [{ point: contactPoint, id: -1 }], penetrationDepth, contactNormal, flipped);
 
             return contact;
         }

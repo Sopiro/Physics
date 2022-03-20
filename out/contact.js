@@ -274,8 +274,8 @@ export class ContactManifold extends Constraint {
         this.contactTangent = new Vector2(-contactNormal.y, contactNormal.x);
         this.featureFlipped = featureFlipped;
         for (let i = 0; i < this.numContacts; i++) {
-            this.normalContacts.push(new ContactSolver(this, contactPoints[i]));
-            this.tangentContacts.push(new ContactSolver(this, contactPoints[i]));
+            this.normalContacts.push(new ContactSolver(this, contactPoints[i].point));
+            this.tangentContacts.push(new ContactSolver(this, contactPoints[i].point));
         }
         if (this.numContacts == 2 && Settings.blockSolve) {
             this.blockSolver = new BlockSolver(this);
@@ -308,13 +308,21 @@ export class ContactManifold extends Constraint {
     }
     applyImpulse() { }
     tryWarmStart(oldManifold) {
+        const distance_clamping = false;
         for (let n = 0; n < this.numContacts; n++) {
             let o = 0;
             for (; o < oldManifold.numContacts; o++) {
-                let dist = Util.squared_distance(this.contactPoints[n], oldManifold.contactPoints[o]);
-                // If contact points are close enough, warm start.
-                if (dist < Settings.warmStartingThreshold)
-                    break;
+                if (this.contactPoints[n].id == oldManifold.contactPoints[o].id) {
+                    if (distance_clamping) {
+                        let dist = Util.squared_distance(this.contactPoints[n].point, oldManifold.contactPoints[o].point);
+                        // If contact points are close enough, warm start.
+                        if (dist < Settings.warmStartingThreshold)
+                            break;
+                    }
+                    else {
+                        break;
+                    }
+                }
             }
             if (o < oldManifold.numContacts) {
                 this.normalContacts[n].impulseSum = oldManifold.normalContacts[o].impulseSum;
@@ -335,7 +343,7 @@ export class ContactManifold extends Constraint {
             impulse: 0,
         };
         for (let i = 0; i < this.numContacts; i++) {
-            contactInfo.contactPoints.push(this.contactPoints[i].copy());
+            contactInfo.contactPoints.push(this.contactPoints[i].point.copy());
             contactInfo.impulse += this.normalContacts[i].impulseSum;
         }
         return contactInfo;

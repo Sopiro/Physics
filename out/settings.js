@@ -13,7 +13,7 @@ export var MouseMode;
     MouseMode[MouseMode["Force"] = 1] = "Force";
 })(MouseMode || (MouseMode = {}));
 const frequencyRange = { p1: 10, p2: 240 };
-const iterationRange = { p1: 0, p2: 50 };
+const iterationRange = { p1: 1, p2: 50 };
 const densityRange = { p1: 1, p2: 100 };
 const sizeRange = { p1: 0.1, p2: 3 };
 const gravityForceRange = { p1: -20, p2: 20 };
@@ -56,10 +56,10 @@ export const Settings = {
     },
     gravity: -10,
     gravityScale: 0.25,
-    penetrationSlop: 0.002,
+    penetrationSlop: 0.005,
     restitutionSlop: 0.5,
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.0025 * 0.0025,
+    warmStartingThreshold: 0.005 * 0.005,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,

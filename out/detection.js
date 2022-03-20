@@ -100,6 +100,7 @@ function epa(b1, b2, gjkResult) {
         contactNormal: closestEdge.normal,
     };
 }
+const TANGENT_MIN_LENGTH = 0.01;
 function findFarthestEdge(b, dir) {
     let localDir = b.globalToLocal.mulVector2(dir, 0);
     let farthest = support(b, localDir);
@@ -108,8 +109,8 @@ function findFarthestEdge(b, dir) {
     let localToGlobal = b.localToGlobal;
     if (b instanceof Circle) {
         curr = localToGlobal.mulVector2(curr, 1);
-        let tangent = Util.cross(1, dir).mul(0.01);
-        return new Edge(curr, curr.add(tangent));
+        let tangent = Util.cross(1, dir).mul(TANGENT_MIN_LENGTH);
+        return new Edge(curr, curr.add(tangent), -1);
     }
     else if (b instanceof Polygon) {
         let p = b;
@@ -119,7 +120,9 @@ function findFarthestEdge(b, dir) {
         let e2 = curr.sub(next).normalized();
         let w = Math.abs(e1.dot(localDir)) <= Math.abs(e2.dot(localDir));
         curr = localToGlobal.mulVector2(curr, 1);
-        return w ? new Edge(localToGlobal.mulVector2(prev, 1), curr) : new Edge(curr, localToGlobal.mulVector2(next, 1));
+        return w ?
+            new Edge(localToGlobal.mulVector2(prev, 1), curr, (idx - 1 + p.count) % p.count, idx) :
+            new Edge(curr, localToGlobal.mulVector2(next, 1), idx, (idx + 1) % p.count);
     }
     else {
         throw "Not a supported shape";
@@ -132,21 +135,27 @@ function clipEdge(edge, p, dir, remove = false) {
         return;
     let per = Math.abs(d1) + Math.abs(d2);
     if (d1 < 0) {
-        if (remove)
+        if (remove) {
             edge.p1 = edge.p2;
-        else
+            edge.id1 = edge.id2;
+        }
+        else {
             edge.p1 = edge.p1.add(edge.p2.sub(edge.p1).mul(-d1 / per));
+        }
     }
     else if (d2 < 0) {
-        if (remove)
+        if (remove) {
             edge.p2 = edge.p1;
-        else
+            edge.id2 = edge.id1;
+        }
+        else {
             edge.p2 = edge.p2.add(edge.p1.sub(edge.p2).mul(-d2 / per));
+        }
     }
 }
 // Since the findFarthestEdge function returns a edge with a minimum length of 0.01 for circle,
 // merging threshold should be greater than sqrt(2) * minimum edge length
-const CONTACT_MERGE_THRESHOLD = 1.415 * 0.01;
+const CONTACT_MERGE_THRESHOLD = 1.415 * TANGENT_MIN_LENGTH;
 function findContactPoints(n, a, b) {
     let edgeA = findFarthestEdge(a, n);
     let edgeB = findFarthestEdge(b, n.inverted());
@@ -165,10 +174,12 @@ function findContactPoints(n, a, b) {
     clipEdge(inc, ref.p1, flip ? n : n.inverted(), true);
     let contactPoints;
     // If two points are closer than threshold, merge them into one point
-    if (inc.length <= CONTACT_MERGE_THRESHOLD)
-        contactPoints = [inc.p1];
-    else
-        contactPoints = [inc.p1, inc.p2];
+    if (inc.length <= CONTACT_MERGE_THRESHOLD) {
+        contactPoints = [{ point: inc.p1, id: inc.id1 }];
+    }
+    else {
+        contactPoints = [{ point: inc.p1, id: inc.id1 }, { point: inc.p2, id: inc.id2 }];
+    }
     return contactPoints;
 }
 // Returns contact data if collide, otherwise returns null
@@ -193,7 +204,7 @@ export function detectCollision(a, b) {
                 contactNormal.invert();
                 flipped = true;
             }
-            let contact = new ContactManifold(a, b, [contactPoint], penetrationDepth, contactNormal, flipped);
+            let contact = new ContactManifold(a, b, [{ point: contactPoint, id: -1 }], penetrationDepth, contactNormal, flipped);
             return contact;
         }
     }

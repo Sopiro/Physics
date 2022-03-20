@@ -9,4 +9,7 @@ export class Camera extends Entity {
     get cameraTransform() {
         return super.globalToLocal;
     }
+    reset() {
+        this.resetTransform();
+    }
 }

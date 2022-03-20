@@ -24,7 +24,7 @@ export class Island {
                 let linear_a = b.force.mul(b.inverseMass * Settings.dt); // Force / mass * dt
                 b.linearVelocity.x += linear_a.x;
                 b.linearVelocity.y += linear_a.y;
-                let angular_a = b.torque * b.inverseInertia * Settings.dt; // Torque / Inertia * dt
+                let angular_a = b.torque * b.inverseInertia * Settings.dt; // Torque / inertia * dt
                 b.angularVelocity += angular_a;
                 if (this.sleeping &&
                     (linear_a.squaredLength >= Settings.restLinearTolerance) || (angular_a * angular_a >= Settings.restAngularTolerance)) {

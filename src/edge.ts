@@ -7,7 +7,10 @@ export class Edge
     public p2: Vector2;
     public dir: Vector2;
 
-    constructor(p1: Vector2, p2: Vector2)
+    public id1: number;
+    public id2: number;
+
+    constructor(p1: Vector2, p2: Vector2, id1: number = -1, id2: number = -1)
     {
         this.p1 = p1.copy();
         this.p2 = p2.copy();
@@ -16,6 +19,9 @@ export class Edge
             this.dir = new Vector2(0, 0);
         else
             this.dir = p2.sub(p1).normalized();
+
+        this.id1 = id1;
+        this.id2 = id2;
     }
 
     get length()

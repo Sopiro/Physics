@@ -46,7 +46,7 @@ export class Island
                 b.linearVelocity.x += linear_a.x;
                 b.linearVelocity.y += linear_a.y;
 
-                let angular_a = b.torque * b.inverseInertia * Settings.dt // Torque / Inertia * dt
+                let angular_a = b.torque * b.inverseInertia * Settings.dt // Torque / inertia * dt
                 b.angularVelocity += angular_a;
 
                 if (this.sleeping &&

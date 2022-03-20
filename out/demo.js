@@ -56,7 +56,7 @@ function demo3(game, world) {
     const rows = 15;
     const boxSize = 0.35;
     const xGap = 0.05;
-    const yGap = 0.15;
+    const yGap = 0.2;
     const xStart = -rows * boxSize / 2.0;
     const yStart = 0.6;
     for (let y = 0; y < rows; y++) {
@@ -92,7 +92,7 @@ function demo4(game, world) {
     b.mass = 30;
     world.register(b);
 }
-Reflect.set(demo5, "SimulationName", "Billiard");
+Reflect.set(demo5, "SimulationName", "Billiards");
 function demo5(game, world) {
     updateSetting("g", false);
     let lstart = -4;
@@ -182,7 +182,7 @@ function demo7(game, world) {
     let yStart = 7.0;
     let gap = 0.30;
     let size = 0.30;
-    let frictions = [0.5, 0.3, 0.2, 0.12, 0.0];
+    let frictions = [0.51, 0.31, 0.21, 0.11, 0.0];
     for (let i = 0; i < frictions.length; i++) {
         b = new Box(size, size);
         b.position = new Vector2(xStart + (size + gap) * i, yStart);

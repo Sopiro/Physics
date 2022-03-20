@@ -3,6 +3,7 @@ import { Matrix2, Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 import * as Util from "./util.js";
 import { Constraint } from "./constraint.js";
+import { ContactPoint } from "./detection.js";
 
 enum ContactType
 {
@@ -377,7 +378,7 @@ export class ContactManifold extends Constraint
     public readonly penetrationDepth: number;
     public readonly contactNormal: Vector2;
     public readonly contactTangent: Vector2;
-    public readonly contactPoints: Vector2[];
+    public readonly contactPoints: ContactPoint[];
 
     private readonly normalContacts: ContactSolver[] = [];
     private readonly tangentContacts: ContactSolver[] = [];
@@ -388,7 +389,7 @@ export class ContactManifold extends Constraint
 
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
-        contactPoints: Vector2[], penetrationDepth: number, contactNormal: Vector2,
+        contactPoints: ContactPoint[], penetrationDepth: number, contactNormal: Vector2,
         featureFlipped: boolean
     )
     {
@@ -401,8 +402,8 @@ export class ContactManifold extends Constraint
 
         for (let i = 0; i < this.numContacts; i++)
         {
-            this.normalContacts.push(new ContactSolver(this, contactPoints[i]));
-            this.tangentContacts.push(new ContactSolver(this, contactPoints[i]));
+            this.normalContacts.push(new ContactSolver(this, contactPoints[i].point));
+            this.tangentContacts.push(new ContactSolver(this, contactPoints[i].point));
         }
 
         if (this.numContacts == 2 && Settings.blockSolve)
@@ -451,16 +452,27 @@ export class ContactManifold extends Constraint
 
     tryWarmStart(oldManifold: ContactManifold)
     {
+        const distance_clamping = false;
+
         for (let n = 0; n < this.numContacts; n++)
         {
             let o = 0;
             for (; o < oldManifold.numContacts; o++)
             {
-                let dist = Util.squared_distance(this.contactPoints[n], oldManifold.contactPoints[o]);
-
-                // If contact points are close enough, warm start.
-                if (dist < Settings.warmStartingThreshold)
-                    break;
+                if (this.contactPoints[n].id == oldManifold.contactPoints[o].id)
+                {
+                    if (distance_clamping)
+                    {
+                        let dist = Util.squared_distance(this.contactPoints[n].point, oldManifold.contactPoints[o].point);
+                        // If contact points are close enough, warm start.
+                        if (dist < Settings.warmStartingThreshold)
+                            break;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
 
             if (o < oldManifold.numContacts)
@@ -490,7 +502,7 @@ export class ContactManifold extends Constraint
 
         for (let i = 0; i < this.numContacts; i++)
         {
-            contactInfo.contactPoints.push(this.contactPoints[i].copy());
+            contactInfo.contactPoints.push(this.contactPoints[i].point.copy());
             contactInfo.impulse += this.normalContacts[i].impulseSum;
         }
 

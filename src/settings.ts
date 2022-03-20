@@ -16,7 +16,7 @@ export enum MouseMode
 }
 
 const frequencyRange: Util.Pair<number, number> = { p1: 10, p2: 240 };
-const iterationRange: Util.Pair<number, number> = { p1: 0, p2: 50 };
+const iterationRange: Util.Pair<number, number> = { p1: 1, p2: 50 };
 const densityRange: Util.Pair<number, number> = { p1: 1, p2: 100 };
 const sizeRange: Util.Pair<number, number> = { p1: 0.1, p2: 3 };
 const gravityForceRange: Util.Pair<number, number> = { p1: -20, p2: 20 };
@@ -61,10 +61,10 @@ export const Settings = {
     },
     gravity: -10,
     gravityScale: 0.25,
-    penetrationSlop: 0.002,
+    penetrationSlop: 0.005,
     restitutionSlop: 0.5, // This has to be greater than (gravity * gravityScale * deltaTime)
     positionCorrectionBeta: 0.2,
-    warmStartingThreshold: 0.0025 * 0.0025,
+    warmStartingThreshold: 0.005 * 0.005,
     deadBottom: -10.0,
     grabCenter: false,
     showInfo: false,

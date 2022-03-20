@@ -259,8 +259,8 @@ export class Game {
                 let j = 0;
                 let mid = new Vector2();
                 for (; j < m.numContacts; j++) {
-                    mid = mid.add(m.contactPoints[j]);
-                    r.drawCircleV(m.contactPoints[j], 0.04);
+                    mid = mid.add(m.contactPoints[j].point);
+                    r.drawCircleV(m.contactPoints[j].point, 0.04);
                 }
                 mid = mid.div(j);
                 r.drawVectorP(mid, mid.add(m.contactNormal.mul(0.2)), 0.015);
