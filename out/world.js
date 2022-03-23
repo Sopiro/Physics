@@ -32,6 +32,8 @@ export class World {
         for (let i = 0; i < this.bodies.length; i++) {
             let b = this.bodies[i];
             b.manifoldIDs = [];
+            if (b.sleeping)
+                continue;
             let node = b.node;
             let tightAABB = createAABB(b, 0.0);
             if (containsAABB(node.aabb, tightAABB))

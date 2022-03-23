@@ -47,6 +47,8 @@ export class World
             let b = this.bodies[i];
             b.manifoldIDs = [];
 
+            if (b.sleeping) continue;
+
             let node = b.node!;
             let tightAABB = createAABB(b, 0.0);
 
