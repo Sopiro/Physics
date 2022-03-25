@@ -21,7 +21,7 @@ export class WeldJoint extends Joint
     constructor(
         bodyA: RigidBody, bodyB: RigidBody,
         anchor: Vector2 = Util.mid(bodyA.position, bodyB.position),
-        frequency = 240, dampingRatio = 1.0, jointMass = -1
+        frequency = -1, dampingRatio = 1.0, jointMass = -1
     )
     {
         super(bodyA, bodyB, frequency, dampingRatio, jointMass);

@@ -106,7 +106,7 @@ function demo5(game, world) {
     seesaw.position = new Vector2(0, 0.45);
     seesaw.mass = 10;
     world.register(seesaw);
-    let j = new RevoluteJoint(ground, seesaw, seesaw.position, 45, 1.0);
+    let j = new RevoluteJoint(ground, seesaw, seesaw.position, 60, 1.0);
     world.register(j);
     let b = new Circle(0.2);
     b.position = new Vector2(-2.5, 1);
@@ -248,7 +248,7 @@ function demo10(game, world) {
     b.mass = 2.0;
     b.position = new Vector2(-3, 5);
     world.register(b);
-    let j = new RevoluteJoint(ground, b, new Vector2(0, 5));
+    let j = new RevoluteJoint(ground, b, new Vector2(0, 5), -1);
     world.register(j);
 }
 Reflect.set(demo11, "SimulationName", "Multi pendulum");
@@ -273,20 +273,19 @@ function demo11(game, world) {
         b2.mass = 1.0;
         b2.position = new Vector2(xStart - (gap + sizeW) * (i + 1), yStart);
         world.register(b2);
-        j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart), 8, 0.5);
+        j = new RevoluteJoint(b1, b2, new Vector2(xStart - (sizeW + gap) / 2 - (gap + sizeW) * i, yStart), 10, 0.5);
         // j = new DistanceJoint(b1, b2, b1.position.subV(new Vector2(sizeW / 2, 0)), b2.position.addV(new Vector2(sizeW / 2, 0)));
         world.register(j);
         j.drawAnchor = false;
         b1 = b2;
     }
 }
-Reflect.set(demo21, "SimulationName", "Suspension bridge");
+Reflect.set(demo12, "SimulationName", "Suspension bridge");
 function demo12(game, world) {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
     ground.restitution = 0.45;
     world.register(ground);
-    let revoluteBridge = true;
     let groundStart = 0.2;
     let xStart = -5;
     let yStart = 4;
@@ -302,17 +301,19 @@ function demo12(game, world) {
     b1.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap, yStart + groundStart);
     world.register(b1);
     let j;
+    let revoluteBridge = Util.random(0, 1) > 0.5;
+    let frequecy = 7;
     if (revoluteBridge) {
-        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth, yStart).div(2)), 7, 1.0);
+        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth, yStart).div(2)), frequecy, 1.0);
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j);
     }
     else {
-        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, 0.03)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, 0.03)), -1, frequecy, 1.0);
         j.drawAnchor = false;
         world.register(j);
-        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, -0.03)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(-sizeX / 2, -0.03)), -1, frequecy, 1.0);
         j.drawAnchor = false;
         world.register(j);
     }
@@ -322,15 +323,15 @@ function demo12(game, world) {
         b2.position = new Vector2(xStart + sizeX / 2 + pillarWidth / 2 + gap + (gap + sizeX) * i, yStart + groundStart);
         world.register(b2);
         if (revoluteBridge) {
-            j = new RevoluteJoint(b1, b2, b1.position.add(b2.position).div(2), 7, 1.0);
+            j = new RevoluteJoint(b1, b2, b1.position.add(b2.position).div(2), frequecy, 1.0);
             j.drawAnchor = false;
             world.register(j);
         }
         else {
-            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, 0.03)), b2.position.add(new Vector2(-sizeX / 2, 0.03)), -1, 3, 1.0);
+            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, 0.03)), b2.position.add(new Vector2(-sizeX / 2, 0.03)), -1, frequecy, 1.0);
             j.drawAnchor = false;
             world.register(j);
-            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, -0.03)), b2.position.add(new Vector2(-sizeX / 2, -0.03)), -1, 3, 1.0);
+            j = new DistanceJoint(b1, b2, b1.position.add(new Vector2(sizeX / 2, -0.03)), b2.position.add(new Vector2(-sizeX / 2, -0.03)), -1, frequecy, 1.0);
             j.drawAnchor = false;
             world.register(j);
         }
@@ -340,16 +341,16 @@ function demo12(game, world) {
     pillar.position = new Vector2(-xStart, yStart / 2 + 0.2);
     world.register(pillar);
     if (revoluteBridge) {
-        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth, yStart).div(2)), 7, 1.0);
+        j = new RevoluteJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth, yStart).div(2)), frequecy, 1.0);
         j.drawConnectionLine = false;
         j.drawAnchor = false;
         world.register(j);
     }
     else {
-        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, 0.03)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, 0.03)), -1, frequecy, 1.0);
         j.drawAnchor = false;
         world.register(j);
-        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, -0.03)), -1, 3, 1.0);
+        j = new DistanceJoint(pillar, b1, pillar.position.add(new Vector2(-pillarWidth / 2, yStart / 2)), b1.position.add(new Vector2(sizeX / 2, -0.03)), -1, frequecy, 1.0);
         j.drawAnchor = false;
         world.register(j);
     }
@@ -409,6 +410,7 @@ function demo14(game, world) {
     b2.position.x = -3;
     b2.position.y = Settings.clipHeight / 2;
     world.register(b2);
+    // Reduce the amplitude by half every second
     let halfLife = 1;
     let frequency = -Math.log(0.5) / (halfLife * Math.PI * 2);
     j = new DistanceJoint(b1, b2, b1.position, b2.position, 2, frequency, 1);
@@ -728,7 +730,7 @@ function demo20(game, world) {
         j.drawAnchor = false;
         j.drawConnectionLine = false;
         world.register(j);
-        m2 = new MotorJoint(ground, c2, c2.position);
+        m2 = new MotorJoint(ground, c2, c2.position, 1000, 30);
         world.register(m2);
         b = new Box(0.4);
         b.mass = 2.0;

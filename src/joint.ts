@@ -10,9 +10,9 @@ export abstract class Joint extends Constraint
     public drawConnectionLine = true;
     public id: number = -1;
 
-    private _frequency: number;
-    private _dampingRatio: number;
-    private _jointMass: number;
+    private _frequency!: number;
+    private _dampingRatio!: number;
+    private _jointMass!: number;
 
     /*
     * Equation of motion for the damped harmonic oscillator
@@ -47,15 +47,40 @@ export abstract class Joint extends Constraint
     * https://box2d.org/files/ErinCatto_SoftConstraints_GDC2011.pdf
     * https://pybullet.org/Bullet/phpBB3/viewtopic.php?f=4&t=1354
     */
-    constructor(bodyA: RigidBody, bodyB: RigidBody, frequency = 15, dampingRatio = 1.0, jointMass = -1)
+
+    // 0 < Frequency
+    // 0 <= Damping ratio <= 1
+    // 0 < Joint mass
+    constructor(
+        bodyA: RigidBody, bodyB: RigidBody,
+        frequency = 15, dampingRatio = 1.0, jointMass = -1
+    )
     {
         super(bodyA, bodyB);
 
-        this._frequency = frequency <= 0 ? 0.1 : frequency;
-        this._dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        this._jointMass = jointMass <= 0 ? bodyB.mass : jointMass;
+        this.setFDM(frequency, dampingRatio, jointMass);
+    }
 
-        this.calculateBetaAndGamma();
+    private setFDM(frequency: number = this._frequency, dampingRatio: number = this._dampingRatio, jointMass: number = this._jointMass): void
+    {
+        if (frequency > 0)
+        {
+            this._frequency = frequency;
+            this._dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
+            this._jointMass = jointMass <= 0 ? this.bodyB.mass : jointMass;
+
+            this.calculateBetaAndGamma();
+        }
+        else
+        {
+            // If the frequency is less than or equal to zero, make this joint solid
+            this._frequency = -1;
+            this._dampingRatio = 1.0;
+            this._jointMass = -1;
+            
+            this.beta = 1.0;
+            this.gamma = 0.0;
+        }
     }
 
     private calculateBetaAndGamma()
@@ -76,8 +101,7 @@ export abstract class Joint extends Constraint
 
     set frequency(frequency: number)
     {
-        this._frequency = frequency <= 0 ? 0.1 : frequency;
-        this.calculateBetaAndGamma();
+        this.setFDM(frequency, undefined, undefined);
     }
 
     get dampingRatio(): number
@@ -87,8 +111,7 @@ export abstract class Joint extends Constraint
 
     set dampingRatio(dampingRatio: number)
     {
-        this._dampingRatio = Util.clamp(dampingRatio, 0.0, 1.0);
-        this.calculateBetaAndGamma();
+        this.setFDM(undefined, dampingRatio, undefined);
     }
 
     get jointMass(): number
@@ -98,7 +121,11 @@ export abstract class Joint extends Constraint
 
     set jointMass(jointMass: number)
     {
-        this._jointMass = jointMass <= 0 ? this.bodyB.mass : jointMass;
-        this.calculateBetaAndGamma();
+        this.setFDM(undefined, undefined, jointMass);
+    }
+
+    get isSolid(): boolean
+    {
+        return this._frequency <= 0;
     }
 }

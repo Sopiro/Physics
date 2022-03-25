@@ -76,7 +76,8 @@ export class World
                 b = pair.p1;
             }
 
-            if (a.type == Type.Static && b.type == Type.Static) continue;
+            if (a.type == Type.Static && b.type == Type.Static)
+                continue;
 
             let key = Util.make_pair_natural(a.id, b.id);
             if (this.passTestSet.has(key)) continue;
