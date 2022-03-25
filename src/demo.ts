@@ -48,7 +48,7 @@ function demo2(game: Game, world: World): void
 
     let start = 0.5;
     let size = 0.3;
-    let gap = 0.26;
+    let gap = 0.25;
 
     // let error = 0.015;
     let error = 0.0;
@@ -74,8 +74,8 @@ function demo3(game: Game, world: World): void
     const rows = 15;
     const boxSize = 0.35;
     const xGap = 0.05;
-    const yGap = 0.2;
-    const xStart = - rows * boxSize / 2.0;
+    const yGap = 0.15;
+    const xStart = - (rows - 1) * (boxSize + xGap) / 2.0;
     const yStart = 0.55;
 
     for (let y = 0; y < rows; y++)
@@ -90,8 +90,45 @@ function demo3(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo4, "SimulationName", "Seesaw");
+Reflect.set(demo4, "SimulationName", "Random convex shapes");
 function demo4(game: Game, world: World): void
+{
+    updateSetting("g", true);
+    let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
+    ground.restitution = 0.45;
+    world.register(ground);
+
+
+    const rows = 12;
+    const size = 0.3;
+    const xGap = 0.2;
+    const yGap = 0.15;
+    const xStart = - (rows - 1) * (size + xGap) / 2.0;
+    const yStart = 1.0;
+
+    for (let y = 0; y < rows; y++)
+    {
+        for (let x = 0; x < rows - y; x++)
+        {
+            let b = Util.createRandomConvexBody(size, 4, 10.0);
+            b.position = new Vector2(xStart + y * (size + xGap) / 2 + x * (size + xGap), yStart + y * (size + yGap));
+            b.linearVelocity = b.position.mul(Util.random(0.5, 0.7));
+            b.friction = Util.random(0.2, 1.0);
+            world.register(b);
+        }
+    }
+
+    let pillar = new Box(0.25, 4, Type.Static);
+    pillar.position = new Vector2(xStart - 0.2, 3);
+    world.register(pillar);
+
+    pillar = new Box(0.25, 4, Type.Static);
+    pillar.position = new Vector2(-(xStart - 0.2), 3);
+    world.register(pillar);
+}
+
+Reflect.set(demo5, "SimulationName", "Seesaw");
+function demo5(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -119,8 +156,8 @@ function demo4(game: Game, world: World): void
     world.register(b);
 }
 
-Reflect.set(demo5, "SimulationName", "Billiards");
-function demo5(game: Game, world: World): void
+Reflect.set(demo6, "SimulationName", "Billiards");
+function demo6(game: Game, world: World): void
 {
     updateSetting("g", false);
 
@@ -165,8 +202,8 @@ function demo5(game: Game, world: World): void
     world.register(c);
 }
 
-Reflect.set(demo6, "SimulationName", "Throwing spinning stick");
-function demo6(game: Game, world: World): void
+Reflect.set(demo7, "SimulationName", "Throwing spinning stick");
+function demo7(game: Game, world: World): void
 {
     updateSetting("g", false);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -196,8 +233,8 @@ function demo6(game: Game, world: World): void
     world.register(b);
 }
 
-Reflect.set(demo7, "SimulationName", "Friction test");
-function demo7(game: Game, world: World): void
+Reflect.set(demo8, "SimulationName", "Friction test");
+function demo8(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -244,8 +281,8 @@ function demo7(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo8, "SimulationName", "Restitution test");
-function demo8(game: Game, world: World): void
+Reflect.set(demo9, "SimulationName", "Restitution test");
+function demo9(game: Game, world: World): void
 {
     updateSetting("g", true);
     let g = new Box(Settings.clipWidth * 2, 0.4, Type.Static);
@@ -269,8 +306,8 @@ function demo8(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo9, "SimulationName", "Single pendulum");
-function demo9(game: Game, world: World): void
+Reflect.set(demo10, "SimulationName", "Single pendulum");
+function demo10(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -286,8 +323,8 @@ function demo9(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo10, "SimulationName", "Multi pendulum");
-function demo10(game: Game, world: World): void
+Reflect.set(demo11, "SimulationName", "Multi pendulum");
+function demo11(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -322,8 +359,8 @@ function demo10(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo11, "SimulationName", "Suspension bridge");
-function demo11(game: Game, world: World): void
+Reflect.set(demo21, "SimulationName", "Suspension bridge");
+function demo12(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -416,8 +453,8 @@ function demo11(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo12, "SimulationName", "Circle stacking");
-function demo12(game: Game, world: World): void
+Reflect.set(demo13, "SimulationName", "Circle stacking");
+function demo13(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -444,8 +481,8 @@ function demo12(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo13, "SimulationName", "Springs");
-function demo13(game: Game, world: World): void
+Reflect.set(demo14, "SimulationName", "Springs");
+function demo14(game: Game, world: World): void
 {
     updateSetting("g", false);
 
@@ -505,8 +542,8 @@ function demo13(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo14, "SimulationName", "Weld joint: Dumbbells");
-function demo14(game: Game, world: World): void
+Reflect.set(demo15, "SimulationName", "Weld joint: Dumbbells");
+function demo15(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -549,8 +586,8 @@ function demo14(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo15, "SimulationName", "Max distance joint");
-function demo15(game: Game, world: World): void
+Reflect.set(demo16, "SimulationName", "Max distance joint");
+function demo16(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -586,8 +623,8 @@ function demo15(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo16, "SimulationName", "Prismatic joint");
-function demo16(game: Game, world: World): void
+Reflect.set(demo17, "SimulationName", "Prismatic joint");
+function demo17(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -675,8 +712,8 @@ function demo16(game: Game, world: World): void
     world.register(j);
 }
 
-Reflect.set(demo17, "SimulationName", "Motor joint: Windmill");
-function demo17(game: Game, world: World): void
+Reflect.set(demo18, "SimulationName", "Motor joint: Windmill");
+function demo18(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -709,8 +746,8 @@ function demo17(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo18, "SimulationName", "Conveyor belt");
-function demo18(game: Game, world: World): void
+Reflect.set(demo19, "SimulationName", "Conveyor belt");
+function demo19(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -796,8 +833,8 @@ function demo18(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo19, "SimulationName", "Crankshaft");
-function demo19(game: Game, world: World): void
+Reflect.set(demo20, "SimulationName", "Crankshaft");
+function demo20(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -921,8 +958,8 @@ function demo19(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo20, "SimulationName", "Ragdoll");
-function demo20(game: Game, world: World): void
+Reflect.set(demo21, "SimulationName", "Ragdoll");
+function demo21(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -1155,8 +1192,8 @@ function demo20(game: Game, world: World): void
     world.register(c);
 }
 
-Reflect.set(demo21, "SimulationName", "Contact callbacks: Breakable body");
-function demo21(game: Game, world: World): void
+Reflect.set(demo22, "SimulationName", "Contact callbacks: Breakable body");
+function demo22(game: Game, world: World): void
 {
     updateSetting("g", true);
     let ground = new Box(Settings.clipWidth * 5, 0.4, Type.Static);
@@ -1211,8 +1248,8 @@ function demo21(game: Game, world: World): void
     }
 }
 
-Reflect.set(demo22, "SimulationName", "Car driving");
-function demo22(game: Game, world: World): void
+Reflect.set(demo23, "SimulationName", "Car driving");
+function demo23(game: Game, world: World): void
 {
     updateSetting("g", true);
 
@@ -1411,5 +1448,5 @@ export const demos: ((game: Game, world: World) => void)[] =
     [
         demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8, demo9, demo10,
         demo11, demo12, demo13, demo14, demo15, demo16, demo17, demo18, demo19,
-        demo20, demo21, demo22
+        demo20, demo21, demo22, demo23
     ];

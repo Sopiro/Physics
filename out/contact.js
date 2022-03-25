@@ -308,14 +308,14 @@ export class ContactManifold extends Constraint {
     }
     applyImpulse() { }
     tryWarmStart(oldManifold) {
-        const distance_clamping = true;
         for (let n = 0; n < this.numContacts; n++) {
             let o = 0;
             for (; o < oldManifold.numContacts; o++) {
                 if (this.contactPoints[n].id == oldManifold.contactPoints[o].id) {
-                    if (distance_clamping) {
+                    if (Settings.applyWarmStartingThreshold) {
                         let dist = Util.squared_distance(this.contactPoints[n].point, oldManifold.contactPoints[o].point);
                         // If contact points are close enough, warm start.
+                        // Otherwise, it means it's penetrating too deeply, skip the warm starting to prevent the overshoot
                         if (dist < Settings.warmStartingThreshold)
                             break;
                     }

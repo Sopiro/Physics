@@ -82,6 +82,7 @@ export const Settings = {
     sleepingWait: 1.0,
     colorizeActiveBody: true,
     sleepEnabled: true,
+    applyWarmStartingThreshold: true,
     showProfile: false,
     visualizeAABBTree: false,
 }
@@ -307,6 +308,10 @@ colorizeIsland.addEventListener("click", () => { Settings.colorizeIsland = !Sett
 const sleepEnabled = document.querySelector("#sleepEnabled")! as HTMLInputElement;
 sleepEnabled.checked = Settings.sleepEnabled;
 sleepEnabled.addEventListener("click", () => { Settings.sleepEnabled = !Settings.sleepEnabled; });
+
+const applyWarmStartingThreshold = document.querySelector("#applyWarmStartingThreshold")! as HTMLInputElement;
+applyWarmStartingThreshold.checked = Settings.applyWarmStartingThreshold;
+applyWarmStartingThreshold.addEventListener("click", () => { Settings.applyWarmStartingThreshold = !Settings.applyWarmStartingThreshold; });
 
 const colorizeActiveBody = document.querySelector("#colorizeActiveBody")! as HTMLInputElement;
 colorizeActiveBody.checked = Settings.colorizeActiveBody;

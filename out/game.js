@@ -21,7 +21,7 @@ export class Game {
         this.dragging = false;
         this.cameraMove = false;
         this.grabbing = false;
-        this.currentDemo = 0;
+        this.currentDemo = 3;
         this.callback = () => { };
         this.renderer = renderer;
         this.camera = new Camera();

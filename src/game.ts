@@ -35,7 +35,7 @@ export class Game
     private target!: RigidBody;
     private grabJoint!: GrabJoint;
 
-    private currentDemo = 0;
+    private currentDemo = 3;
     public callback = () => { };
 
     constructor(renderer: Renderer)
