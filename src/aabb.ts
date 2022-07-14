@@ -60,6 +60,7 @@ export function createAABB(body: RigidBody, margin: number = 0.0): AABB
         let localToGlobal = body.localToGlobal;
 
         let res = new AABB(localToGlobal.mulVector2(body.vertices[0], 1), localToGlobal.mulVector2(body.vertices[0], 1));
+        fix(res);
 
         for (let i = 1; i < body.count; i++)
         {

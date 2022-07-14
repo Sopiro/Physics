@@ -334,17 +334,21 @@ export function detectCollision(a: RigidBody, b: RigidBody): ContactManifold | n
         // If the gjk termination simplex has vertices less than 3, expand to full simplex
         // Because EPA needs a full n-simplex to get started
         let simplex = gjkResult.simplex;
+
         switch (simplex.count)
         {
             case 1:
                 let v = simplex.vertices[0];
                 let randomSupport = csoSupport(a, b, new Vector2(1, 0));
+
                 if (randomSupport.equals(v))
                     randomSupport = csoSupport(a, b, new Vector2(-1, 0));
+
                 simplex.addVertex(randomSupport);
             case 2:
                 let e = new Edge(simplex.vertices[0], simplex.vertices[1]);
                 let normalSupport = csoSupport(a, b, e.normal);
+
                 if (simplex.containsVertex(normalSupport))
                     simplex.addVertex(csoSupport(a, b, e.normal.inverted()));
                 else

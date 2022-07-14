@@ -36,6 +36,7 @@ export function createAABB(body, margin = 0.0) {
     else if (body instanceof Polygon) {
         let localToGlobal = body.localToGlobal;
         let res = new AABB(localToGlobal.mulVector2(body.vertices[0], 1), localToGlobal.mulVector2(body.vertices[0], 1));
+        fix(res);
         for (let i = 1; i < body.count; i++) {
             let gv = localToGlobal.mulVector2(body.vertices[i], 1);
             if (gv.x < res.min.x)

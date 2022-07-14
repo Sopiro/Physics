@@ -23,70 +23,67 @@ export class AABBTree {
         body.node = newNode;
         if (this.root == undefined) {
             this.root = newNode;
+            return newNode;
         }
-        else {
-            // Find the best sibling for the new leaf
-            let bestSibling = this.root;
-            let bestCost = union(this.root.aabb, aabb).area;
-            let q = [this.root];
-            while (q.length != 0) {
-                let current = q.shift();
-                let directCost = union(current.aabb, aabb).area;
-                let inheritedCost = 0;
-                let ancestor = current.parent;
-                while (ancestor != undefined) {
-                    inheritedCost += union(ancestor.aabb, aabb).area - ancestor.aabb.area;
-                    ancestor = ancestor.parent;
-                }
-                let costForCurrent = directCost + inheritedCost;
-                if (costForCurrent < bestCost) {
-                    bestCost = costForCurrent;
-                    bestSibling = current;
-                }
-                let lowerBoundCost = aabb.area + (union(current.aabb, aabb).area - current.aabb.area) + inheritedCost;
-                if (lowerBoundCost < bestCost) {
-                    if (!current.isLeaf) {
-                        q.push(current.child1);
-                        q.push(current.child2);
-                    }
+        // Find the best sibling for the new leaf
+        let bestSibling = this.root;
+        let bestCost = union(this.root.aabb, aabb).area;
+        let q = [{ p1: this.root, p2: 0.0 }];
+        while (q.length != 0) {
+            let front = q.shift();
+            let current = front.p1;
+            let inheritedCost = front.p2;
+            let combined = union(current.aabb, aabb);
+            let directCost = combined.area;
+            let costForCurrent = directCost + inheritedCost;
+            if (costForCurrent < bestCost) {
+                bestCost = costForCurrent;
+                bestSibling = current;
+            }
+            inheritedCost += directCost - current.aabb.area;
+            let lowerBoundCost = aabb.area + inheritedCost;
+            if (lowerBoundCost < bestCost) {
+                if (!current.isLeaf) {
+                    q.push({ p1: current.child1, p2: inheritedCost });
+                    q.push({ p1: current.child2, p2: inheritedCost });
                 }
             }
-            // Create a new parent
-            let oldParent = bestSibling.parent;
-            let newParent = {
-                id: this.nodeID++,
-                parent: oldParent,
-                aabb: union(aabb, bestSibling.aabb),
-                isLeaf: false
-            };
-            if (oldParent != undefined) {
-                if (oldParent.child1 == bestSibling) {
-                    oldParent.child1 = newParent;
-                }
-                else {
-                    oldParent.child2 = newParent;
-                }
-                newParent.child1 = bestSibling;
-                newParent.child2 = newNode;
-                bestSibling.parent = newParent;
-                newNode.parent = newParent;
+        }
+        // Create a new parent
+        let oldParent = bestSibling.parent;
+        let newParent = {
+            id: this.nodeID++,
+            parent: oldParent,
+            aabb: union(aabb, bestSibling.aabb),
+            isLeaf: false
+        };
+        if (oldParent != undefined) {
+            if (oldParent.child1 == bestSibling) {
+                oldParent.child1 = newParent;
             }
             else {
-                newParent.child1 = bestSibling;
-                newParent.child2 = newNode;
-                bestSibling.parent = newParent;
-                newNode.parent = newParent;
-                this.root = newParent;
+                oldParent.child2 = newParent;
             }
-            // Walk back up the tree refitting ancestors' AABB and applying rotations
-            let ancestor = newNode.parent;
-            while (ancestor != undefined) {
-                let child1 = ancestor.child1;
-                let child2 = ancestor.child2;
-                ancestor.aabb = union(child1.aabb, child2.aabb);
-                this.rotate(ancestor);
-                ancestor = ancestor.parent;
-            }
+            newParent.child1 = bestSibling;
+            newParent.child2 = newNode;
+            bestSibling.parent = newParent;
+            newNode.parent = newParent;
+        }
+        else {
+            newParent.child1 = bestSibling;
+            newParent.child2 = newNode;
+            bestSibling.parent = newParent;
+            newNode.parent = newParent;
+            this.root = newParent;
+        }
+        // Walk back up the tree refitting ancestors' AABB and applying rotations
+        let ancestor = newNode.parent;
+        while (ancestor != undefined) {
+            let child1 = ancestor.child1;
+            let child2 = ancestor.child2;
+            ancestor.aabb = union(child1.aabb, child2.aabb);
+            this.rotate(ancestor);
+            ancestor = ancestor.parent;
         }
         return newNode;
     }

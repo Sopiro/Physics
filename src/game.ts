@@ -78,7 +78,7 @@ export class Game
     {
         this.frame = 0;
         this.time = 0.0;
-        if(Settings.resetCamera)
+        if (Settings.resetCamera)
         {
             this.camera.position = new Vector2(0, Settings.clipHeight / 2.0);
             this.camera.scale = new Vector2(1, 1);
