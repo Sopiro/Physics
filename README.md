@@ -25,7 +25,7 @@ Video: https://youtu.be/ROAqjE40pxU
   - Friction and restitution  
   - Iterative solver (Sequential impulses)  
   - Collision callback  
-- Constraint-basd simulation
+- Constraint-based simulation
   - Contact constraint
   - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
   - Soft constraints
