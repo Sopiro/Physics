@@ -48,7 +48,7 @@ export const Settings = {
     showBoundingBox: false,
     showContactLink: false,
     mode: MouseMode.Grab,
-    mouseStrength: 0.6,
+    mouseStrength: 1.5,
     numIterations: 10, // Number of resolution(sequential impulses) iterations
     newBodySettings:
     {
@@ -79,7 +79,7 @@ export const Settings = {
     colorizeIsland: false,
     restLinearTolerance: 0.005 * 0.005,
     restAngularTolerance: (0.5 * Math.PI / 180.0) * (0.5 * Math.PI / 180.0),
-    sleepingWait: 1.0,
+    sleepingWait: 0.5,
     colorizeActiveBody: true,
     sleepEnabled: true,
     applyWarmStartingThreshold: true,

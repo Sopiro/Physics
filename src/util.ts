@@ -126,39 +126,31 @@ export function calculateCircleInertia(radius: number, mass: number): number
     return mass * radius * radius / 2.0;
 }
 
-// This function assumes the origin is the rotation axis
+// https://en.wikipedia.org/wiki/List_of_moments_of_inertia
 export function calculateConvexPolygonInertia(vertices: Vector2[], mass: number, area: number = -1): number
 {
     let inertia = 0;
 
-    let count = vertices.length;
+    let vertexCount = vertices.length;
 
-    if (area <= 0)
+    let numerator = 0.0;
+    let denominator = 0.0;
+
+    let i0 = vertexCount - 1;
+    for (let i1 = 0; i1 < vertexCount; ++i1)
     {
-        area = 0;
+        let v0 = vertices[i0];
+        let v1 = vertices[i1];
 
-        for (let i = 0; i < count; i++)    
-        {
-            let v1 = vertices[i];
-            let v2 = vertices[(i + 1) % count];
-            area += Math.abs(v1.cross(v2));
-        }
+        let crs = Math.abs(v1.cross(v0));
 
-        area *= 0.5;
+        numerator += crs * (v1.dot(v1) + v1.dot(v0) + v0.dot(v0));
+        denominator += crs;
+
+        i0 = i1;
     }
 
-    for (let i = 0; i < count; i++)
-    {
-        let v1 = vertices[i];
-        let v2 = vertices[(i + 1) % count];
-        let l1 = v1.length;
-        let l2 = v2.length;
-        let beta = Math.acos(v1.dot(v2) / (l1 * l2)) / 2;
-
-        let partialMass = (Math.abs(v1.cross(v2)) / 2.0) / area * mass;
-
-        inertia += 0.5 * partialMass * l1 * l2 * (1 - 2.0 / 3.0 * Math.sin(beta) * Math.sin(beta));
-    }
+    inertia = numerator / (denominator * 6.0);
 
     return inertia;
 }
