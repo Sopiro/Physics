@@ -4,6 +4,8 @@
 
 Live demo: https://sopiro.github.io/Physics/  
 Video: https://youtu.be/ROAqjE40pxU  
+  
+Optimized C++ version: https://github.com/Sopiro/Muli
 
 ## Examples
 |![example1](.github/Animation1.gif)|![example2](.github/Animation2.gif)|
@@ -29,7 +31,7 @@ Video: https://youtu.be/ROAqjE40pxU
   - Contact constraint
   - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
   - Soft constraints
-  - Block solver
+  - 2-contact LCP solver (Block solver)
 - Optimization
   - Constraint islanding
   - Island(Rigid body) sleeping
