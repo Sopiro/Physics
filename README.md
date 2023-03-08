@@ -1,4 +1,4 @@
-# 2D Rigid Body Physics Engine
+# 2D Rigidbody Physics Engine
 
 2D Rigid body physics engine written in TypeScript.
 
