@@ -5,9 +5,9 @@
 Live demo: https://sopiro.github.io/Physics/  
 Video: https://youtu.be/ROAqjE40pxU  
   
-Optimized C++ version: https://github.com/Sopiro/Muli
+Optimized C++ library: https://github.com/Sopiro/Muli
 
-## Examples
+## Samples
 |![example1](.github/Animation1.gif)|![example2](.github/Animation2.gif)|
 |--|--|
 |![example3](.github/Animation3.gif)|![example4](.github/Animation4.gif)|
@@ -26,10 +26,10 @@ Optimized C++ version: https://github.com/Sopiro/Muli
   - Impulse-based collision response  
   - Friction and restitution  
   - Iterative solver (Sequential impulses)  
-  - Collision callback  
+  - Collision callbacks  
 - Constraint-based simulation
   - Contact constraint
-  - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle, Grab
+  - Joints: Revolute, Prismatic, Distance, Max distance, Weld, Motor, Line, Angle and Grab
   - Soft constraints
   - 2-contact LCP solver (Block solver)
 - Optimization
