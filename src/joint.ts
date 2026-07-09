@@ -106,7 +106,7 @@ export abstract class Joint extends Constraint
 
     get dampingRatio(): number
     {
-        return this._frequency;
+        return this._dampingRatio;
     }
 
     set dampingRatio(dampingRatio: number)
@@ -116,7 +116,7 @@ export abstract class Joint extends Constraint
 
     get jointMass(): number
     {
-        return this._frequency;
+        return this._jointMass;
     }
 
     set jointMass(jointMass: number)
